@@ -58,16 +58,20 @@ mod.json                 -- version, author, requires, settingsPage, settings[]
 CHANGELOG.md             -- one ## <version> section per release (shipped;
                             the app shows players the sections an update skips)
 settings/index.html      -- the mod's own settings window
+client/index.js          -- client plugin: redraws the Attendance Check window with
+                            the rewards the server gives (settings may change them)
 db/when/enable_dummies/  -- mob_db.yml, mob_avail.yml: the Training Dummy (Normal, Boss)
 db/when/enable_attendance/ -- attendance.yml (Renewal rewards) and extension_db.yml
-                            (attendance_repeat): rAthena's Attendance Check
+                            (attendance_repeat, attendance_script_rewards):
+                            rAthena's Attendance Check
 System/CheckAttendance.lub -- the client's copy of the rewards (always shipped;
                             does nothing while the server has no period)
 npc/
   custom/snpc_settings.txt  -- F_SNPC_Off: switch for always-loaded NPCs
   *.txt                     -- always-loaded NPCs (Warper, Buffer, Job Master, ...)
   when/<setting key>/      -- loaded only if that boolean setting is on
-                              (Bounty Hunter, MVP dungeon, Training Dummies)
+                              (Bounty Hunter, MVP dungeon, Training Dummies,
+                              Attendance Check rewards from the settings)
     */*_era.txt            -- Renewal-only spawns
 pre-renewal/npc/when/...   -- Pre-renewal copies of the *_era.txt files
 pre-renewal/db/when/...    -- Pre-renewal mob_db.yml (dummies), attendance.yml
@@ -103,7 +107,7 @@ README.md, assets/, CLAUDE.md, docs/, tools/, tests/  -- repo only, never in the
   `db/import-tmpl`). Any other name lands in `db/import/` and is never read
   (#25).
 
-### Settings — 16 of max 40 used
+### Settings — 20 of max 40 used
 
 App limits: `type` is `boolean`, `number` or `string`; max 40 settings (20
 before app 1.5.5); `label` up to 120 and `description` up to **400 bytes**

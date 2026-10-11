@@ -109,6 +109,38 @@
       "description": "The game's own Attendance Check window (replaces the Daily Rewards NPC): one reward a day, sent by mail, 20 days that start over after day 20. A missed day does not reset progress; progress is per account. Rewards differ between Renewal and Pre-renewal."
     },
     {
+      "key": "attendance_re",
+      "type": "string",
+      "default": "",
+      "max_length": 200,
+      "label": "Attendance Check: Renewal rewards, days 1-10",
+      "description": "Filled in by the Settings… window (Attendance Check → Rewards…): item ID:amount for days 1-10, comma-separated. An empty place, or an item the server does not know, keeps the mod's own reward for that day. Empty = all default."
+    },
+    {
+      "key": "attendance_re2",
+      "type": "string",
+      "default": "",
+      "max_length": 200,
+      "label": "Attendance Check: Renewal rewards, days 11-20",
+      "description": "Filled in by the Settings… window (Attendance Check → Rewards…): item ID:amount for days 11-20, comma-separated. An empty place, or an item the server does not know, keeps the mod's own reward for that day. Empty = all default."
+    },
+    {
+      "key": "attendance_pre",
+      "type": "string",
+      "default": "",
+      "max_length": 200,
+      "label": "Attendance Check: Pre-renewal rewards, days 1-10",
+      "description": "Filled in by the Settings… window (Attendance Check → Rewards…): item ID:amount for days 1-10, comma-separated. An empty place, or an item the server does not know, keeps the mod's own reward for that day. Empty = all default."
+    },
+    {
+      "key": "attendance_pre2",
+      "type": "string",
+      "default": "",
+      "max_length": 200,
+      "label": "Attendance Check: Pre-renewal rewards, days 11-20",
+      "description": "Filled in by the Settings… window (Attendance Check → Rewards…): item ID:amount for days 11-20, comma-separated. An empty place, or an item the server does not know, keeps the mod's own reward for that day. Empty = all default."
+    },
+    {
       "key": "enable_bounties",
       "type": "boolean",
       "default": true,
