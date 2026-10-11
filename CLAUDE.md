@@ -103,7 +103,7 @@ README.md, assets/, CLAUDE.md, docs/, tools/, tests/  -- repo only, never in the
   `db/import-tmpl`). Any other name lands in `db/import/` and is never read
   (#25).
 
-### Settings — 9 of max 40 used
+### Settings — 16 of max 40 used
 
 App limits: `type` is `boolean`, `number` or `string`; max 40 settings (20
 before app 1.5.5); `label` up to 120 and `description` up to **400 bytes**

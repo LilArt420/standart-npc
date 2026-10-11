@@ -89,8 +89,18 @@ function installMod() {
     const enabled = path.join(mods, 'enabled.txt');
     const list = fs.existsSync(enabled) ? fs.readFileSync(enabled, 'utf8').split(/\r?\n/).filter(Boolean) : [];
     if (!list.includes(MOD)) fs.writeFileSync(enabled, [...list, MOD].join('\n') + '\n');
+    // Settings the tests need (the app's mod-settings.json); the rest keep
+    // their defaults.
+    const settingsFile = path.join(WORLD, 'state', 'mod-settings.json');
+    const settings = fs.existsSync(settingsFile) ? JSON.parse(fs.readFileSync(settingsFile, 'utf8')) : {};
+    settings[MOD] = { ...TEST_SETTINGS };
+    fs.writeFileSync(settingsFile, JSON.stringify(settings, null, 2));
     return files.length;
 }
+// Smuggler: MVP and mini-boss cards and costumes banned, and typed in
+// Orange Potion (502; the fork's re/pre-re item_db) and an ID that is no item.
+const TEST_SETTINGS = { smuggler_no_mvp_cards: true, smuggler_no_boss_cards: true, smuggler_no_costumes: true,
+    smuggler_ban: '502, 99999999' };
 
 // Restarts the world in `era`. Returns { ok, out } of `world up`.
 function boot(era) {
@@ -158,6 +168,11 @@ function serverChecks(era, up) {
     check(bounty, 'Bounty Hunter loaded its contracts', bounty ? bounty[0] : 'no "Bounty Hunter:" line');
     if (bounty && era === 'renewal') check(bounty[2] === '0', 'Renewal: no contract hidden', bounty[0]);
     if (bounty && era === 'pre-renewal') check(Number(bounty[2]) > 0, 'Pre-renewal: Renewal-only contracts hidden', bounty[0]);
+    // Smuggler: the one real typed ID kept, the MVP and mini-boss cards found
+    // (4.9.6: 145 and 85 on Renewal, 44 and 40 on Pre-renewal).
+    const smug = log.map(l => l.match(/Smuggler: banned (\d+) item IDs, (\d+) MVP cards, (\d+) mini-boss cards, costumes/)).find(Boolean);
+    check(smug && smug[1] === '1' && Number(smug[2]) > 30 && Number(smug[3]) > 10, 'Smuggler: banned IDs read, MVP and mini-boss cards found',
+        smug ? smug[0] : (log.find(l => l.includes('Smuggler: banned')) || 'no "Smuggler: banned" line'));
     const dummies = log.find(l => /Training Dummies:.*(no dummies spawned|did not spawn)/.test(l));
     check(!dummies, 'Training Dummies spawned', dummies || '');
 
