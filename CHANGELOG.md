@@ -254,3 +254,10 @@ Needs Ragnarok Offline 1.5.5 or newer.
 - Daily Rewards NPC replaced by the game's own Attendance Check window. It opens after you log in; click the day's item to claim it, and it comes by mail (RODEX). 20 days, then the rewards start again from day 1. A missed day does not reset your progress, and progress is per account. Rewards are Lil Art's, picked and adjusted by MondoTruth; Renewal and Pre-renewal have their own sets. Switch it off with the new "Attendance Check" setting.
 - Progress from the old Daily Rewards NPC is not carried over: everyone starts at day 1.
 - "Daily Rewards" is gone from the Settings… window; if you had switched it off, nothing else changes.
+
+## 4.9.6
+
+If warps or Fly Wings get slower the longer you play, update Ragnarok Offline to 1.5.7 or newer (the hidden Attendance Check window was redrawn on every map change).
+
+### Renewal and Pre-renewal
+- Smuggler: Settings… → Smuggler → Options… can keep him from selling cards, MVP cards, mini-boss cards, costumes, or any item IDs you list. Banned items are refused both for sale and as the free item after his quest. Requested on Discord.

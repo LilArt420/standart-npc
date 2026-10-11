@@ -1,6 +1,6 @@
 {
   "name": "standart-npc",
-  "version": "4.9.5",
+  "version": "4.9.6",
   "author": "MondoTruth, Lil Art, IceGlaive, Nokzin, iguera, Claude, and the Ragnarok Offline community",
   "description": "Works with or without Lil Art's cash-shop-extended (Find Mods): with it, some NPCs also take Cash Points. Turning the mod on turns on every NPC; switch single ones off with Settings… (Warper, Job Master, Reset Girl, Stylist, Episode Valkyrie and all the others).",
   "settingsPage": "settings/index.html",
@@ -48,6 +48,58 @@
       "default": true,
       "label": "Warper: quest-locked dungeons",
       "description": "The Warper only takes a character to Bio Lab, the Culvert, Dewata Dungeon, Nidhoggur's Dungeon and Rachel Sanctuary after the quest that opens their official entrance. Off = every dungeon is open."
+    },
+    {
+      "key": "smuggler_no_cards",
+      "type": "boolean",
+      "default": false,
+      "label": "Smuggler: no cards",
+      "description": "The Smuggler refuses every card, both for sale and as the free item after his quest."
+    },
+    {
+      "key": "smuggler_no_mvp_cards",
+      "type": "boolean",
+      "default": false,
+      "label": "Smuggler: no MVP cards",
+      "description": "The Smuggler refuses cards that an MVP drops, both for sale and as the free item. The list is made at server start from the monster database, so MVPs from other mods count too. Mini-boss cards have a setting of their own."
+    },
+    {
+      "key": "smuggler_no_boss_cards",
+      "type": "boolean",
+      "default": false,
+      "label": "Smuggler: no mini-boss cards",
+      "description": "The Smuggler refuses cards that a mini-boss (a Boss-class monster that is not an MVP, like Angeling or Eclipse) drops, both for sale and as the free item. The list is made at server start from the monster database."
+    },
+    {
+      "key": "smuggler_no_costumes",
+      "type": "boolean",
+      "default": false,
+      "label": "Smuggler: no costumes",
+      "description": "The Smuggler refuses costume items (anything worn in a costume slot: headgear and garment), both for sale and as the free item."
+    },
+    {
+      "key": "smuggler_ban",
+      "type": "string",
+      "default": "",
+      "max_length": 200,
+      "label": "Smuggler: banned item IDs",
+      "description": "Filled in by the Settings… window (Smuggler → Options…): item IDs the Smuggler refuses, comma-separated. The list goes on in the next two settings."
+    },
+    {
+      "key": "smuggler_ban2",
+      "type": "string",
+      "default": "",
+      "max_length": 200,
+      "label": "Smuggler: banned item IDs (2)",
+      "description": "Filled in by the Settings… window: the banned item IDs that do not fit in the first setting."
+    },
+    {
+      "key": "smuggler_ban3",
+      "type": "string",
+      "default": "",
+      "max_length": 200,
+      "label": "Smuggler: banned item IDs (3)",
+      "description": "Filled in by the Settings… window: the banned item IDs that do not fit in the first two settings."
     },
     {
       "key": "enable_attendance",

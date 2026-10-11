@@ -46,6 +46,14 @@
 //=   single item is still just OK. .@max_amount caps one order
 //=   (30000); an order is also capped so the total stays under
 //=   .@max_total (2,000,000,000z, the Zeny limit).
+//= - Banned goods (Settings… → Smuggler → Options…), refused both
+//=   for buying and as the free item: "smuggler_no_cards" (every
+//=   card), "smuggler_no_mvp_cards" / "smuggler_no_boss_cards" (cards
+//=   that an MVP / a mini-boss drops, found at start-up in the mob
+//=   db, so other mods' monsters count too), "smuggler_no_costumes"
+//=   (anything worn in a costume slot) and item IDs in "smuggler_ban", "smuggler_ban2", "smuggler_ban3"
+//=   (comma lists; three because a string setting holds 200
+//=   characters). Read once in OnInit into .ban[<item ID>].
 //= - Location/sprite: the first line below.
 //============================================================
 
@@ -244,6 +252,11 @@ L_Free:
 		mes "Never heard of it. Think it over and come back.";
 		close;
 	}
+	if (callsub(S_Banned, .@id)) {
+		mes "[Smuggler]";
+		mes "A Valkyrie came to me in a dream and forbade me to sell this!";
+		close;
+	}
 	mes "[Smuggler]";
 	mes "^0000FF" + getitemname(.@id) + "^000000, for free. That one?";
 	next;
@@ -272,6 +285,11 @@ L_Buy:
 	if (.@price < 0) {
 		mes "[Smuggler]";
 		mes "Never heard of it. No deal.";
+		close;
+	}
+	if (callsub(S_Banned, .@id)) {
+		mes "[Smuggler]";
+		mes "A Valkyrie came to me in a dream and forbade me to sell this!";
 		close;
 	}
 	.@type = getiteminfo(.@id,ITEMINFO_TYPE);
@@ -332,11 +350,77 @@ S_Markup:
 		return .markup_re;
 	return .markup_pre;
 
+// 1 if the item may not be sold or given away (settings window options).
+S_Banned:
+	if (.ban[getarg(0)])
+		return 1;
+	if (.no_cards && getiteminfo(getarg(0), ITEMINFO_TYPE) == IT_CARD)
+		return 1;
+	if (.no_costumes && (getiteminfo(getarg(0), ITEMINFO_LOCATIONS)
+		& (EQP_COSTUME_HEAD_TOP | EQP_COSTUME_HEAD_MID | EQP_COSTUME_HEAD_LOW | EQP_COSTUME_GARMENT)))
+		return 1;
+	return 0;
+
 OnInit:
 	if (callfunc("F_SNPC_Off", "smuggler")) {	// switched off in the settings window
 		disablenpc strnpcinfo(0);
 		end;
 	}
+	// Banned goods: .ban[<item ID>] = 1 (typed in the settings window)
+	// or 2 (a card an MVP drops).
+	.no_cards = callfunc("F_ModSetting", "standart-npc", "smuggler_no_cards", 0);
+	.@list$ = callfunc("F_ModSetting", "standart-npc", "smuggler_ban", "") + ","
+		+ callfunc("F_ModSetting", "standart-npc", "smuggler_ban2", "") + ","
+		+ callfunc("F_ModSetting", "standart-npc", "smuggler_ban3", "");
+	explode(.@ids$, .@list$, ",");
+	.@n = getarraysize(.@ids$);
+	for (.@i = 0; .@i < .@n; .@i++) {
+		.@id = atoi(.@ids$[.@i]);
+		if (.@id > 0 && getiteminfo(.@id, ITEMINFO_TYPE) >= 0) {
+			.ban[.@id] = 1;
+			.@banned++;
+		}
+	}
+	.no_costumes = callfunc("F_ModSetting", "standart-npc", "smuggler_no_costumes", 0);
+	.@mvp = callfunc("F_ModSetting", "standart-npc", "smuggler_no_mvp_cards", 0);
+	.@boss = callfunc("F_ModSetting", "standart-npc", "smuggler_no_boss_cards", 0);
+	if (!.no_cards && (.@mvp || .@boss)) {
+		// Every MVP / mini-boss in the mob db (IDs 1001-3998 and
+		// 20021-31998, the ranges rAthena accepts). A mini-boss is
+		// Class Boss, which rAthena turns into these three modes
+		// (MobDatabase::loadingFinished); an MVP has MD_MVP as well.
+		// getmobdrops lists the normal drops, where the card is.
+		.@boss_modes = MD_DETECTOR | MD_STATUSIMMUNE | MD_KNOCKBACKIMMUNE;
+		freeloop(1);
+		setarray .@from[0], 1001, 20021;
+		setarray .@to[0], 3998, 31998;
+		for (.@r = 0; .@r < 2; .@r++) {
+			for (.@m = .@from[.@r]; .@m <= .@to[.@r]; .@m++) {
+				.@mode = getmonsterinfo(.@m, MOB_MODE);
+				if (.@mode < 0)
+					continue;
+				if (.@mode & MD_MVP)
+					.@kind = .@mvp ? 2 : 0;
+				else if ((.@mode & .@boss_modes) == .@boss_modes && !(.@mode & MD_SKILLIMMUNE))
+					.@kind = .@boss ? 3 : 0;
+				else
+					.@kind = 0;
+				if (!.@kind || !getmobdrops(.@m))
+					continue;
+				for (.@d = 0; .@d < $@MobDrop_count; .@d++) {
+					.@item = $@MobDrop_item[.@d];
+					if (!.ban[.@item] && getiteminfo(.@item, ITEMINFO_TYPE) == IT_CARD) {
+						.ban[.@item] = .@kind;
+						.@cards[.@kind]++;
+					}
+				}
+			}
+		}
+		freeloop(0);
+	}
+	if (.no_cards || .no_costumes || .@banned || .@cards[2] || .@cards[3])
+		debugmes "Smuggler: banned " + .@banned + " item IDs, " + .@cards[2] + " MVP cards, " + .@cards[3] + " mini-boss cards"
+			+ (.no_cards ? ", all cards" : "") + (.no_costumes ? ", costumes" : "");
 	// A quest bubble until the access quest is done: "!" before it
 	// starts, "?" while the Smuggler waits for the mask and the diamonds.
 	questinfo QTYPE_QUEST, QMARK_NONE, "SNPC_Smuggler == 0";

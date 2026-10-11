@@ -62,6 +62,11 @@ const ENCH_TEST = { hat: 2220, shirt: 2301, jewel: 27422 };
 // asked for is a Red Potion. IDs from the fork's db/re and db/pre-re
 // item_db (Mr_Smile 2278 sits on Head_Low + Head_Mid: equip 1 | 512).
 const SMUG_TEST = { mask: 2278, gems: 730, gemsNeeded: 10, free: 501, worn: 513 };
+// Banned goods (tests/world.cjs sets the options): Baphomet Card, which
+// Baphomet (1039, Mvp mode) drops; Angeling Card, which Angeling (1096,
+// Class Boss) drops; T Spinx Helm (Costume_Head_Top); Orange Potion,
+// typed in as an ID. All in the fork's re and pre-re dbs.
+const SMUG_BANNED = { mvpCard: 4147, bossCard: 4054, costume: 19501, typed: 502 };
 // Plagiarism Master (#74): the character is made a Shadow Chaser (4072) with
 // Plagiarism (225) and Reproduce (2285) Lv 10, then copies Bash (5, Lv 10)
 // and Comet (2213, max Lv 5). IDs from the fork's mmo.hpp and db/re/skill_db.
@@ -463,6 +468,11 @@ function runEra(era) {
         const after = smug([]);
         check(after && after.menu.includes('Buy an item') && after.menu.includes('Repeat the deal (no free item)') && !after.menu.some(t => /free item$/.test(t) && !/no free/.test(t)),
             'Smuggler: then the shop menu, free item gone, replay offered', JSON.stringify(after && after.menu));
+        for (const [what, id] of [['an MVP card', SMUG_BANNED.mvpCard], ['a mini-boss card', SMUG_BANNED.bossCard],
+            ['a costume', SMUG_BANNED.costume], ['a banned ID', SMUG_BANNED.typed]]) {
+            const buy = smug(['Buy an item', id]);
+            check(buy && String(buy.said).includes('forbade me to sell this'), `Smuggler: refuses ${what} (${id})`, JSON.stringify(buy).slice(-200));
+        }
     }
     if (want('cardexchanger')) {
         // Card Exchanger: pull the Fabre Card (slot 1) out of the Knife; the
