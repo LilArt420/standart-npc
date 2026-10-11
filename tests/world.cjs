@@ -99,8 +99,12 @@ function installMod() {
 }
 // Smuggler: MVP and mini-boss cards and costumes banned, and typed in
 // Orange Potion (502; the fork's re/pre-re item_db) and an ID that is no item.
+// Attendance Check rewards (#84): day 1 three Red Potions (501, in the
+// fork's re/pre-re item_db), day 2 left empty, day 3 an ID that is no item;
+// days 2 and 3 keep the mod's own rewards.
+const ATTENDANCE_SET = '501:3,,99999999:1';
 const TEST_SETTINGS = { smuggler_no_mvp_cards: true, smuggler_no_boss_cards: true, smuggler_no_costumes: true,
-    smuggler_ban: '502, 99999999' };
+    smuggler_ban: '502, 99999999', attendance_re: ATTENDANCE_SET, attendance_pre: ATTENDANCE_SET };
 
 // Restarts the world in `era`. Returns { ok, out } of `world up`.
 function boot(era) {
@@ -108,6 +112,12 @@ function boot(era) {
     if (era === 'pre-renewal') fs.writeFileSync(marker, 'true'); else fs.rmSync(marker, { force: true });
     rotest('stop');
     rotest('world', 'down');
+    // The client's files (the mod's client/ plugin and System/ tables, the
+    // era's own copies) are only put together by link-assets, which world up
+    // runs only when the served Config.local.js names another login port.
+    // A wrong port makes it link again with this era and the mod as installed.
+    const config = path.join(WORLD, 'state', 'assets', 'Config.local.js');
+    if (fs.existsSync(config)) fs.writeFileSync(config, fs.readFileSync(config, 'utf8').replace(/(\bport:\s*)\d+/, (_, key) => key + '1'));
     return rotest('world', 'up');
 }
 
@@ -162,6 +172,14 @@ function serverChecks(era, up) {
         const m = log.map(l => l.match(new RegExp(`Done reading '(\\d+)' entries in 'db/import/${table}\\.yml'`))).find(Boolean);
         check(m && Number(m[1]) >= 1, `db/import/${table}.yml read`, m ? `${m[1]} entries` : 'not in the log');
     }
+
+    // Attendance Check rewards from the settings (#84): the extension is on,
+    // day 1 changed without a word, day 3's unknown item refused and logged.
+    const attOff = log.find(l => /attendance_script_rewards extension is off|Extension attendance_script_rewards is off/.test(l));
+    check(!attOff, 'Attendance Check: attendance_script_rewards extension on', attOff || '');
+    const attKept = log.filter(l => /Attendance Check day \d+ keeps the mod's reward/.test(l));
+    check(attKept.length === 1 && /day 3 keeps/.test(attKept[0]) && log.some(l => /Unknown item ID 99999999 for day 3/.test(l)),
+        "Attendance Check: only the unknown item (day 3) keeps the mod's reward", attKept.join('\n') || "no \"keeps the mod's reward\" line");
 
     // The mod's own start-up lines.
     const bounty = log.map(l => l.match(/Bounty Hunter: (\d+) contracts loaded, (\d+) hidden/)).find(Boolean);
