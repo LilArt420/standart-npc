@@ -168,9 +168,10 @@ function serverChecks(era, up) {
     check(bounty, 'Bounty Hunter loaded its contracts', bounty ? bounty[0] : 'no "Bounty Hunter:" line');
     if (bounty && era === 'renewal') check(bounty[2] === '0', 'Renewal: no contract hidden', bounty[0]);
     if (bounty && era === 'pre-renewal') check(Number(bounty[2]) > 0, 'Pre-renewal: Renewal-only contracts hidden', bounty[0]);
-    // Smuggler: the one real typed ID kept, the MVP and mini-boss cards found.
+    // Smuggler: the one real typed ID kept, the MVP and mini-boss cards found
+    // (4.9.6: 145 and 85 on Renewal, 44 and 40 on Pre-renewal).
     const smug = log.map(l => l.match(/Smuggler: banned (\d+) item IDs, (\d+) MVP cards, (\d+) mini-boss cards, costumes/)).find(Boolean);
-    check(smug && smug[1] === '1' && Number(smug[2]) > 50 && Number(smug[3]) > 10, 'Smuggler: banned IDs read, MVP and mini-boss cards found',
+    check(smug && smug[1] === '1' && Number(smug[2]) > 30 && Number(smug[3]) > 10, 'Smuggler: banned IDs read, MVP and mini-boss cards found',
         smug ? smug[0] : (log.find(l => l.includes('Smuggler: banned')) || 'no "Smuggler: banned" line'));
     const dummies = log.find(l => /Training Dummies:.*(no dummies spawned|did not spawn)/.test(l));
     check(!dummies, 'Training Dummies spawned', dummies || '');
