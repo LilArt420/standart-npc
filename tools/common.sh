@@ -2,7 +2,7 @@
 
 # The app clone: $SNPC_APP, else ragnarokoffline.app next to the main
 # checkout (also right when this runs from a worktree).
-main_root=$(cd "$(git -C "$(dirname "$0")" rev-parse --git-common-dir)/.." && pwd)
+main_root=$(cd "$(git -C "$(dirname "$0")" rev-parse --path-format=absolute --git-common-dir)/.." && pwd)
 SNPC_ROOT=$(cd "$(dirname "$0")/.." && pwd)
 APP_CLONE=${SNPC_APP:-$(dirname "$main_root")/ragnarokoffline.app}
 RUNTIME="$APPDATA/Ragnarok Offline/runtime"
