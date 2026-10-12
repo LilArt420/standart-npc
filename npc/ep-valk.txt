@@ -11,10 +11,27 @@
 //= or skipped. Also sells the tickets for Zeny. Only parts with a
 //= real skip are offered; other tickets are kept for later.
 //= Renewal only.
-//= Parts are numbered episode * 10 + part: 141 = 14.1, 180 = 18.
+//= Parts are numbered episode * 10 + part: 131 = 13.1, 180 = 18.
 //= Each skip sets the part's main variable to its last step,
 //= completes the main quests a finished story leaves completed and
 //= erases the others still open.
+//= Episode 13.1: ep13_ryu = 100, ep13_newbs = 100, ep13_1_rhea = 100,
+//= ep13_1_edq = 14. Needs base level 70, as the Promotional Staff does.
+//= Onward to the New World, New Surroundings, The Tripartite Union's
+//= Feud and Report from the New World: the expedition camp, its
+//= dailies and Nydhogg's Nest open; 13.2 can begin. The Cat Paw Agent,
+//= the Monster Scholar, Taab's part-time work, Pursuing Rayan Moore
+//= and Finding a Fairy / a Giant Tree are left as they are.
+//= Episode 13.2: ep13_2_rhea = 100, ep13_mdrama = 28. Otherworld
+//= Language and Two Tribes. Gives the Ring of the Ancient Wise King
+//= (the Sapha translator, Otherworld Language's reward) if you have
+//= none: without it Manuk, Splendide and El Dicastes stay closed. The
+//= dailies are left as they are.
+//= Episode 13.3: ep13_3_invite = 6, ep13_3_secret = 24. Sapha's Visit
+//= (El Dicastes opens) and Doha's Secret Order up to the man in black
+//= at the camp; Jarute HesLanta takes it on in 14.3. Frede's Request,
+//= the departments' and Ahat's dailies are left as they are.
+//= 13 and 14 are separate: 14.1 does not need 13.
 //= Episode 14.1: ep14_1_bs = 19, ep14_1_mistwoods = 10. Needs base
 //= level 100, as Theore does. Theore's Request (the way to Mora) and
 //= Wandering Protector (the Hazy Forest's young man), which opens the
@@ -197,6 +214,15 @@ S_Prev:
 // "" when nothing is missing, else what to say.
 S_Need:
 	switch (getarg(0)) {
+	case 131:
+		// The Promotional Staff in Izlude (quests_13_1.txt).
+		if (BaseLevel < 70)
+			return "Episode 13.1 needs base level 70.";
+		break;
+	case 132:
+		if (countitem(2782) < 1 && !checkweight(2782, 1))
+			return "You are carrying too much to take the Ring of the Ancient Wise King that comes with Episode 13.2.";
+		break;
 	case 141:
 		// Theore (quests_mora.txt).
 		if (BaseLevel < 100)
@@ -232,6 +258,20 @@ S_Need:
 // Whether the part's main story is finished.
 S_Done:
 	switch (getarg(0)) {
+	case 131:
+		// The four stories' ends (quests_13_1.txt). Report from the New
+		// World ends at 14; Nydhogg's Nest takes it to 15. Its branches
+		// use 61-123 midway.
+		return (ep13_ryu >= 100 && ep13_newbs >= 100 && ep13_1_rhea >= 100
+			&& (ep13_1_edq == 14 || ep13_1_edq == 15));
+	case 132:
+		// The ring is made; Arc's reward in Terra's Yai, 28 is the last
+		// talk after it (quests_13_2.txt).
+		return (ep13_2_rhea >= 100 && ep13_mdrama >= 27);
+	case 133:
+		// El Dicastes opens; the man in black at the camp
+		// (quests_dicastes.txt).
+		return (ep13_3_invite >= 6 && ep13_3_secret >= 24);
 	case 141:
 		// Theore's reward; the young man's last words open the Mora
 		// dailies (quests_mora.txt, HazyForest.txt).
@@ -271,6 +311,36 @@ S_Done:
 // Marks the part's main story as finished.
 S_Skip:
 	switch (getarg(0)) {
+	case 131:
+		copyarray .@open[0], .q131[0], getarraysize(.q131);
+		copyarray .@done[0], .q131_done[0], getarraysize(.q131_done);
+		if (ep13_ryu < 100)
+			ep13_ryu = 100;
+		if (ep13_newbs < 100)
+			ep13_newbs = 100;
+		if (ep13_1_rhea < 100)
+			ep13_1_rhea = 100;
+		if (ep13_1_edq != 14 && ep13_1_edq != 15)
+			ep13_1_edq = 14;
+		break;
+	case 132:
+		copyarray .@open[0], .q132[0], getarraysize(.q132);
+		copyarray .@done[0], .q132_done[0], getarraysize(.q132_done);
+		ep13_2_rhea = 100;
+		ep13_mdrama = 28;
+		// The translator (Ring_Of_Wise_King); the Saphas speak only to
+		// whoever wears it.
+		if (countitem(2782) < 1)
+			getitem 2782, 1;
+		break;
+	case 133:
+		copyarray .@open[0], .q133[0], getarraysize(.q133);
+		copyarray .@done[0], .q133_done[0], getarraysize(.q133_done);
+		if (ep13_3_invite < 6)
+			ep13_3_invite = 6;
+		if (ep13_3_secret < 24)
+			ep13_3_secret = 24;
+		break;
 	case 141:
 		copyarray .@open[0], .q141[0], getarraysize(.q141);
 		copyarray .@done[0], .q141_done[0], getarraysize(.q141_done);
@@ -391,11 +461,11 @@ OnInit:
 		end;
 	}
 	// Parts with a real skip, in menu order.
-	setarray .ready[0], 141, 142, 143, 151, 152, 161, 162, 171, 172, 180;
-	// Story order, as far as S_Done can tell a part is finished. 14.2, 15.1
-	// and 16.1 do not need the part before them in the game, so 0 starts a
-	// new chain there.
-	setarray .order[0], 141, 0, 142, 143, 0, 151, 152, 0, 161, 162, 171, 172, 180;
+	setarray .ready[0], 131, 132, 133, 141, 142, 143, 151, 152, 161, 162, 171, 172, 180;
+	// Story order, as far as S_Done can tell a part is finished. 14.1, 14.2,
+	// 15.1 and 16.1 do not need the part before them in the game, so 0
+	// starts a new chain there.
+	setarray .order[0], 131, 132, 133, 0, 141, 0, 142, 143, 0, 151, 152, 0, 161, 162, 171, 172, 180;
 	// Episode Clear Tickets (EpisodClear13 - EpisodClear18).
 	.ticket[13] = 1000284;
 	.ticket[14] = 1000285;
@@ -417,6 +487,41 @@ OnInit:
 		if (inarray(.sell, .@ep) < 0)
 			.sell[getarraysize(.sell)] = .@ep;
 	}
+	// Episode 13.1 (npc/quests/quests_13_1.txt): Onward to the New World,
+	// ep13_ryu 1 to 100 (10057-10078), New Surroundings, ep13_newbs 1 to
+	// 100 (11084-11100), The Tripartite Union's Feud, ep13_1_rhea 1 to 100
+	// (8196-8210), and Report from the New World, ep13_1_edq 1 to 14
+	// (3085-3094).
+	setarray .q131[0],
+		10057, 10058, 10059, 10060, 10061, 10062, 10063, 10064, 10065,
+		10066, 10067, 10068, 10069, 10070, 10071, 10072, 10073, 10074,
+		10075, 10076, 10077,
+		11084, 11085, 11087, 11088, 11089, 11091, 11092, 11093, 11094,
+		11095, 11096, 11097, 11099,
+		8196, 8197, 8198, 8199, 8200, 8201, 8202, 8203, 8204, 8205, 8206,
+		8207, 8208, 8209,
+		3085, 3086, 3087, 3088, 3089, 3090, 3091, 3092, 3093;
+	setarray .q131_done[0],
+		10078, 11086, 11090, 11098, 11100, 8210, 3094;
+	// Episode 13.2 (npc/quests/quests_13_2.txt): Otherworld Language,
+	// ep13_2_rhea 1 to 100 (8241-8253, all left completed), and Two
+	// Tribes, ep13_mdrama 1 to 28 (7056-7071). The dailies (7074-7079,
+	// Bradium, Laphine craftsman, Dragon eggs) are left alone.
+	setarray .q132[0],
+		7056, 7057, 7058, 7059, 7060, 7061, 7062, 7063, 7064, 7065, 7066,
+		7067, 7068, 7069, 7070;
+	setarray .q132_done[0],
+		8241, 8242, 8243, 8244, 8245, 8246, 8247, 8248, 8249, 8250, 8251,
+		8252, 8253, 7071;
+	// Episode 13.3 (npc/re/quests/quests_dicastes.txt): Sapha's Visit,
+	// ep13_3_invite 1 to 6 (7182-7184), and Doha's Secret Order,
+	// ep13_3_secret 1 to 24 (7185-7203). Ahat's daily (7200, 7201),
+	// Frede's Request and the departments' quests are left alone.
+	setarray .q133[0],
+		7182, 7183,
+		7185, 7186, 7187, 7188, 7189, 7190, 7191, 7192, 7193, 7194, 7195,
+		7196, 7197, 7198, 7199, 7202;
+	setarray .q133_done[0], 7184, 7203;
 	// Episode 14.1 (npc/re/quests/quests_mora.txt, and the instance
 	// HazyForest in npc/re/instances): Theore's Request, ep14_1_bs 1 to
 	// 19, with its three branches (Kusmi, Theodore, Pauchon), and
