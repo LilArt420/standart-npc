@@ -236,6 +236,32 @@ Warper, on by default (switch each off in Settings..., "Options..." next to the 
 ### Renewal only
 - Dummy Master: one more type, MVP taking 90% less damage, like the newer MVPs.
 
+## 4.9.4
+
+### Renewal and Pre-renewal
+- Kafra Employee (the mod's own NPC in Prontera, not the Kafras in towns) is now the Premium Service Manager (Prontera 160,187), with a new look. Save, Storage and Identify stay. New: Discard an item — get rid of items you cannot drop or trade (account-bound, trade-restricted, rental). It asks how many of a stack and for a confirmation. Equipped items are not listed. A discarded item is gone for good.
+- If you had switched the Kafra Employee off in the settings, the Premium Service Manager stays off.
+
+### Renewal only
+- Plagiarism Master: Shadow Chaser and Abyss Chaser can now copy a 3rd class skill into the Reproduce slot (65 skills), up to their Reproduce level. 1st and 2nd class skills still go into the Plagiarism slot.
+- Known issue: the skill window lets you put skill points into a copied skill. They are not lost: Apply gives them back. Fixed in the game client, coming with an app update.
+
+## 4.9.5
+
+Needs Ragnarok Offline 1.5.5 or newer.
+
+### Renewal and Pre-renewal
+- Daily Rewards NPC replaced by the game's own Attendance Check window. It opens after you log in; click the day's item to claim it, and it comes by mail (RODEX). 20 days, then the rewards start again from day 1. A missed day does not reset your progress, and progress is per account. Rewards are Lil Art's, picked and adjusted by MondoTruth; Renewal and Pre-renewal have their own sets. Switch it off with the new "Attendance Check" setting.
+- Progress from the old Daily Rewards NPC is not carried over: everyone starts at day 1.
+- "Daily Rewards" is gone from the Settings… window; if you had switched it off, nothing else changes.
+
+## 4.9.6
+
+If warps or Fly Wings get slower the longer you play, update Ragnarok Offline to 1.5.7 or newer (the hidden Attendance Check window was redrawn on every map change).
+
+### Renewal and Pre-renewal
+- Smuggler: Settings… → Smuggler → Options… can keep him from selling cards, MVP cards, mini-boss cards, costumes, or any item IDs you list. Banned items are refused both for sale and as the free item after his quest. Requested on Discord.
+
 ## Next version
 
 ### Renewal only

@@ -89,8 +89,18 @@ function installMod() {
     const enabled = path.join(mods, 'enabled.txt');
     const list = fs.existsSync(enabled) ? fs.readFileSync(enabled, 'utf8').split(/\r?\n/).filter(Boolean) : [];
     if (!list.includes(MOD)) fs.writeFileSync(enabled, [...list, MOD].join('\n') + '\n');
+    // Settings the tests need (the app's mod-settings.json); the rest keep
+    // their defaults.
+    const settingsFile = path.join(WORLD, 'state', 'mod-settings.json');
+    const settings = fs.existsSync(settingsFile) ? JSON.parse(fs.readFileSync(settingsFile, 'utf8')) : {};
+    settings[MOD] = { ...TEST_SETTINGS };
+    fs.writeFileSync(settingsFile, JSON.stringify(settings, null, 2));
     return files.length;
 }
+// Smuggler: MVP and mini-boss cards and costumes banned, and typed in
+// Orange Potion (502; the fork's re/pre-re item_db) and an ID that is no item.
+const TEST_SETTINGS = { smuggler_no_mvp_cards: true, smuggler_no_boss_cards: true, smuggler_no_costumes: true,
+    smuggler_ban: '502, 99999999' };
 
 // Restarts the world in `era`. Returns { ok, out } of `world up`.
 function boot(era) {
@@ -101,10 +111,94 @@ function boot(era) {
     return rotest('world', 'up');
 }
 
+// rAthena colours its log; the app's copy also runs lines together.
+const clean = text => text.replace(/\x1b\[[0-9;]*[A-Za-z]/g, '').replace(/\r/g, '\n')
+    .replace(/(\[(?:Status|Info|Warning|Error|Debug|Notice|SQL)\])/g, '\n$1');
+
+// Errors from the app's own scripts, not this mod's: a note, not a failure.
+const APP_OWN = [
+    // Population engine's recruiter.txt (app 1.4.8): the floating template
+    // runs OnInit and tries to hide itself by a name no NPC on a map has.
+    /buildin_hide: Attempted to disablenpc a non-existing NPC 'Companion Recruiter'/,
+];
+
+// What the server says about the mod after boot(era) (its { ok, out }):
+// the mod applied, the map server ready, no script errors or unknown IDs,
+// the mod's tables read, its start-up lines. Saves the map-server log of
+// this start as smoke-<era>.log next to the world. Returns
+// { checks: [{ ok, text, detail }], notes }: notes are rAthena's other
+// warnings, for a look.
+function serverChecks(era, up) {
+    const checks = [];
+    const check = (ok, text, detail = '') => checks.push({ ok: !!ok, text, detail });
+    const modsLine = up.out.split('\n').find(l => /^mods: /.test(l) && l.includes(MOD) && !l.includes('was not applied'));
+    check(modsLine, 'mod applied (supervisor "mods:" line)', up.out.split('\n').filter(l => l.includes(MOD)).join('\n'));
+
+    // Only the last start of the map server: the log keeps every start.
+    const all = clean(rotest('server', 'logs', 'map', '20000').out).split('\n');
+    let start = 0;
+    all.forEach((line, i) => { if (/Done reading '\d+' messages in 'conf\/msg_conf\/map_msg\.conf'/.test(line)) start = i; });
+    const log = all.slice(start);
+    fs.writeFileSync(path.join(path.dirname(WORLD), `smoke-${era}.log`), log.join('\n'));
+    check(log.some(l => /Server is 'ready'/.test(l)), 'map server ready');
+
+    // Problems this mod has caused before (#22, #24, #25) or could.
+    const bad = log.filter(l => !APP_OWN.some(re => re.test(l)) && (
+        /script error|npc_parse|buildin_|pc_attendance_load|Unknown mob ID|Invalid sell item|does not exists? in the item_db|parse_simpleexpr|Invalid NPC constant|was not applied/i.test(l)
+        || (l.includes(MOD) && /\[(Error|Warning)\]/.test(l))));
+    check(bad.length === 0, 'no script errors, unknown IDs or NPC parse problems', bad.slice(0, 15).join('\n'));
+
+    // The mod's own tables (Training Dummy: 2 monsters, 2 looks).
+    for (const table of ['mob_db', 'mob_avail']) {
+        const m = log.map(l => l.match(new RegExp(`Done reading '(\\d+)' entries in 'db/import/${table}\\.yml'`))).find(Boolean);
+        check(m && Number(m[1]) >= 2, `db/import/${table}.yml read`, m ? `${m[1]} entries` : 'not in the log');
+    }
+
+    // Attendance Check: one 20-day period, and attendance_repeat turned on.
+    // A bad day drops the whole period with only a warning, so also count it.
+    const attendance = log.find(l => /attendance\.yml/.test(l) && /\[(Error|Warning)\]/.test(l));
+    check(!attendance, 'db/import/attendance.yml without warnings', attendance || '');
+    for (const table of ['attendance', 'extension_db']) {
+        const m = log.map(l => l.match(new RegExp(`Done reading '(\\d+)' entries in 'db/import/${table}\\.yml'`))).find(Boolean);
+        check(m && Number(m[1]) >= 1, `db/import/${table}.yml read`, m ? `${m[1]} entries` : 'not in the log');
+    }
+
+    // The mod's own start-up lines.
+    const bounty = log.map(l => l.match(/Bounty Hunter: (\d+) contracts loaded, (\d+) hidden/)).find(Boolean);
+    check(bounty, 'Bounty Hunter loaded its contracts', bounty ? bounty[0] : 'no "Bounty Hunter:" line');
+    if (bounty && era === 'renewal') check(bounty[2] === '0', 'Renewal: no contract hidden', bounty[0]);
+    if (bounty && era === 'pre-renewal') check(Number(bounty[2]) > 0, 'Pre-renewal: Renewal-only contracts hidden', bounty[0]);
+    // Smuggler: the one real typed ID kept, the MVP and mini-boss cards found
+    // (4.9.6: 145 and 85 on Renewal, 44 and 40 on Pre-renewal).
+    const smug = log.map(l => l.match(/Smuggler: banned (\d+) item IDs, (\d+) MVP cards, (\d+) mini-boss cards, costumes/)).find(Boolean);
+    check(smug && smug[1] === '1' && Number(smug[2]) > 30 && Number(smug[3]) > 10, 'Smuggler: banned IDs read, MVP and mini-boss cards found',
+        smug ? smug[0] : (log.find(l => l.includes('Smuggler: banned')) || 'no "Smuggler: banned" line'));
+    const dummies = log.find(l => /Training Dummies:.*(no dummies spawned|did not spawn)/.test(l));
+    check(!dummies, 'Training Dummies spawned', dummies || '');
+
+    const notes = log.filter(l => /\[(Error|Warning)\]/.test(l) && !bad.includes(l));
+    return { checks, notes };
+}
+
+// Prints one era's checks: failures with their detail, info lines and a
+// count; every passed check too with --verbose. Returns the failures.
+function report(checks, { verbose = false } = {}) {
+    let failed = 0, passed = 0;
+    for (const c of checks) {
+        if (c.info) { console.log(`info  ${c.text}${c.detail ? ': ' + c.detail : ''}`); continue; }
+        if (c.ok) passed++; else failed++;
+        if (c.ok && !verbose) continue;
+        console.log(`${c.ok ? 'PASS' : 'FAIL'}  ${c.text}`);
+        if (c.detail) console.log('      ' + String(c.detail).split('\n').join('\n      '));
+    }
+    console.log(`${passed} passed, ${failed} failed`);
+    return failed;
+}
+
 function parseEras(args) {
-    const eras = args.filter(a => !a.startsWith('--'));
+    const eras = args.filter(a => !a.startsWith('-'));
     for (const era of eras) if (!ERAS.includes(era)) die(`unknown era: ${era}`);
     return eras.length ? eras : ERAS;
 }
 
-module.exports = { REPO, APP, WORLD, MOD, ENV, die, rotest, rotestJson, prepare, installMod, boot, parseEras };
+module.exports = { REPO, APP, WORLD, MOD, ENV, die, rotest, rotestJson, prepare, installMod, boot, parseEras, serverChecks, report };
