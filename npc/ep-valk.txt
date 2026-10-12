@@ -15,6 +15,16 @@
 //= Each skip sets the part's main variable to its last step,
 //= completes the main quests a finished story leaves completed and
 //= erases the others still open.
+//= Episode 15.1: ep15_1_atnad = 19, ep15_2_permit 1, ep15_1_elb = 15.
+//= Needs base level 140 and the Eden Group Mark, as the game does
+//= before 15.1 begins. Both of its stories: the Atnad excavation
+//= team's (Eden Group) and To Phantasmagorika! Opens the research
+//= facilities (verus01, verus02) and Vestige; 15.2 can begin.
+//= Episode 15.2: ep15_1_atnad = 34, ep15_2_permit 6, ep15_2_bslast =
+//= 9. The excavation team's story up to Rekenber's headquarters, and
+//= Vestige. Opens the Last Room (un_myst). The Memory Record dailies,
+//= the bunker's and Krotzel's quests are left as they are.
+//= 15 and 16 are separate: 16.1 does not need 15.
 //= Episode 16.1: ep16_royal = 24. Needs base level 100 and the way to
 //= the New World (ep13_ryu or ep13_start 100), as the game does before
 //= 16.1 begins. Opens Nillem's trips to the past Prontera and the
@@ -36,7 +46,8 @@
 //= (wolfvill 79,260) and the Wolfvill dailies.
 //===== How to customize: ====================================
 //= OnInit: .price[<episode>] is the ticket price in Zeny,
-//= .ready the parts with a skip, .order the story order.
+//= .ready the parts with a skip, .order the story order (0 starts a
+//= new chain: the part after it needs nothing before).
 //============================================================
 
 prontera,128,193,4	script	Valkyrie#EpsClear	4_F_VALKYRIE,{
@@ -154,7 +165,8 @@ S_Name:
 		return (getarg(0) / 10) + "." + (getarg(0) % 10);
 	return "" + (getarg(0) / 10);
 
-// The part before this one in .order, or 0.
+// The part before this one in .order, or 0 (also when a 0 in .order
+// is before it).
 S_Prev:
 	.@n = getarraysize(.order);
 	for (.@i = 1; .@i < .@n; .@i++) {
@@ -167,6 +179,13 @@ S_Prev:
 // "" when nothing is missing, else what to say.
 S_Need:
 	switch (getarg(0)) {
+	case 151:
+		// Secretary Lime Evenor (quests_15_1.txt).
+		if (BaseLevel < 140)
+			return "Episode 15.1 needs base level 140.";
+		if (countitem(6219) < 1 && countitem(22508) < 1)
+			return "Episode 15.1 needs an Eden Group Mark: the excavation team takes only Eden Group members.";
+		break;
 	case 161:
 		// The Royal Messenger (quests_16_1.txt).
 		if (BaseLevel < 100)
@@ -180,6 +199,14 @@ S_Need:
 // Whether the part's main story is finished.
 S_Done:
 	switch (getarg(0)) {
+	case 151:
+		// Ian Atnad lets you into the research facilities; Looking for the
+		// Traces ends with Maggi (quests_15_1.txt).
+		return (ep15_1_atnad >= 19 && ep15_1_elb >= 15);
+	case 152:
+		// Tatio at Rekenber's headquarters; Vestige ends at the Last Room's
+		// door (quests_15_2.txt).
+		return (ep15_1_atnad >= 34 && ep15_2_bslast >= 9);
 	case 161:
 		// The end of 16.1: Friedrich Heine (quests_16_1.txt).
 		return (ep16_royal >= 24);
@@ -199,6 +226,40 @@ S_Done:
 // Marks the part's main story as finished.
 S_Skip:
 	switch (getarg(0)) {
+	case 151:
+		copyarray .@open[0], .q151[0], getarraysize(.q151);
+		copyarray .@done[0], .q151_done[0], getarraysize(.q151_done);
+		// Core Collection and the excavation report are also dailies:
+		// closed only while they are still the story's.
+		if (ep15_1_atnad < 8 && isbegin_quest(7615) == 1)
+			erasequest 7615;
+		if (ep15_1_atnad < 13 && isbegin_quest(7617) == 1)
+			erasequest 7617;
+		if (ep15_1_atnad < 19) {
+			ep15_1_atnad = 19;
+			// What Ian Atnad gives at the end of 15.1; 15.2 starts with them.
+			if (isbegin_quest(7641) == 0)
+				setquest 7641;
+			if (isbegin_quest(7642) == 0)
+				setquest 7642;
+		}
+		if (ep15_2_permit < 1)
+			ep15_2_permit = 1;
+		if (ep15_1_elb < 15)
+			ep15_1_elb = 15;
+		break;
+	case 152:
+		copyarray .@open[0], .q152[0], getarraysize(.q152);
+		copyarray .@done[0], .q152_done[0], getarraysize(.q152_done);
+		ep15_1_atnad = 34;
+		// Five days of research facilities' Memory Records; 6 is what
+		// sends you to Ian Atnad and Rekenber's headquarters.
+		ep15_2_permit = 6;
+		if (ep15_2_bslast < 9) {
+			ep15_2_bslast = 9;
+			ep15_2_bsmemo = 18;
+		}
+		break;
 	case 161:
 		copyarray .@open[0], .q161[0], getarraysize(.q161);
 		copyarray .@done[0], .q161_done[0], getarraysize(.q161_done);
@@ -258,9 +319,10 @@ OnInit:
 		end;
 	}
 	// Parts with a real skip, in menu order.
-	setarray .ready[0], 161, 162, 171, 172, 180;
-	// Story order, as far as S_Done can tell a part is finished.
-	setarray .order[0], 161, 162, 171, 172, 180;
+	setarray .ready[0], 151, 152, 161, 162, 171, 172, 180;
+	// Story order, as far as S_Done can tell a part is finished. 16.1 does
+	// not need 15 in the game, so 0 starts a new chain there.
+	setarray .order[0], 151, 152, 0, 161, 162, 171, 172, 180;
 	// Episode Clear Tickets (EpisodClear13 - EpisodClear18).
 	.ticket[13] = 1000284;
 	.ticket[14] = 1000285;
@@ -282,6 +344,27 @@ OnInit:
 		if (inarray(.sell, .@ep) < 0)
 			.sell[getarraysize(.sell)] = .@ep;
 	}
+	// Episode 15.1 (npc/re/quests/quests_15_1.txt and quests_15_2.txt):
+	// the excavation team's quests, ep15_1_atnad 1 to 19, and To
+	// Phantasmagorika! with Looking for the Traces, ep15_1_elb 1 to 15
+	// (all left completed). 7615 and 7617 are handled in S_Skip. The
+	// excavation dailies, New Power Source, the police quests and the
+	// Wandering Bard are left alone.
+	setarray .q151[0],
+		7607, 7609, 7620, 7621, 7622, 7623, 7624, 7625, 7626, 7627;
+	setarray .q151_done[0],
+		7608, 7610, 7619,
+		11363, 11364, 11365, 11366, 11367, 11368, 11369, 11370, 11371,
+		11372, 11373, 11374, 11375;
+	// Episode 15.2 (npc/re/quests/quests_15_2.txt): the excavation team's
+	// quests, ep15_1_atnad 19 to 34, and Vestige, ep15_2_bslast 1 to 9
+	// (11381 is erased by the story). The Memory Record dailies
+	// (7650-7655), the bunker's (5341-5370), Krotzel's and the Last Room
+	// itself (11379, 11380) are left alone.
+	setarray .q152[0],
+		7642, 7643, 7644, 7645, 7646, 7647, 7648, 7649, 11381;
+	setarray .q152_done[0],
+		7641, 11382, 11383, 11384, 11385, 11386, 11387, 11388, 11389;
 	// Episode 16.1 (npc/re/quests/quests_16_1.txt, and the instances
 	// RitualOfBlessing and RoomOfConsciousness in npc/re/instances): the
 	// main-story quests, ep16_royal 1 to 24, and the one a finished story
