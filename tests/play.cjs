@@ -26,8 +26,8 @@
 //= cleared, so every run starts from the same place. It also gets a
 //= +5 Knife [4] with two cards, for the Card Exchanger check, and
 //= its Welcoming gift is cleared. On Renewal it stands in the middle of
-//= Episodes 16.2, 17.1, 17.2 and 18, for the Episode Valkyrie check,
-//= with the Zeny for their tickets.
+//= Episodes 16.1, 16.2, 17.1, 17.2 and 18, for the Episode Valkyrie
+//= check, with the Zeny for their tickets.
 //============================================================
 'use strict';
 const fs = require('node:fs');
@@ -59,18 +59,20 @@ const PREM_TEST = { gauche: 1207, potion: 503, jellopy: 909 };
 // Shirt on the body, a Shard of Agility Jewel in the bag (Renewal only;
 // checked in the fork's re/pre-re item_db: Hat and Cotton Shirt in both).
 const ENCH_TEST = { hat: 2220, shirt: 2301, jewel: 27422 };
-// Episode Valkyrie (#51), Renewal: with 16.1 as far as 16.2 needs
-// (ep16_royal 17), the character stands in the middle of 16.2, 17.1, 17.2
-// and 18 (a quest of each open). It first tries to skip 17.1, 17.2 and 18
-// (refused: the part before is not finished), then buys and uses a ticket
-// for 16.2, 17.1, 17.2, then 18. 16.2 and 17.1 share terra_gloria_main:
-// 17.1 has no start of its own, and only the last part on a variable has
-// its end checked. Quest and item IDs from the fork's npc/re/quests/
-// quests_16_2.txt, quests_17_1.txt, quests_17_2.txt and quests_18.txt,
-// db/re/quest_db.yml, db/re/item_db_etc.yml. `done` is a sample of what
-// each skip completes.
+// Episode Valkyrie (#51), Renewal: with the way to the New World open
+// (ep13_ryu 100, which 16.1 asks for), the character stands in the middle
+// of 16.1, 16.2, 17.1, 17.2 and 18 (a quest of each open). It first tries
+// to skip 16.2, 17.1, 17.2 and 18 (refused: the part before is not
+// finished), then buys and uses a ticket for 16.1, 16.2, 17.1, 17.2, then
+// 18. 16.2 and 17.1 share terra_gloria_main: 17.1 has no start of its own,
+// and only the last part on a variable has its end checked. Quest and item
+// IDs from the fork's npc/re/quests/quests_16_1.txt, quests_16_2.txt,
+// quests_17_1.txt, quests_17_2.txt and quests_18.txt, db/re/quest_db.yml,
+// db/re/item_db_etc.yml. `done` is a sample of what each skip completes.
 const VALK_TEST = {
     parts: [
+        { name: '16.1', ep: 16, ticket: 1000282, price: 4000000, priceText: '4,000,000', key: 'ep16_royal', start: 13, end: 24,
+          open: 7695, done: [7682] },
         { name: '16.2', ep: 16, ticket: 1000282, price: 4000000, priceText: '4,000,000', key: 'terra_gloria_main', start: 16, end: 25,
           open: 14614, done: [14600, 14601, 14602, 14613, 11462, 14615, 12374, 7741], doneBefore: 14601 },
         { name: '17.1', ep: 17, ticket: 1000287, price: 5000000, priceText: '5,000,000', key: 'terra_gloria_main', start: null, end: 26,
@@ -80,9 +82,9 @@ const VALK_TEST = {
         { name: '18', ep: 18, ticket: 1000288, price: 6000000, priceText: '6,000,000', key: 'ep18_main', start: 41, end: 57,
           open: 16573, done: [8681, 11720, 11724, 18085], doneBefore: 8681 },
     ],
-    // Set before the run (16.1 as far as 16.2 needs it), and what 16.2's
-    // skip raises to at least 10.
-    before: { ep16_royal: 17 },
+    // Set before the run (what 16.1 needs), and what 16.2's skip raises
+    // to at least 10.
+    before: { ep13_ryu: 100 },
     side: { key: 'terra_gloria_lady_part', min: 10 },
 };
 const VALK_PRICE = VALK_TEST.parts.reduce((n, p) => n + p.price, 0);
@@ -350,7 +352,7 @@ function runEra(era) {
             const valk = ev(`snpc.npcs(10).map(n => n.name)`);
             check(Array.isArray(valk) && !valk.some(n => n.startsWith('Valkyrie')), 'Episode Valkyrie: not on Pre-renewal', JSON.stringify(valk));
         } else {
-            // 18 before 17.2 is refused; then per part: buy its episode's
+            // A part before the one ahead of it is refused; then per part: buy its episode's
             // ticket and use it (#51). Zeny is read after each talk; the quest
             // log and the main variables from SQL after logging out.
             const valkTalk = steps => ev(`(async () => {
@@ -370,7 +372,7 @@ function runEra(era) {
                 await snpc.close();
                 return said.join(' / ');
             })()`);
-            for (const [part, prev] of [['17.1', '16.2'], ['17.2', '17.1'], ['18', '17.2']]) {
+            for (const [part, prev] of [['16.2', '16.1'], ['17.1', '16.2'], ['17.2', '17.1'], ['18', '17.2']]) {
                 const order = valkTalk(['Use a ticket', `Episode ${part} `]);
                 check(typeof order === 'string' && order.includes(`First finish Episode ${prev}`), `Episode Valkyrie: ${part} needs ${prev} finished first`, String(order).slice(-200));
             }
