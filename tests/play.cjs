@@ -61,14 +61,17 @@ const PREM_TEST = { gauche: 1207, potion: 503, jellopy: 909 };
 const ENCH_TEST = { hat: 2220, shirt: 2301, jewel: 27422 };
 // Episode Valkyrie (#51), Renewal: with the way to the New World open
 // (ep13_ryu 100, which 16.1 asks for) and an Eden Group Mark (which 15.1
-// asks for), the character stands in the middle of 15.1, 16.1, 16.2, 17.1,
-// 17.2 and 18 (a quest of each open). It first tries to skip 15.2, 16.2,
-// 17.1, 17.2 and 18 (refused: the part before is not finished), then buys
-// and uses a ticket for 16.1 (15 not finished: 16.1 does not need it),
-// 15.1, 15.2, 16.2, 17.1, 17.2, then 18. Parts sharing a variable (15.1
+// asks for), the character stands in the middle of 14.1, 14.2, 14.3, 15.1,
+// 16.1, 16.2, 17.1, 17.2 and 18 (a quest of each open). It first tries to
+// skip 14.3, 15.2, 16.2, 17.1, 17.2 and 18 (refused: the part before is not
+// finished), then buys and uses a ticket for 14.1, 14.2 (14.1 is not
+// needed), 14.3, 16.1 (15 not finished: 16.1 does not need it), 15.1, 15.2,
+// 16.2, 17.1, 17.2, then 18. Parts sharing a variable (15.1
 // and 15.2, 16.2 and 17.1) have the end checked only on the last one; a
 // part with start null has no start of its own. Quest and item IDs from
-// the fork's npc/re/quests/quests_15_1.txt, quests_15_2.txt,
+// the fork's npc/re/quests/quests_mora.txt, quests_eclage.txt,
+// quests_14_3_bis.txt, npc/re/instances/HazyForest.txt, IsleOfBios.txt,
+// quests_15_1.txt, quests_15_2.txt,
 // quests_16_1.txt, quests_16_2.txt, quests_17_1.txt, quests_17_2.txt and
 // quests_18.txt, db/re/quest_db.yml, db/re/item_db_etc.yml. `done` is a
 // sample of what each skip completes (all of it for 15). 15.1's open
@@ -76,6 +79,12 @@ const ENCH_TEST = { hat: 2220, shirt: 2301, jewel: 27422 };
 // is the story's.
 const VALK_TEST = {
     parts: [
+        { name: '14.1', ep: 14, ticket: 1000285, price: 2000000, priceText: '2,000,000', key: 'ep14_1_bs', start: 11, end: 19,
+          open: 11189, done: [11208, 7213] },
+        { name: '14.2', ep: 14, ticket: 1000285, price: 2000000, priceText: '2,000,000', key: 'ep14_2_oliver', start: 1, end: 3,
+          open: 7440, done: [11311, 7418, 7419, 7420, 7427, 7444, 7453] },
+        { name: '14.3', ep: 14, ticket: 1000285, price: 2000000, priceText: '2,000,000', key: 'ep14_3_newerabs', start: 16, end: 24,
+          open: 11355, done: [11349, 11353, 11362, 15006] },
         { name: '16.1', ep: 16, ticket: 1000282, price: 4000000, priceText: '4,000,000', key: 'ep16_royal', start: 13, end: 24,
           open: 7695, done: [7682] },
         { name: '15.1', ep: 15, ticket: 1000286, price: 3000000, priceText: '3,000,000', key: 'ep15_1_atnad', start: 12, end: 19,
@@ -93,8 +102,9 @@ const VALK_TEST = {
     ],
     // Set before the run (what 16.1 needs), and the other variables the
     // skips raise to at least these values.
-    before: { ep13_ryu: 100 },
-    after: { terra_gloria_lady_part: 10, ep15_1_elb: 15, ep15_2_permit: 6, ep15_2_bslast: 9, ep15_2_bsmemo: 18 },
+    // 14.2's main variable is checked here: 14.3 raises it to 34.
+    before: { ep13_ryu: 100, ep14_2_mylord: 18 },
+    after: { ep14_1_mistwoods: 10, ep14_2_mylord: 34, ep14_3_isle: 1, ep14_3_mors01: 1, terra_gloria_lady_part: 10, ep15_1_elb: 15, ep15_2_permit: 6, ep15_2_bslast: 9, ep15_2_bsmemo: 18 },
     mark: 6219,   // Eden Group Mark (Para_Team_Mark), db/re/item_db_etc.yml
 };
 const VALK_PRICE = VALK_TEST.parts.reduce((n, p) => n + p.price, 0);
@@ -383,7 +393,7 @@ function runEra(era) {
                 await snpc.close();
                 return said.join(' / ');
             })()`);
-            for (const [part, prev] of [['15.2', '15.1'], ['16.2', '16.1'], ['17.1', '16.2'], ['17.2', '17.1'], ['18', '17.2']]) {
+            for (const [part, prev] of [['14.3', '14.2'], ['15.2', '15.1'], ['16.2', '16.1'], ['17.1', '16.2'], ['17.2', '17.1'], ['18', '17.2']]) {
                 const order = valkTalk(['Use a ticket', `Episode ${part} `]);
                 check(typeof order === 'string' && order.includes(`First finish Episode ${prev}`), `Episode Valkyrie: ${part} needs ${prev} finished first`, String(order).slice(-200));
             }
