@@ -11,10 +11,28 @@
 //= or skipped. Also sells the tickets for Zeny. Only parts with a
 //= real skip are offered; other tickets are kept for later.
 //= Renewal only.
-//= Parts are numbered episode * 10 + part: 171 = 17.1, 180 = 18.
+//= Parts are numbered episode * 10 + part: 141 = 14.1, 180 = 18.
 //= Each skip sets the part's main variable to its last step,
 //= completes the main quests a finished story leaves completed and
 //= erases the others still open.
+//= Episode 14.1: ep14_1_bs = 19, ep14_1_mistwoods = 10. Needs base
+//= level 100, as Theore does. Theore's Request (the way to Mora) and
+//= Wandering Protector (the Hazy Forest's young man), which opens the
+//= Mora dailies. Cheshire, Lope and Euridi, the research tools and
+//= the Knights are left as they are.
+//= 14 and 15 are separate, and 14.2 does not need 14.1.
+//= Episode 14.2: ep14_2_mylord = 33, ep14_2_oliver at least 3. Needs
+//= base level 99, as the travelers in Eclage do. Eclage's Entrance and
+//= Encounter in a Strange Land up to the chief of staff's end; the
+//= Eclage Interior is behind it. 14.3 can begin. Eclage's other quests
+//= are left as they are.
+//= Episode 14.3: ep14_2_mylord 34, ep14_3_newerabs = 24, ep14_3_isle
+//= 1, ep14_3_mors01 = 1. Needs base level 140. Avant at the Flame
+//= Basin (his dailies), Dimensional Travel (the Eclage teleporter to
+//= the Flame Basin, the way into moro_cav), the Isle of Bios and Morse
+//= Cave as cleared: Commander Hibba Agip sends you against the Demon
+//= God. The Demon God's fight itself, Jeruth Hesranta's and the
+//= Doom Prayers' quests are left as they are.
 //= Episode 15.1: ep15_1_atnad = 19, ep15_2_permit 1, ep15_1_elb = 15.
 //= Needs base level 140 and the Eden Group Mark, as the game does
 //= before 15.1 begins. Both of its stories: the Atnad excavation
@@ -179,6 +197,21 @@ S_Prev:
 // "" when nothing is missing, else what to say.
 S_Need:
 	switch (getarg(0)) {
+	case 141:
+		// Theore (quests_mora.txt).
+		if (BaseLevel < 100)
+			return "Episode 14.1 needs base level 100.";
+		break;
+	case 142:
+		// The travelers in Eclage (quests_eclage.txt).
+		if (BaseLevel < 99)
+			return "Episode 14.2 needs base level 99.";
+		break;
+	case 143:
+		// The Piled Rags in Morocc (quests_14_3_bis.txt).
+		if (BaseLevel < 140)
+			return "Episode 14.3 needs base level 140.";
+		break;
 	case 151:
 		// Secretary Lime Evenor (quests_15_1.txt).
 		if (BaseLevel < 140)
@@ -199,6 +232,18 @@ S_Need:
 // Whether the part's main story is finished.
 S_Done:
 	switch (getarg(0)) {
+	case 141:
+		// Theore's reward; the young man's last words open the Mora
+		// dailies (quests_mora.txt, HazyForest.txt).
+		return (ep14_1_bs >= 19 && ep14_1_mistwoods >= 10);
+	case 142:
+		// The last of the chief of staff (quests_eclage.txt); Avant at
+		// the Flame Basin takes it to 34.
+		return (ep14_2_mylord >= 33);
+	case 143:
+		// Morse Cave cleared: what Commander Hibba Agip asks before the
+		// Demon God (quests_14_3_bis.txt, MorseCave.txt).
+		return (ep14_3_mors01 >= 1);
 	case 151:
 		// Ian Atnad lets you into the research facilities; Looking for the
 		// Traces ends with Maggi (quests_15_1.txt).
@@ -226,6 +271,33 @@ S_Done:
 // Marks the part's main story as finished.
 S_Skip:
 	switch (getarg(0)) {
+	case 141:
+		copyarray .@open[0], .q141[0], getarraysize(.q141);
+		copyarray .@done[0], .q141_done[0], getarraysize(.q141_done);
+		if (ep14_1_bs < 19)
+			ep14_1_bs = 19;
+		if (ep14_1_mistwoods < 10)
+			ep14_1_mistwoods = 10;
+		break;
+	case 142:
+		copyarray .@open[0], .q142[0], getarraysize(.q142);
+		copyarray .@done[0], .q142_done[0], getarraysize(.q142_done);
+		// Eclage's Entrance: the forms for first-time visitors.
+		if (ep14_2_oliver < 3)
+			ep14_2_oliver = 3;
+		ep14_2_mylord = 33;
+		break;
+	case 143:
+		copyarray .@open[0], .q143[0], getarraysize(.q143);
+		copyarray .@done[0], .q143_done[0], getarraysize(.q143_done);
+		// Avant at the Flame Basin.
+		if (ep14_2_mylord < 34)
+			ep14_2_mylord = 34;
+		ep14_3_newerabs = 24;
+		if (ep14_3_isle < 1)
+			ep14_3_isle = 1;
+		ep14_3_mors01 = 1;
+		break;
 	case 151:
 		copyarray .@open[0], .q151[0], getarraysize(.q151);
 		copyarray .@done[0], .q151_done[0], getarraysize(.q151_done);
@@ -319,10 +391,11 @@ OnInit:
 		end;
 	}
 	// Parts with a real skip, in menu order.
-	setarray .ready[0], 151, 152, 161, 162, 171, 172, 180;
-	// Story order, as far as S_Done can tell a part is finished. 16.1 does
-	// not need 15 in the game, so 0 starts a new chain there.
-	setarray .order[0], 151, 152, 0, 161, 162, 171, 172, 180;
+	setarray .ready[0], 141, 142, 143, 151, 152, 161, 162, 171, 172, 180;
+	// Story order, as far as S_Done can tell a part is finished. 14.2, 15.1
+	// and 16.1 do not need the part before them in the game, so 0 starts a
+	// new chain there.
+	setarray .order[0], 141, 0, 142, 143, 0, 151, 152, 0, 161, 162, 171, 172, 180;
 	// Episode Clear Tickets (EpisodClear13 - EpisodClear18).
 	.ticket[13] = 1000284;
 	.ticket[14] = 1000285;
@@ -344,6 +417,35 @@ OnInit:
 		if (inarray(.sell, .@ep) < 0)
 			.sell[getarraysize(.sell)] = .@ep;
 	}
+	// Episode 14.1 (npc/re/quests/quests_mora.txt, and the instance
+	// HazyForest in npc/re/instances): Theore's Request, ep14_1_bs 1 to
+	// 19, with its three branches (Kusmi, Theodore, Pauchon), and
+	// Wandering Protector, ep14_1_mistwoods 1 to 10. The Hazy Forest's
+	// entry time (7211) is left alone.
+	setarray .q141[0],
+		11182, 11183, 11184, 11185, 11186, 11187, 11188, 11189, 11190,
+		11191, 11192, 11193, 11194, 11195, 11196, 11197, 11198, 11199,
+		11200, 11201, 11202, 11203, 11204, 11205, 11206, 11207, 7212;
+	setarray .q141_done[0], 11208, 7213;
+	// Episode 14.2 (npc/re/quests/quests_eclage.txt, and the instance
+	// EclageInterior in npc/re/instances): Eclage's Entrance, ep14_2_oliver
+	// 1 to 3, and Encounter in a Strange Land, ep14_2_mylord 1 to 33, with
+	// the errands it sends you on (7428-7433).
+	setarray .q142[0],
+		11310, 7411, 7412, 7413, 7414, 7415, 7416, 7417, 7421, 7422,
+		7423, 7424, 7425, 7426, 7428, 7429, 7430, 7431, 7432, 7433,
+		7434, 7435, 7436, 7437, 7438, 7439, 7440, 7441, 7442, 7443,
+		7445, 7446, 7447, 7448, 7449, 7450, 7451, 7452;
+	setarray .q142_done[0], 11311, 7418, 7419, 7420, 7427, 7444, 7453;
+	// Episode 14.3 (npc/re/quests/quests_14_3_bis.txt, and the instances
+	// IsleOfBios and MorseCave in npc/re/instances): Dimensional Travel
+	// with Specimen Collection and Antidote, ep14_3_newerabs 1 to 24, the
+	// Isle of Bios exploration and Morse Cave's hunt (9318). The instances'
+	// entry times (15005, 15007, 15008, 9319) are left alone.
+	setarray .q143[0],
+		11350, 11351, 11352, 11354, 11355, 11356, 11357, 11358, 11359,
+		11360, 11361, 9318;
+	setarray .q143_done[0], 11349, 11353, 11362, 15006;
 	// Episode 15.1 (npc/re/quests/quests_15_1.txt and quests_15_2.txt):
 	// the excavation team's quests, ep15_1_atnad 1 to 19, and To
 	// Phantasmagorika! with Looking for the Traces, ep15_1_elb 1 to 15
