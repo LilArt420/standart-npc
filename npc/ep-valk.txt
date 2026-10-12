@@ -15,9 +15,13 @@
 //= Each skip sets the part's main variable to its last step,
 //= completes the main quests a finished story leaves completed and
 //= erases the others still open.
+//= Episode 16.1: ep16_royal = 24. Needs base level 100 and the way to
+//= the New World (ep13_ryu or ep13_start 100), as the game does before
+//= 16.1 begins. Opens Nillem's trips to the past Prontera and the
+//= repeatable Room of Consciousness (Friedrich Heine); 16.2 can begin.
+//= The families' side stories are left as they are.
 //= Episode 16.2: terra_gloria_main = 25, terra_gloria_lady_part at
-//= least 10. Needs 16.1 as far as the game asks before 16.2 begins
-//= (ep16_royal 17). Opens the Heart Hunter War Base and the Werner
+//= least 10. Opens the Heart Hunter War Base and the Werner
 //= Laboratory central room, Einbech's station, the 16.2 dailies
 //= (Sweeping the remnants, Hiding Researcher, the Chimeras) and the
 //= Rebellion hideout's side quests; 17.1 can begin.
@@ -56,6 +60,12 @@ prontera,128,193,4	script	Valkyrie#EpsClear	4_F_VALKYRIE,{
 		if (.@prev && !callsub(S_Done, .@prev)) {
 			mes "[Valkyrie]";
 			mes "First finish Episode " + callsub(S_Name, .@prev) + ", by playing it or with a ticket.";
+			close;
+		}
+		.@need$ = callsub(S_Need, .@part);
+		if (.@need$ != "") {
+			mes "[Valkyrie]";
+			mes .@need$;
 			close;
 		}
 		if (countitem(.ticket[.@ep]) < 1) {
@@ -153,13 +163,26 @@ S_Prev:
 	}
 	return 0;
 
+// What the game asks before the part begins, beyond the part before it:
+// "" when nothing is missing, else what to say.
+S_Need:
+	switch (getarg(0)) {
+	case 161:
+		// The Royal Messenger (quests_16_1.txt).
+		if (BaseLevel < 100)
+			return "Episode 16.1 needs base level 100.";
+		if (ep13_ryu < 100 && ep13_start < 100)
+			return "Episode 16.1 needs the way to the New World open: Onward to the New World, or the Cat Paw Agent's quest.";
+		break;
+	}
+	return "";
+
 // Whether the part's main story is finished.
 S_Done:
 	switch (getarg(0)) {
 	case 161:
-		// What the game checks before 16.2 begins (quests_16_2.txt):
-		// the room of consciousness in 16.1. Until 16.1 has a skip.
-		return (ep16_royal >= 17);
+		// The end of 16.1: Friedrich Heine (quests_16_1.txt).
+		return (ep16_royal >= 24);
 	case 162:
 		// The end of 16.2 (quests_16_2.txt); 17.1 begins at 25.
 		return (terra_gloria_main >= 25);
@@ -176,6 +199,14 @@ S_Done:
 // Marks the part's main story as finished.
 S_Skip:
 	switch (getarg(0)) {
+	case 161:
+		copyarray .@open[0], .q161[0], getarraysize(.q161);
+		copyarray .@done[0], .q161_done[0], getarraysize(.q161_done);
+		ep16_royal = 24;
+		// The Royal Messenger's letter, taken at the royal villa.
+		if (countitem(6933))
+			delitem 6933, countitem(6933);
+		break;
 	case 162:
 		copyarray .@open[0], .q162[0], getarraysize(.q162);
 		copyarray .@done[0], .q162_done[0], getarraysize(.q162_done);
@@ -227,7 +258,7 @@ OnInit:
 		end;
 	}
 	// Parts with a real skip, in menu order.
-	setarray .ready[0], 162, 171, 172, 180;
+	setarray .ready[0], 161, 162, 171, 172, 180;
 	// Story order, as far as S_Done can tell a part is finished.
 	setarray .order[0], 161, 162, 171, 172, 180;
 	// Episode Clear Tickets (EpisodClear13 - EpisodClear18).
@@ -251,6 +282,16 @@ OnInit:
 		if (inarray(.sell, .@ep) < 0)
 			.sell[getarraysize(.sell)] = .@ep;
 	}
+	// Episode 16.1 (npc/re/quests/quests_16_1.txt, and the instances
+	// RitualOfBlessing and RoomOfConsciousness in npc/re/instances): the
+	// main-story quests, ep16_royal 1 to 24, and the one a finished story
+	// leaves completed. The families' quests (7683, 7684, 7686 and their
+	// own lines) and the repeatable Room of Consciousness (7705, 7706) are
+	// left alone.
+	setarray .q161[0],
+		7681, 7685, 7687, 7688, 7689, 7690, 7691, 7692, 7693, 7694,
+		7695, 7696, 7697, 7698, 7699, 7700, 7701, 7702, 7703;
+	setarray .q161_done[0], 7682;
 	// Episode 16.2 (npc/re/quests/quests_16_2.txt, and the instances
 	// HeartHunterWarBase and WernerLaboratoryCentralRoom in
 	// npc/re/instances): the main-story quests, terra_gloria_main 1 to

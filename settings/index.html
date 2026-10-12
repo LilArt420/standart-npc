@@ -31,6 +31,10 @@
   The Warper's options ("warp_fee", "warp_quests", WARP_KEYS) are on a page of
   their own too: "Options..." next to the Warper.
 
+  So are the Smuggler's banned goods: booleans (SMUG_KEYS) and a list
+  of item IDs typed in one box, split over the strings in BAN_KEYS (three
+  of 200 characters, about 100 IDs) and read by npc/smuggler.txt.
+
   Presets (NPC_PRESETS, BUFF_PRESETS) set every switch on their page at
   once; the one that matches what is ticked is highlighted, and a mix that
   matches none is simply saved as it is. Revert puts back what was last
@@ -96,6 +100,11 @@
   #status { flex: 1; color: var(--dim); font-size: 12px; }
   #status.dirty { color: var(--warn); }
   #buffs[hidden], #groups[hidden], .tools[hidden] { display: none; }
+  .ban { padding: 9px 14px; border-top: 1px solid var(--line); }
+  .ban textarea { width: 100%; min-height: 90px; margin: 6px 0 2px; font: 12px/1.4 ui-monospace, monospace; padding: 6px 8px;
+                  border-radius: 7px; border: 1px solid var(--line); background: var(--card); color: var(--text); resize: vertical; }
+  .ban small { display: block; color: var(--dim); }
+  .ban small.over { color: var(--warn); }
   #buffs h2 { font-size: 16px; margin: 0 0 4px; }
   #buffs > p { color: var(--dim); margin: 0 0 12px; }
   .excl { color: var(--warn); }
@@ -130,6 +139,22 @@
   <p>Both are on by default. Each one applies to every Warper in every town, and to Last Warp.</p>
   <div id="warper-opts"></div>
 </main>
+<main id="smuggler" hidden>
+  <div class="tools">
+    <button id="smuggler-back">← Back</button>
+  </div>
+  <h2>Smuggler — banned goods</h2>
+  <p>Everything here is refused both for sale and as the free item after his quest. A player who already has such an item keeps it.</p>
+  <details open><summary><span class="name">What he won't sell</span></summary>
+    <div id="smuggler-opts"></div>
+    <div class="ban" id="ban-box" hidden>
+      <b>Banned item IDs</b>
+      <small>Item IDs separated by commas, spaces or new lines, e.g. <code>4121, 4123</code>. Find an ID in game with <code>@iteminfo &lt;name&gt;</code>.</small>
+      <textarea id="ban-ids" spellcheck="false"></textarea>
+      <small id="ban-count"></small>
+    </div>
+  </details>
+</main>
 <footer>
   <span id="status"></span>
   <button id="revert">Revert</button>
@@ -142,7 +167,7 @@
 // "npc:<name>" keys are the always-loaded NPCs from ALWAYS_LOADED below.
 // note: one line under the group's name, shown even when it is folded.
 const GROUPS = [
-  { title: 'Travel and services', note: 'getting around, buffs, storage, rewards', keys: ['npc:warper', 'npc:buffer', 'npc:kafra', 'npc:weightmax', 'npc:daily', 'npc:welcome'] },
+  { title: 'Travel and services', note: 'getting around, buffs, storage, rewards', keys: ['npc:warper', 'npc:buffer', 'npc:kafra', 'npc:weightmax', 'enable_attendance', 'npc:welcome'] },
   { title: 'Character',           note: 'jobs, resets, looks, skills',             keys: ['npc:jobmaster', 'npc:reset', 'npc:stylist', 'npc:epvalk', 'npc:plagiarism'] },
   { title: 'Shops',               note: 'items for Zeny',                          keys: ['npc:tooldealer', 'npc:smuggler', 'npc:cardexchanger', 'npc:falcon'] },
   { title: 'Hunting quests',      note: 'one NPC, four kinds of contracts',        keys: ['enable_bounties'] },
@@ -163,10 +188,10 @@ const ALWAYS_LOADED = {
   'npc:jobmaster': { label: 'Job Master',        description: 'Job changes up to 4th class, with job equipment. Prontera (157,195).' },
   'npc:reset':     { label: 'Reset Girl',        description: 'Resets skills, stats, or both. Prontera (154,195).' },
   'npc:stylist':   { label: 'Stylist',           description: 'Hair style, hair color and cloth color. Prontera (169,180).' },
-  'npc:epvalk':    { label: 'Episode Valkyrie',  description: 'Episode Clear Tickets skip the main story of an episode, as on official servers (no rewards). One ticket per part, in story order; 16.2, 17.1, 17.2 and 18 for now. Sells the tickets for Zeny. Renewal only. Prontera (128,193).' },
+  'npc:epvalk':    { label: 'Episode Valkyrie',  description: 'Episode Clear Tickets skip the main story of an episode, as on official servers (no rewards). One ticket per part, in story order; 16.1 to 18 for now. Sells the tickets for Zeny. Renewal only. Prontera (128,193).' },
   'npc:falcon':    { label: 'Falcon Breeder',    description: 'Falcon for Hunters/Snipers, Wolf Flute for Rangers/Windhawks, Hawk Flute for Windhawks. Prontera (128,211).' },
   'npc:buffer':    { label: 'Buffer',            description: 'Free instant buffs + full heal on click. Every major town.' },
-  'npc:kafra':     { label: 'Kafra Employee',    description: 'Save point, storage, free identify. Prontera (160,187).' },
+  'npc:kafra':     { label: 'Premium Service Manager', description: 'Save point, storage, free identify, disposing of items that cannot be dropped or traded. Prontera (160,187).' },
   'npc:weightmax': { label: 'Weight Maxxer',     description: 'Trades a Gym Pass for +1 permanent carry capacity, up to 10 times. Prontera (147,172).' },
   'npc:plagiarism':{ label: 'Plagiarism Master', description: 'Rogue line: copy any Plagiarism-copyable skill, level capped by your Plagiarism level. By iguera. Prontera (171,182).' },
   'npc:tooldealer':{ label: 'Tool Dealer',       description: 'Fixed-price shop. Prontera (143,178).' },
@@ -176,7 +201,6 @@ const ALWAYS_LOADED = {
   'npc:grade':     { label: 'Grade Refiner',     description: 'Opens the equipment grading UI and the refining UI. Renewal only. By Lil Art. Prontera (164,166).' },
   'npc:enchanter': { label: 'Universal Enchanter', description: 'Attaches an Enchant/Class Stone to costume, shadow or regular gear, for free. By Lil Art. Prontera (164,169).' },
   'npc:nokzin':    { label: 'Master Nokzin',     description: 'Endows your weapon with an element for an hour, removable for free. Prontera (144,229).' },
-  'npc:daily':     { label: 'Daily Rewards',     description: 'Distributes daily attendance rewards, once every 24 hours. By Lil Art. Prontera (147,166).' },
   'npc:welcome':   { label: 'Welcoming',         description: 'A one-time starter gift per character: 150,000 Zeny, a Premium Booster Box and two costumes. Renewal only. By Lil Art. Izlude (189,209).' },
 };
 
@@ -277,7 +301,7 @@ const BUFF_SETTING = Object.fromEntries(BUFFS.flatMap(g => g.list.map(b => [b.co
 const ESSENTIALS = ['npc:warper', 'npc:buffer', 'npc:kafra', 'npc:jobmaster', 'npc:reset', 'npc:stylist'];
 const NPC_PRESETS = [
   { name: 'All on',     note: 'every NPC and feature',                            on: () => true },
-  { name: 'Essentials', note: 'Warper, Buffer, Kafra, Job Master, Reset, Stylist', on: k => ESSENTIALS.includes(k) },
+  { name: 'Essentials', note: 'Warper, Buffer, Premium Service, Job Master, Reset, Stylist', on: k => ESSENTIALS.includes(k) },
   { name: 'All off',    note: 'nothing from this mod',                            on: () => false },
 ];
 // "Everything" takes the first buff of each ⚠ set, in list order.
@@ -308,6 +332,12 @@ let hasBuffKey = false;
 const WARP_KEYS = ['warp_fee', 'warp_quests'];
 const warpBoxes = {}; // Warper option key -> checkbox (on the Warper page)
 let hasWarpOpts = false;
+const SMUG_KEYS = ['smuggler_no_cards', 'smuggler_no_mvp_cards', 'smuggler_no_boss_cards', 'smuggler_no_costumes'];
+const BAN_KEYS = ['smuggler_ban', 'smuggler_ban2', 'smuggler_ban3'];
+const BAN_LEN = 200;  // max_length of each BAN_KEYS string
+const smugBoxes = {}; // Smuggler option key -> checkbox (on the Smuggler page)
+let banKeys = [];     // BAN_KEYS that mod.json declares
+let hasSmugOpts = false;
 let preRenewal = false;
 
 function status(text, dirty = false) {
@@ -325,6 +355,8 @@ function values() {
   }
   if (hasOffKey) out[OFF_KEY] = [...off, ...offExtra].join(',');
   for (const [k, box] of Object.entries(warpBoxes)) out[k] = box.checked;
+  for (const [k, box] of Object.entries(smugBoxes)) out[k] = box.checked;
+  if (banKeys.length) Object.assign(out, packBans(banIds()).values);
   for (const key of Object.keys(buffExtra))
     out[key] = [...Object.keys(buffBoxes).filter(c => BUFF_SETTING[c] === key && buffBoxes[c].checked), ...buffExtra[key]].join(',');
   return out;
@@ -362,6 +394,8 @@ function setValues(v) {
     box.checked = k.startsWith('npc:') ? !off.includes(k.slice(4)) : v[k] === true;
   for (const [code, box] of Object.entries(buffBoxes)) box.checked = chosen.includes(code);
   for (const [k, box] of Object.entries(warpBoxes)) box.checked = v[k] === true;
+  for (const [k, box] of Object.entries(smugBoxes)) box.checked = v[k] === true;
+  if (banKeys.length) { $('ban-ids').value = banKeys.map(k => v[k] || '').filter(Boolean).join(','); banCount(); }
   groups.forEach(syncGroup);
   buffCount();
   markDirty();
@@ -427,6 +461,12 @@ function drawGroup(title, settings, note = '') {
       const open = document.createElement('button');
       open.textContent = 'Options…';
       open.onclick = e => { e.preventDefault(); showWarper(true); };
+      text.append(open);
+    }
+    if (s.key === 'npc:smuggler' && hasSmugOpts) {
+      const open = document.createElement('button');
+      open.textContent = 'Options…';
+      open.onclick = e => { e.preventDefault(); showPage('smuggler', true); };
       text.append(open);
     }
     details.append(label);
@@ -517,14 +557,15 @@ function drawBuffs(chosen) {
 }
 $('buffs-back').onclick = () => showBuffs(false);
 
-// ---- Warper page --------------------------------------------------------
-function showWarper(on) {
-  $('warper').hidden = !on;
+// ---- Warper and Smuggler pages -------------------------------------------
+function showPage(id, on) {
+  $(id).hidden = !on;
   $('groups').hidden = on;
   document.querySelector('body > .tools').hidden = on;
   window.scrollTo(0, 0);
 }
-function drawWarperOpts(settings) {
+const showWarper = on => showPage('warper', on);
+function drawOpts(settings, where, boxes) {
   for (const s of settings) {
     const label = document.createElement('label');
     label.className = 'row';
@@ -542,11 +583,37 @@ function drawWarperOpts(settings) {
     }
     box.onchange = markDirty;
     label.append(box, text);
-    $('warper-opts').append(label);
-    warpBoxes[s.key] = box;
+    $(where).append(label);
+    boxes[s.key] = box;
   }
 }
 $('warper-back').onclick = () => showWarper(false);
+$('smuggler-back').onclick = () => showPage('smuggler', false);
+
+// The IDs in the box, without repeats, in the order typed.
+function banIds() {
+  return [...new Set($('ban-ids').value.split(/[^0-9]+/).filter(Boolean).map(n => String(Number(n))).filter(n => n !== '0'))];
+}
+// Fills the BAN_KEYS strings in turn; what fits in none is "left".
+function packBans(ids) {
+  const parts = banKeys.map(() => []);
+  let i = 0, left = 0;
+  for (const id of ids) {
+    while (i < parts.length && [...parts[i], id].join(',').length > BAN_LEN) i++;
+    if (i < parts.length) parts[i].push(id); else left++;
+  }
+  return { values: Object.fromEntries(banKeys.map((k, n) => [k, parts[n].join(',')])), left };
+}
+function banCount() {
+  const ids = banIds();
+  const { left } = packBans(ids);
+  const count = $('ban-count');
+  count.className = left ? 'over' : '';
+  const used = ids.join(',').length;
+  count.textContent = `${used} of ${banKeys.length * BAN_LEN} characters`
+    + (left ? `: ${left} IDs don't fit, remove some before saving.` : '');
+}
+$('ban-ids').oninput = () => { banCount(); markDirty(); };
 
 async function run(button, work) {
   for (const b of document.querySelectorAll('footer button')) b.disabled = true;
@@ -556,6 +623,7 @@ async function run(button, work) {
 }
 
 async function save() {
+  if (banKeys.length && packBans(banIds()).left) throw new Error("the Smuggler's banned item IDs don't all fit");
   const v = values();
   await window.modSettings.set(v);
   saved = v;
@@ -576,7 +644,8 @@ async function save() {
     if (offSetting) {
       hasOffKey = true;
       const off = String(offSetting.value || '').split(',').map(n => n.trim()).filter(Boolean);
-      offExtra = off.filter(n => !ALWAYS_LOADED['npc:' + n]);
+      // "daily": Daily Rewards, removed in 4.9.5; dropped on the next save
+      offExtra = off.filter(n => !ALWAYS_LOADED['npc:' + n] && n !== 'daily');
       for (const [k, info] of Object.entries(ALWAYS_LOADED))
         byKey.set(k, { key: k, ...info, value: !off.includes(k.slice(4)) });
       if (mod.context && mod.context.era === 'pre-renewal') {
@@ -605,7 +674,19 @@ async function save() {
     }
     const warpOpts = WARP_KEYS.filter(k => byKey.has(k)).map(k => byKey.get(k));
     WARP_KEYS.forEach(k => byKey.delete(k));
-    if (warpOpts.length) { hasWarpOpts = true; drawWarperOpts(warpOpts); }
+    if (warpOpts.length) { hasWarpOpts = true; drawOpts(warpOpts, 'warper-opts', warpBoxes); }
+    const smugOpts = SMUG_KEYS.filter(k => byKey.has(k)).map(k => byKey.get(k));
+    SMUG_KEYS.forEach(k => byKey.delete(k));
+    banKeys = BAN_KEYS.filter(k => mod.settings.some(s => s.key === k));
+    if (smugOpts.length || banKeys.length) {
+      hasSmugOpts = true;
+      drawOpts(smugOpts, 'smuggler-opts', smugBoxes);
+      if (banKeys.length) {
+        $('ban-box').hidden = false;
+        $('ban-ids').value = banKeys.map(k => mod.settings.find(s => s.key === k).value || '').filter(Boolean).join(', ');
+        banCount();
+      }
+    }
     for (const g of GROUPS) {
       const list = g.keys.filter(k => byKey.has(k)).map(k => byKey.get(k));
       g.keys.forEach(k => byKey.delete(k));
