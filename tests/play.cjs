@@ -344,13 +344,13 @@ function runEra(era) {
         // Without cash-shop-extended (it is not in the test world): Master
         // Nokzin sells the Elemental Converters (not the Tool Dealer), the Tool
         // Dealer the Gym Pass, and the Cheffenia Gatekeeper offers Zeny only (#40).
-        check(!items.some(n => /Converter/.test(n)), 'Tool Dealer: no Elemental Converters (Master Nokzin sells them)', items.filter(n => /Convert/.test(n)).join(', ') || 'none');
+        check(!items.some(n => /Converter/.test(n)), 'Tool Dealer: no Elemental Converters (the Elemental Endower sells them)', items.filter(n => /Convert/.test(n)).join(', ') || 'none');
         check(items.includes('Gym Pass'), 'Tool Dealer: Gym Pass sold without cash-shop-extended', items.includes('Gym Pass') ? 'listed' : 'not listed');
     }
     if (want('nokzin')) {
-        gm('@warp prontera 144 226');
+        gm('@warp prontera 164 160');
         const nokzin = ev(`(async () => {
-            await snpc.talk('Master Nokzin');
+            await snpc.talk('Elemental Endower');
             const v = await snpc.go('What about converter scrolls?');
             const text = v.text || '';
             await snpc.close();
@@ -362,7 +362,7 @@ function runEra(era) {
             return { text, items: [...new Set(names)] };
         })()`);
         const converters = nokzin && Array.isArray(nokzin.items) ? nokzin.items.filter(n => /Converter/.test(n)) : [];
-        check(nokzin && /five thousand zeny each/.test(nokzin.text) && converters.length === 4, 'Master Nokzin: sells the four Elemental Converters',
+        check(nokzin && /5,000 z/.test(nokzin.text) && converters.length === 4, 'Elemental Endower: sells the four Elemental Converters',
             converters.join(', ') || JSON.stringify(nokzin).slice(-200));
     }
     if (want('gatekeeper')) {

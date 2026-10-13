@@ -146,7 +146,7 @@ CHANGELOG.md.
 | Safe Refiner | 164,172 | npc_off `refiner` |
 | Grade Refiner | 164,166 | npc_off `grade` (Renewal only) |
 | Universal Enchanter | 164,169 | npc_off `enchanter` |
-| Master Nokzin | 144,229 | npc_off `nokzin` |
+| Elemental Endower | 164,163 | npc_off `nokzin` |
 | Training Dummy / Dummy Master | 156,225 / 150,225 | enable_dummies |
 
 Before placing a new NPC, grep all `prontera,` lines to avoid collisions.

@@ -1,37 +1,37 @@
 //===== rAthena Script =======================================
-//= Master Nokzin (Elemental Endows)
+//= Elemental Endower
 //===== By: Nokzin =============================================
 //===== Description: =========================================
-//= Master Nokzin endows your weapon with an element for an hour
-//= (10,000z), works on carded weapons too since it's a temporary
+//= The Elemental Endower endows your weapon with an element for an hour
+//= (10,000 z), works on carded weapons too since it's a temporary
 //= status, not a weapon change. Removes the endow for free.
 //= Without Lil Art's cash-shop-extended he also sells the
-//= Elemental Converters (5,000z each); with it, its Cash Shop does.
+//= Elemental Converters (5,000 z each); with it, its Cash Shop does.
 //===== How to customize: ====================================
 //= - Endow cost/duration: the 10000/3600000 in case 1.
 //= - Converter prices: the shop line at the end of the file.
 //= - Location/sprite: the first line of the NPC block.
 //============================================================
 
-prontera,144,229,5	script	Master Nokzin#endowersage	679,{
+prontera,164,163,4	script	Elemental Endower#endowersage	679,{
 	mes "[Master Nokzin]";
-	mes "I can lay an element on your weapon for an hour. Ten thousand zeny, and it wears off clean when the hour's up -- or right now, if you'd rather have it off early.";
+	mes "Greetings! My name is Master Nokzin. I can lay an element on your weapon for an hour. ^0055FF10,000 z^000000, and it wears off clean when the hour's up -- or right now, if you'd rather have it off early.";
 	next;
 
-	switch(select("Endow my weapon (10,000z)","Remove my endow (free)","What about converter scrolls?","Never mind")) {
+	switch(select("Endow my weapon (10,000 z)","Remove my endow","What about converter scrolls?","Never mind")) {
 	case 1:
-		next;
+		if (Zeny < 10000) {
+			mes "[Master Nokzin]";
+			mes "^0055FF10,000 z^000000. Come back when you have it.";
+			close;
+		}
 		mes "[Master Nokzin]";
 		mes "Pick your element.";
 		next;
 		setarray .@ename$[0], "Fire","Water","Wind","Earth";
 		.@e = select("Fire","Water","Wind","Earth") - 1;
-
-		if (Zeny < 10000) {
-			mes "[Master Nokzin]";
-			mes "Ten thousand zeny. Come back when you have it.";
+		if (Zeny < 10000)	// spent meanwhile
 			close;
-		}
 		Zeny -= 10000;
 		if (.@e == 0) sc_start SC_FIREWEAPON,3600000,5;
 		else if (.@e == 1) sc_start SC_WATERWEAPON,3600000,5;
@@ -58,7 +58,7 @@ prontera,144,229,5	script	Master Nokzin#endowersage	679,{
 			mes "Converter scrolls let you endow on the fly without coming to see me -- the Cash Shop sells those. Mine last much longer, though!";
 			close;
 		}
-		mes "Converter scrolls let you endow on the fly without coming to see me. I keep a few: five thousand zeny each. Mine last much longer, though!";
+		mes "Converter scrolls let you endow on the fly without coming to see me. I keep a few: ^0055FF5,000 z^000000 each. Mine last much longer, though!";
 		close2;
 		callshop "Nokzin Converters#endowersage", 1;
 		end;
@@ -72,6 +72,6 @@ OnInit:
 	end;
 }
 
-// Master Nokzin's converters (Fire, Water, Earth, Wind; both eras), opened
+// The Elemental Endower's converters (Fire, Water, Earth, Wind; both eras), opened
 // from his menu only when cash-shop-extended is not loaded.
 -	shop	Nokzin Converters#endowersage	-1,12114:5000,12115:5000,12116:5000,12117:5000
