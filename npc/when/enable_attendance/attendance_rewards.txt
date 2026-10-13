@@ -1,0 +1,78 @@
+//===== rAthena Script =======================================
+//= Attendance Check rewards from the settings
+//===== By: MondoTruth ======================================
+//===== Description: =========================================
+//= Applies the Attendance Check rewards chosen in the mod's
+//= Settings… window (Attendance Check → Rewards…) over the mod's
+//= own list in db/attendance.yml, at server start. A day left
+//= empty, or an item the server does not know, keeps the mod's
+//= reward; the map-server log says which day and why.
+//= Also answers the mod's client plugin (client/index.js), which
+//= redraws the Attendance Check window with the rewards the
+//= server really gives (the client's System/CheckAttendance.lub
+//= only has the mod's own list).
+//= Needs the fork's attendance_script_rewards extension (turned on
+//= by db/when/enable_attendance/extension_db.yml).
+//===== How to customize: ====================================
+//= - The rewards: in the Settings… window, or the settings
+//=   attendance_re / attendance_re2 (Renewal, days 1-10 / 11-20)
+//=   and attendance_pre / attendance_pre2 (Pre-renewal): item
+//=   ID:amount, comma-separated, one place per day.
+//= - The mod's own rewards: db/when/enable_attendance/attendance.yml
+//=   and pre-renewal/db/when/enable_attendance/attendance.yml.
+//============================================================
+
+-	script	SNPC_AttendanceRewards	-1,{
+OnInit:
+	bindatcmd "snpcattendance", strnpcinfo(3) + "::OnQuery", 0, 99;
+	if (!getextension("attendance_script_rewards")) {
+		debugmes "standart-npc: the attendance_script_rewards extension is off, Attendance Check keeps the mod's own rewards.";
+		end;
+	}
+	if (checkre(0))
+		.@key$ = "attendance_re";
+	else
+		.@key$ = "attendance_pre";
+	.@days = getattendancereward(0);
+	for (.@part = 0; .@part < 2; .@part++) {
+		if (.@part == 0)
+			.@list$ = callfunc("F_ModSetting", "standart-npc", .@key$, "");
+		else
+			.@list$ = callfunc("F_ModSetting", "standart-npc", .@key$ + "2", "");
+		if (.@list$ == "")
+			continue;
+		deletearray .@place$;
+		explode(.@place$, .@list$, ",");
+		for (.@i = 0; .@i < 10 && .@i < getarraysize(.@place$); .@i++) {
+			.@day = .@part * 10 + .@i + 1;
+			if (.@day > .@days || .@place$[.@i] == "")
+				continue;
+			deletearray .@f$;
+			explode(.@f$, .@place$[.@i], ":");
+			.@id = atoi(.@f$[0]);
+			.@amount = atoi(.@f$[1]);
+			if (.@amount < 1)
+				.@amount = 1;
+			if (.@id < 1 || !setattendancereward(.@day, .@id, .@amount))
+				debugmes "standart-npc: Attendance Check day " + .@day + " keeps the mod's reward (setting " + .@place$[.@i] + ").";
+		}
+	}
+	end;
+
+// The client plugin asks for the running rewards: "id:amount" per day,
+// comma-separated, in two parts (days 1-10, 11-20) to keep lines short;
+// the client joins the parts as they are.
+OnQuery:
+	.@n$ = .@atcmd_parameters$[0];
+	.@days = getattendancereward(0);
+	for (.@part = 0; .@part < 2; .@part++) {
+		.@line$ = "";
+		for (.@d = .@part * 10 + 1; .@d <= .@part * 10 + 10 && .@d <= .@days; .@d++) {
+			if (.@d > 1)
+				.@line$ += ",";
+			.@line$ += getattendancereward(.@d) + ":" + getattendancereward(.@d, 1);
+		}
+		dispbottom "@@reply " + .@n$ + " " + (.@part + 1) + "/2 " + .@line$;
+	}
+	end;
+}

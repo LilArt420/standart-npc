@@ -35,6 +35,13 @@
   of item IDs typed in one box, split over the strings in BAN_KEYS (three
   of 200 characters, about 100 IDs) and read by npc/smuggler.txt.
 
+  The Attendance Check rewards: "Rewards..." next to Attendance Check, a tab
+  per era, 20 rows of item ID and amount. Each era has two strings (ATT_KEYS,
+  days 1-10 and 11-20) of "id:amount" places, an empty place being the mod's
+  own reward; npc/when/enable_attendance/attendance_rewards.txt applies them.
+  ATT_DEFAULT must match db/when/enable_attendance/attendance.yml and the
+  Pre-renewal copy.
+
   Presets (NPC_PRESETS, BUFF_PRESETS) set every switch on their page at
   once; the one that matches what is ticked is highlighted, and a mix that
   matches none is simply saved as it is. Revert puts back what was last
@@ -108,6 +115,13 @@
   #buffs h2 { font-size: 16px; margin: 0 0 4px; }
   #buffs > p { color: var(--dim); margin: 0 0 12px; }
   .excl { color: var(--warn); }
+  .att { display: grid; grid-template-columns: 52px 1fr 92px 72px; gap: 8px; align-items: center; padding: 6px 14px; }
+  .att + .att { border-top: 1px solid var(--line); }
+  .att small { color: var(--dim); }
+  .att input { width: 100%; font: 12px ui-monospace, monospace; padding: 3px 6px; border-radius: 6px;
+               border: 1px solid var(--line); background: var(--card); color: var(--text); }
+  .att input::placeholder { color: var(--dim); opacity: .6; }
+  .att input.bad { border-color: var(--warn); }
 </style>
 </head>
 <body>
@@ -155,6 +169,17 @@
     </div>
   </details>
 </main>
+<main id="attendance" hidden>
+  <div class="tools">
+    <button id="attendance-back">← Back</button>
+  </div>
+  <h2>Attendance Check — rewards</h2>
+  <p>One reward a day, sent by mail; after day 20 the list starts over. Leave a day empty for the mod's own reward (shown under the day). An item the server does not know also keeps the mod's reward, and the server log says so. Find an ID in game with <code>@iteminfo &lt;name&gt;</code>.</p>
+  <div class="presets" id="att-eras"></div>
+  <details open><summary><span class="name" id="att-title"></span><span class="count"><button id="att-default">Default</button></span></summary>
+    <div id="att-rows"></div>
+  </details>
+</main>
 <footer>
   <span id="status"></span>
   <button id="revert">Revert</button>
@@ -188,7 +213,7 @@ const ALWAYS_LOADED = {
   'npc:jobmaster': { label: 'Job Master',        description: 'Job changes up to 4th class, with job equipment. Prontera (157,195).' },
   'npc:reset':     { label: 'Reset Girl',        description: 'Resets skills, stats, or both. Prontera (154,195).' },
   'npc:stylist':   { label: 'Stylist',           description: 'Hair style, hair color and cloth color. Prontera (169,180).' },
-  'npc:epvalk':    { label: 'Episode Valkyrie',  description: 'Redeems Episode Clear Tickets for EXP (tickets 16-18 from cash-shop-extended). Renewal only. Prontera (128,193).' },
+  'npc:epvalk':    { label: 'Episode Valkyrie',  description: 'Episode Clear Tickets skip the main story of an episode, as on official servers (no rewards). One ticket per part, in story order; 13.1 to 18 for now. Sells the tickets for Zeny. Renewal only. Prontera (128,193).' },
   'npc:falcon':    { label: 'Falcon Breeder',    description: 'Falcon for Hunters/Snipers, Wolf Flute for Rangers/Windhawks, Hawk Flute for Windhawks. Prontera (128,211).' },
   'npc:buffer':    { label: 'Buffer',            description: 'Free instant buffs + full heal on click. Every major town.' },
   'npc:kafra':     { label: 'Premium Service Manager', description: 'Save point, storage, free identify, disposing of items that cannot be dropped or traded. Prontera (160,187).' },
@@ -200,7 +225,7 @@ const ALWAYS_LOADED = {
   'npc:refiner':   { label: 'Safe Refiner',      description: 'Refines gear to +7 through +15 using certificates (Pre-renewal: +7, +8, +9, +11). Prontera (164,172).' },
   'npc:grade':     { label: 'Grade Refiner',     description: 'Opens the equipment grading UI and the refining UI. Renewal only. By Lil Art. Prontera (164,166).' },
   'npc:enchanter': { label: 'Universal Enchanter', description: 'Attaches an Enchant/Class Stone to costume, shadow or regular gear, for free. By Lil Art. Prontera (164,169).' },
-  'npc:nokzin':    { label: 'Master Nokzin',     description: 'Endows your weapon with an element for an hour, removable for free. Prontera (144,229).' },
+  'npc:nokzin':    { label: 'Elemental Endower', description: 'Endows your weapon with an element for an hour, removable for free. Prontera (164,163).' },
   'npc:welcome':   { label: 'Welcoming',         description: 'A one-time starter gift per character: 150,000 Zeny, a Premium Booster Box and two costumes. Renewal only. By Lil Art. Izlude (189,209).' },
 };
 
@@ -338,6 +363,35 @@ const BAN_LEN = 200;  // max_length of each BAN_KEYS string
 const smugBoxes = {}; // Smuggler option key -> checkbox (on the Smuggler page)
 let banKeys = [];     // BAN_KEYS that mod.json declares
 let hasSmugOpts = false;
+// Attendance Check rewards, per era: two strings of 10 "id:amount" places each.
+const ATT_KEYS = { renewal: ['attendance_re', 'attendance_re2'], 'pre-renewal': ['attendance_pre', 'attendance_pre2'] };
+const ATT_ERAS = { renewal: 'Renewal', 'pre-renewal': 'Pre-renewal' };
+const ATT_MAX = 30000;  // rAthena's MAX_AMOUNT
+// [item ID, amount, name]: the mod's own rewards, from the attendance.yml files
+const ATT_DEFAULT = {
+  renewal: [
+    [100906, 15, '21st Anniversary All in One Potion'], [969, 7, 'Gold'], [14545, 3, 'Field Manual 300%'],
+    [12412, 5, 'HE Bubble Gum'], [6232, 1, '+9 Armor Refine Ticket'], [14545, 5, 'Field Manual 300%'],
+    [100742, 5, 'Awakened Ancient Heros Weapon Box'], [6238, 1, '+11 Weapon Refine Ticket'], [6585, 1, '+12 Armor Certificate'],
+    [6635, 15, 'Blacksmith Blessing'], [1000337, 50, 'Blessed Etel Dust'], [6878, 1, 'Safe to 15 Armor Certificate'],
+    [6635, 25, 'Blacksmith Blessing'], [101653, 5, '+11 Helm of Face Chest'], [490337, 1, 'Amulet of Genesis Stone'],
+    [102070, 5, 'Good Weapon Box'], [102074, 5, 'Crown of Good and Evil Box'], [6872, 1, 'Safe to 15 Weapon Certificate'],
+    [102071, 5, 'Evil Weapon Box'], [22829, 1, 'Sealed Card Album'],
+  ],
+  'pre-renewal': [
+    [969, 2, 'Gold'], [14545, 3, 'Field Manual 300%'], [12412, 5, 'HE Bubble Gum'],
+    [12016, 10, 'Speed Potion'], [7620, 10, 'Enriched Oridecon'], [6232, 1, '+9 Armor Refine Ticket'],
+    [617, 3, 'Old Purple Box'], [617, 5, 'Old Purple Box'], [12411, 10, 'HE Battle Manual'],
+    [616, 1, 'Old Card Album'], [6238, 1, '+11 Weapon Refine Ticket'], [6239, 1, '+11 Armor Refine Ticket'],
+    [7619, 10, 'Enriched Elunium'], [607, 30, 'Yggdrasil Berry'], [608, 50, 'Yggdrasil Seed'],
+    [6239, 1, '+11 Armor Refine Ticket'], [7620, 20, 'Enriched Oridecon'], [644, 5, 'Gift Box'],
+    [603, 20, 'Old Blue Box'], [616, 3, 'Old Card Album'],
+  ],
+};
+let hasAttKeys = false;
+const attRows = {};   // era -> 20 × { id, amount } strings as typed ('' = default)
+let attEra = 'renewal';
+const attInputs = []; // the drawn rows: { id, amount } inputs
 let preRenewal = false;
 
 function status(text, dirty = false) {
@@ -357,6 +411,7 @@ function values() {
   for (const [k, box] of Object.entries(warpBoxes)) out[k] = box.checked;
   for (const [k, box] of Object.entries(smugBoxes)) out[k] = box.checked;
   if (banKeys.length) Object.assign(out, packBans(banIds()).values);
+  if (hasAttKeys) Object.assign(out, attValues());
   for (const key of Object.keys(buffExtra))
     out[key] = [...Object.keys(buffBoxes).filter(c => BUFF_SETTING[c] === key && buffBoxes[c].checked), ...buffExtra[key]].join(',');
   return out;
@@ -396,6 +451,7 @@ function setValues(v) {
   for (const [k, box] of Object.entries(warpBoxes)) box.checked = v[k] === true;
   for (const [k, box] of Object.entries(smugBoxes)) box.checked = v[k] === true;
   if (banKeys.length) { $('ban-ids').value = banKeys.map(k => v[k] || '').filter(Boolean).join(','); banCount(); }
+  if (hasAttKeys) { attLoad(v); attDraw(); }
   groups.forEach(syncGroup);
   buffCount();
   markDirty();
@@ -467,6 +523,12 @@ function drawGroup(title, settings, note = '') {
       const open = document.createElement('button');
       open.textContent = 'Options…';
       open.onclick = e => { e.preventDefault(); showPage('smuggler', true); };
+      text.append(open);
+    }
+    if (s.key === 'enable_attendance' && hasAttKeys) {
+      const open = document.createElement('button');
+      open.textContent = 'Rewards…';
+      open.onclick = e => { e.preventDefault(); showPage('attendance', true); };
       text.append(open);
     }
     details.append(label);
@@ -615,6 +677,98 @@ function banCount() {
 }
 $('ban-ids').oninput = () => { banCount(); markDirty(); };
 
+// ---- Attendance Check page ------------------------------------------------
+function attLoad(v) {
+  for (const [era, keys] of Object.entries(ATT_KEYS)) {
+    attRows[era] = keys.flatMap(k => {
+      const places = String(v[k] ?? '').split(',');
+      return Array.from({ length: 10 }, (_, j) => {
+        const [id = '', amount = ''] = (places[j] || '').trim().split(':');
+        return { id, amount: id ? amount : '' };
+      });
+    });
+  }
+}
+function attBad(row) {
+  return {
+    id: row.id !== '' && !(/^\d+$/.test(row.id) && Number(row.id) > 0),
+    amount: row.amount !== '' && !(/^\d+$/.test(row.amount) && Number(row.amount) >= 1 && Number(row.amount) <= ATT_MAX),
+  };
+}
+// One day as stored: '' for the mod's own reward, else "id:amount".
+function attPlace(row, def) {
+  if (row.id === '') return '';
+  const id = Number(row.id), amount = row.amount === '' ? 1 : Number(row.amount);
+  return id === def[0] && amount === def[1] ? '' : `${id}:${amount}`;
+}
+function attValues() {
+  const out = {};
+  for (const [era, keys] of Object.entries(ATT_KEYS))
+    keys.forEach((k, half) => {
+      const places = attRows[era].slice(half * 10, half * 10 + 10).map((row, j) => attPlace(row, ATT_DEFAULT[era][half * 10 + j]));
+      while (places.length && places[places.length - 1] === '') places.pop();
+      out[k] = places.join(',');
+    });
+  return out;
+}
+function attInvalid() {
+  return Object.values(attRows).some(rows => rows.some(row => { const b = attBad(row); return b.id || b.amount; }));
+}
+function attDraw() {
+  const eras = $('att-eras');
+  eras.textContent = '';
+  for (const [era, name] of Object.entries(ATT_ERAS)) {
+    const button = document.createElement('button');
+    const title = document.createElement('strong');
+    title.textContent = name;
+    const note = document.createElement('span');
+    note.textContent = era === (preRenewal ? 'pre-renewal' : 'renewal') ? 'this server' : 'kept for when the server runs it';
+    button.append(title, note);
+    button.classList.toggle('on', era === attEra);
+    button.onclick = () => { attEra = era; attDraw(); };
+    eras.append(button);
+  }
+  $('att-title').textContent = ATT_ERAS[attEra] + ' rewards';
+  const box = $('att-rows');
+  box.textContent = '';
+  attRows[attEra].forEach((row, i) => {
+    const def = ATT_DEFAULT[attEra][i];
+    const line = document.createElement('div');
+    line.className = 'att';
+    const day = document.createElement('b');
+    day.textContent = `Day ${i + 1}`;
+    const hint = document.createElement('small');
+    hint.textContent = `default: ${def[2]} ×${def[1]} (${def[0]})`;
+    const id = document.createElement('input');
+    id.inputMode = 'numeric';
+    id.placeholder = String(def[0]);
+    id.title = 'Item ID';
+    id.value = row.id;
+    const amount = document.createElement('input');
+    amount.inputMode = 'numeric';
+    amount.placeholder = row.id === '' ? String(def[1]) : '1';
+    amount.title = `Amount, 1 to ${ATT_MAX}`;
+    amount.value = row.amount;
+    const check = () => {
+      const bad = attBad(row);
+      id.classList.toggle('bad', bad.id);
+      amount.classList.toggle('bad', bad.amount);
+    };
+    id.oninput = () => { row.id = id.value.trim(); amount.placeholder = row.id === '' ? String(def[1]) : '1'; check(); markDirty(); };
+    amount.oninput = () => { row.amount = amount.value.trim(); check(); markDirty(); };
+    check();
+    line.append(day, hint, id, amount);
+    box.append(line);
+  });
+}
+$('att-default').onclick = e => {
+  e.preventDefault();
+  attRows[attEra] = Array.from({ length: 20 }, () => ({ id: '', amount: '' }));
+  attDraw();
+  markDirty();
+};
+$('attendance-back').onclick = () => showPage('attendance', false);
+
 async function run(button, work) {
   for (const b of document.querySelectorAll('footer button')) b.disabled = true;
   try { await work(); }
@@ -624,6 +778,7 @@ async function run(button, work) {
 
 async function save() {
   if (banKeys.length && packBans(banIds()).left) throw new Error("the Smuggler's banned item IDs don't all fit");
+  if (hasAttKeys && attInvalid()) throw new Error('an Attendance Check reward has a wrong item ID or amount (marked in orange)');
   const v = values();
   await window.modSettings.set(v);
   saved = v;
@@ -686,6 +841,12 @@ async function save() {
         $('ban-ids').value = banKeys.map(k => mod.settings.find(s => s.key === k).value || '').filter(Boolean).join(', ');
         banCount();
       }
+    }
+    hasAttKeys = Object.values(ATT_KEYS).flat().every(k => mod.settings.some(s => s.key === k));
+    if (hasAttKeys) {
+      attEra = preRenewal ? 'pre-renewal' : 'renewal';
+      attLoad(Object.fromEntries(mod.settings.map(s => [s.key, s.value])));
+      attDraw();
     }
     for (const g of GROUPS) {
       const list = g.keys.filter(k => byKey.has(k)).map(k => byKey.get(k));
