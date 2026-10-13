@@ -1,12 +1,20 @@
 //===== rAthena Script =======================================
 //= Stylist
-//===== By: Euphy ============================================
+//===== By: Euphy, MondoTruth ================================
+//===== Description: =========================================
 //= Changes hair style, hair color, and cloth color.
+//= Renewal: 3rd classes (also transcendent, mounted and baby)
+//= and 4th classes can switch for free to the 3rd class's
+//= alternative outfit (the "second costume"); a 4th class gets
+//= its 3rd class's one. Kept on log-in, taken off by a job change.
 //===== How to customize: ====================================
 //= - Location/sprite: the first line (map,x,y,dir / sprite).
 //= - Max style numbers come from your server's battle_config.conf
 //=   (max_hair_style, max_hair_color, max_cloth_color), not from
 //=   this script.
+//= - Which classes get which outfit: the S_Map lines in OnInit.
+//=   The outfit IDs (JOB_*_2ND) must be in the server's job_db:
+//=   db/job_stats.yml of this mod declares them.
 //= License: GPL-3.0, based on rAthena's npc/custom/stylist.txt
 //=   (see LICENSE and LICENSE-GPL-3.0).
 //============================================================
@@ -14,7 +22,12 @@
 prontera,169,180,5	script	Stylist#custom_stylist	122,{
     setarray .@Styles[1], getbattleflag("max_cloth_color"), getbattleflag("max_hair_style"), getbattleflag("max_hair_color");
     setarray .@Look[1], LOOK_CLOTHES_COLOR, LOOK_HAIR, LOOK_HAIR_COLOR;
-    set .@s, select(" ~ Cloth color: ~ Hairstyle: ~ Hair color");
+    // The outfit option only for classes that have one (Renewal only).
+    set .@menu$, " ~ Cloth color: ~ Hairstyle: ~ Hair color";
+    if (.outfit[Class])
+        set .@menu$, .@menu$ + ": ~ Alternative outfit";
+    set .@s, select(.@menu$);
+    if (.@s == 4) callsub S_Outfit;
     set .@Revert, getlook(.@Look[.@s]);
     set .@Style,1;
     while(1) {
@@ -30,8 +43,52 @@ prontera,169,180,5	script	Stylist#custom_stylist	122,{
     }
     end;
 
+// The 3rd class's alternative outfit, free. setlook LOOK_BODY2 saves it
+// with the character; the server takes it off on a job change.
+S_Outfit:
+    set .@alt, .outfit[Class];
+    mes "[Stylist]";
+    if (getlook(LOOK_BODY2) == .@alt)
+        mes "You are wearing the alternative outfit.";
+    else
+        mes "Your class has an alternative outfit. I can put it on for free.";
+    mes "A job change takes it off.";
+    next;
+    mes "[Stylist]";
+    mes "^FF0000Known display problems^000000 until a game client update:";
+    mes "- After you log in again you may see your usual outfit. It is still on.";
+    mes "- Arch Bishop and Cardinal may look like a Novice.";
+    mes "- After a job change the outfit may stay until you log in again.";
+    switch (select(" ~ Alternative outfit: ~ Standard outfit: ~ Cancel")) {
+        case 1: setlook LOOK_BODY2, .@alt; break;
+        case 2: setlook LOOK_BODY2, Class; break;
+    }
+    close;
+
+// .outfit[<class>] = the outfit's job ID; arg 0 is the outfit, the rest
+// are the classes that may wear it.
+S_Map:
+    for (set .@i, 1; .@i < getargcount(); set .@i, .@i + 1)
+        set .outfit[getarg(.@i)], getarg(0);
+    return;
+
 OnInit:
     // Switched off in the settings window? Hide.
     if (callfunc("F_SNPC_Off", "stylist")) disablenpc strnpcinfo(0);
+    // Alternative outfits are Renewal only (checkre(0): 1 = Renewal).
+    if (!checkre(0)) end;
+    callsub S_Map, JOB_RUNE_KNIGHT_2ND, JOB_RUNE_KNIGHT, JOB_RUNE_KNIGHT2, JOB_RUNE_KNIGHT_T, JOB_RUNE_KNIGHT_T2, JOB_BABY_RUNE_KNIGHT, JOB_BABY_RUNE_KNIGHT2, JOB_DRAGON_KNIGHT, JOB_DRAGON_KNIGHT2;
+    callsub S_Map, JOB_WARLOCK_2ND, JOB_WARLOCK, JOB_WARLOCK_T, JOB_BABY_WARLOCK, JOB_ARCH_MAGE;
+    callsub S_Map, JOB_RANGER_2ND, JOB_RANGER, JOB_RANGER2, JOB_RANGER_T, JOB_RANGER_T2, JOB_BABY_RANGER, JOB_BABY_RANGER2, JOB_WINDHAWK, JOB_WINDHAWK2;
+    callsub S_Map, JOB_ARCHBISHOP_2ND, JOB_ARCH_BISHOP, JOB_ARCH_BISHOP_T, JOB_BABY_ARCH_BISHOP, JOB_CARDINAL;
+    callsub S_Map, JOB_MECHANIC_2ND, JOB_MECHANIC, JOB_MECHANIC2, JOB_MECHANIC_T, JOB_MECHANIC_T2, JOB_BABY_MECHANIC, JOB_BABY_MECHANIC2, JOB_MEISTER, JOB_MEISTER2;
+    callsub S_Map, JOB_GUILLOTINE_CROSS_2ND, JOB_GUILLOTINE_CROSS, JOB_GUILLOTINE_CROSS_T, JOB_BABY_GUILLOTINE_CROSS, JOB_SHADOW_CROSS;
+    callsub S_Map, JOB_ROYAL_GUARD_2ND, JOB_ROYAL_GUARD, JOB_ROYAL_GUARD2, JOB_ROYAL_GUARD_T, JOB_ROYAL_GUARD_T2, JOB_BABY_ROYAL_GUARD, JOB_BABY_ROYAL_GUARD2, JOB_IMPERIAL_GUARD, JOB_IMPERIAL_GUARD2;
+    callsub S_Map, JOB_SORCERER_2ND, JOB_SORCERER, JOB_SORCERER_T, JOB_BABY_SORCERER, JOB_ELEMENTAL_MASTER;
+    callsub S_Map, JOB_MINSTREL_2ND, JOB_MINSTREL, JOB_MINSTREL_T, JOB_BABY_MINSTREL, JOB_TROUBADOUR;
+    callsub S_Map, JOB_WANDERER_2ND, JOB_WANDERER, JOB_WANDERER_T, JOB_BABY_WANDERER, JOB_TROUVERE;
+    callsub S_Map, JOB_SURA_2ND, JOB_SURA, JOB_SURA_T, JOB_BABY_SURA, JOB_INQUISITOR;
+    callsub S_Map, JOB_GENETIC_2ND, JOB_GENETIC, JOB_GENETIC_T, JOB_BABY_GENETIC, JOB_BIOLO;
+    callsub S_Map, JOB_SHADOW_CHASER_2ND, JOB_SHADOW_CHASER, JOB_SHADOW_CHASER_T, JOB_BABY_SHADOW_CHASER, JOB_ABYSS_CHASER;
     end;
 }

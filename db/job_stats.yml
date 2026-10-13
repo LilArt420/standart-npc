@@ -1,0 +1,29 @@
+# standart-npc: the 3rd class alternative outfits (JOB_*_2ND, the
+# "second costume") as jobs, so the server accepts them as a body style.
+# rAthena only lists them under AlternateOutfits (db/re/job_outfits.yml),
+# and pc_changelook drops a LOOK_BODY2 value that is not in job_db, so
+# the Stylist's outfit (and @bodystyle) did nothing.
+# The same fix is Flux159/rathena#38; once the app ships it this file can
+# go. Until then a second Jobs entry for the same job is harmless.
+# Loads as db/import/job_stats.yml. Only Renewal uses the outfits; on
+# Pre-renewal the entries are unused.
+
+Header:
+  Type: JOB_STATS
+  Version: 4
+
+Body:
+  - Jobs:
+      Rune_Knight_2nd: true
+      Mechanic_2nd: true
+      Guillotine_Cross_2nd: true
+      Warlock_2nd: true
+      ArchBishop_2nd: true
+      Ranger_2nd: true
+      Royal_Guard_2nd: true
+      Genetic_2nd: true
+      Shadow_Chaser_2nd: true
+      Sorcerer_2nd: true
+      Sura_2nd: true
+      Minstrel_2nd: true
+      Wanderer_2nd: true
