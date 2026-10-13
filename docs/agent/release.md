@@ -42,9 +42,6 @@ delete_branch_on_merge is on). Otherwise task branches go straight to
   repeated; then `### Renewal only` and/or `### Pre-renewal only` only when
   such items exist. Small era differences inside a shared item go inline,
   e.g. "(on Renewal)".
-- Players see only the first few hundred characters in the update dialog:
-  when an era block holds the release's main feature, offer to put it first
-  (done for 4.9.0).
 - Items not tested in game get "(Not tested in game yet.)" when MondoTruth
   says so.
 - A `## Next version` heading (not a version, the app skips it) can collect
