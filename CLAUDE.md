@@ -101,7 +101,8 @@ README.md, assets/, CLAUDE.md, docs/, tools/, tests/  -- repo only, never in the
 - Files in `db/` load even when the related NPC is switched off. Since app
   1.4.3 the `when/<key>/` switch also works for `db/when/<key>/`,
   `lua/when/<key>/` and `conf/when/<key>/` (`groups.yml`/`atcommands.yml`).
-  We require app 1.5.5 (for the `attendance_repeat` extension).
+  We require app 1.6.0 (for the `attendance_script_rewards` extension;
+  `attendance_repeat` came in 1.5.5).
 - A `db/` file only loads if its name is a table rAthena imports
   (`mob_db.yml`, `item_db.yml`, ... — the stubs in rAthena's
   `db/import-tmpl`). Any other name lands in `db/import/` and is never read
