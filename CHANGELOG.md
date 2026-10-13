@@ -262,9 +262,12 @@ If warps or Fly Wings get slower the longer you play, update Ragnarok Offline to
 ### Renewal and Pre-renewal
 - Smuggler: Settings… → Smuggler → Options… can keep him from selling cards, MVP cards, mini-boss cards, costumes, or any item IDs you list. Banned items are refused both for sale and as the free item after his quest. Requested on Discord.
 
-## Next version
+## 4.9.7
+
+Needs Ragnarok Offline 1.6.0 or newer.
 
 ### Renewal and Pre-renewal
+- Attendance Check: choose the rewards yourself. Settings… → Attendance Check → Rewards… lists the 20 days for Renewal and Pre-renewal; type an item ID and amount for a day, or leave it empty for the mod's own reward. The Attendance Check window shows your rewards.
 - Master Nokzin is now the Elemental Endower and stands with the refiners and the enchanter in Prontera (164,163). In his dialogue he is still Master Nokzin; if you had switched him off, he stays off.
 
 ### Renewal only
