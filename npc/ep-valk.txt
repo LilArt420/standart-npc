@@ -1,151 +1,636 @@
 //===== rAthena Script =======================================
-//= Valkyrie Episode Clear Ticket Redeemer (Verified DP IDs)
+//= Episode Valkyrie (Episode Clear Tickets)
+//===== By: Lil Art, rework MondoTruth ===========================
 //===== Description: =========================================
-//= Placed at Prontera (128, 193), this Valkyrie uses exact 
-//= Divine Pride item IDs for Episode Clear Tickets (13 - 20).
-//= Prompts players for Ep 17 (17.1 vs 17.2) and sets/completes
-//= all underlying rAthena quest flags properly.
+//= Prontera (128,193). Uses an Episode Clear Ticket to skip the
+//= main story of one part of an episode (18, 17.2, ...), as on
+//= the official servers: its main quests are marked done, which
+//= opens what needs the finished story (instances, dailies,
+//= areas). No EXP and no quest rewards. One ticket per part, in
+//= story order: a part needs the one before it finished, played
+//= or skipped. Also sells the tickets for Zeny. Only parts with a
+//= real skip are offered; other tickets are kept for later.
+//= Renewal only.
+//= Parts are numbered episode * 10 + part: 131 = 13.1, 180 = 18.
+//= Each skip sets the part's main variable to its last step,
+//= completes the main quests a finished story leaves completed and
+//= erases the others still open.
+//= Episode 13.1: ep13_ryu = 100, ep13_newbs = 100, ep13_1_rhea = 100,
+//= ep13_1_edq = 14. Needs base level 70, as the Promotional Staff does.
+//= Onward to the New World, New Surroundings, The Tripartite Union's
+//= Feud and Report from the New World: the expedition camp, its
+//= dailies and Nydhogg's Nest open; 13.2 can begin. The Cat Paw Agent,
+//= the Monster Scholar, Taab's part-time work, Pursuing Rayan Moore
+//= and Finding a Fairy / a Giant Tree are left as they are.
+//= Episode 13.2: ep13_2_rhea = 100, ep13_mdrama = 28. Otherworld
+//= Language and Two Tribes. Gives the Ring of the Ancient Wise King
+//= (the Sapha translator, Otherworld Language's reward) if you have
+//= none: without it Manuk, Splendide and El Dicastes stay closed. The
+//= dailies are left as they are.
+//= Episode 13.3: ep13_3_invite = 6, ep13_3_secret = 24. Sapha's Visit
+//= (El Dicastes opens) and Doha's Secret Order up to the man in black
+//= at the camp; Jarute HesLanta takes it on in 14.3. Frede's Request,
+//= the departments' and Ahat's dailies are left as they are.
+//= 13 and 14 are separate: 14.1 does not need 13.
+//= Episode 14.1: ep14_1_bs = 19, ep14_1_mistwoods = 10. Needs base
+//= level 100, as Theore does. Theore's Request (the way to Mora) and
+//= Wandering Protector (the Hazy Forest's young man), which opens the
+//= Mora dailies. Cheshire, Lope and Euridi, the research tools and
+//= the Knights are left as they are.
+//= 14 and 15 are separate, and 14.2 does not need 14.1.
+//= Episode 14.2: ep14_2_mylord = 33, ep14_2_oliver at least 3. Needs
+//= base level 99, as the travelers in Eclage do. Eclage's Entrance and
+//= Encounter in a Strange Land up to the chief of staff's end; the
+//= Eclage Interior is behind it. 14.3 can begin. Eclage's other quests
+//= are left as they are.
+//= Episode 14.3: ep14_2_mylord 34, ep14_3_newerabs = 24, ep14_3_isle
+//= 1, ep14_3_mors01 = 1. Needs base level 140. Avant at the Flame
+//= Basin (his dailies), Dimensional Travel (the Eclage teleporter to
+//= the Flame Basin, the way into moro_cav), the Isle of Bios and Morse
+//= Cave as cleared: Commander Hibba Agip sends you against the Demon
+//= God. The Demon God's fight itself, Jeruth Hesranta's and the
+//= Doom Prayers' quests are left as they are.
+//= Episode 15.1: ep15_1_atnad = 19, ep15_2_permit 1, ep15_1_elb = 15.
+//= Needs base level 140 and the Eden Group Mark, as the game does
+//= before 15.1 begins. Both of its stories: the Atnad excavation
+//= team's (Eden Group) and To Phantasmagorika! Opens the research
+//= facilities (verus01, verus02) and Vestige; 15.2 can begin.
+//= Episode 15.2: ep15_1_atnad = 34, ep15_2_permit 6, ep15_2_bslast =
+//= 9. The excavation team's story up to Rekenber's headquarters, and
+//= Vestige. Opens the Last Room (un_myst). The Memory Record dailies,
+//= the bunker's and Krotzel's quests are left as they are.
+//= 15 and 16 are separate: 16.1 does not need 15.
+//= Episode 16.1: ep16_royal = 24. Needs base level 100 and the way to
+//= the New World (ep13_ryu or ep13_start 100), as the game does before
+//= 16.1 begins. Opens Nillem's trips to the past Prontera and the
+//= repeatable Room of Consciousness (Friedrich Heine); 16.2 can begin.
+//= The families' side stories are left as they are.
+//= Episode 16.2: terra_gloria_main = 25, terra_gloria_lady_part at
+//= least 10. Opens the Heart Hunter War Base and the Werner
+//= Laboratory central room, Einbech's station, the 16.2 dailies
+//= (Sweeping the remnants, Hiding Researcher, the Chimeras) and the
+//= Rebellion hideout's side quests; 17.1 can begin.
+//= Episode 17.1: terra_gloria_main = 26, quest 16360 done. Opens
+//= Rekenber, the Rudus areas, Clana Nemieri, the Illusion enchanter,
+//= the repeatable Cor Operation and the 17.1 dailies (Morning,
+//= Pure Backward, farm and mercenary work).
+//= Episode 17.2: ep17_2_main = 36. Opens the Mansion areas, Lost
+//= Farm, Hidden Garden, the Sage's Legacy enchanter and the side
+//= quests (bathhouse, library, basement, Water Garden ...).
+//= Episode 18: ep18_main = 57. Opens Villa of Deception
+//= (wolfvill 79,260) and the Wolfvill dailies.
+//===== How to customize: ====================================
+//= OnInit: .price[<episode>] is the ticket price in Zeny,
+//= .ready the parts with a skip, .order the story order (0 starts a
+//= new chain: the part after it needs nothing before).
 //============================================================
 
 prontera,128,193,4	script	Valkyrie#EpsClear	4_F_VALKYRIE,{
-    mes "[Valkyrie]";
-    mes "Greetings, traveler. I possess the power to grant you full completion of historical main story episodes.";
-    mes "Present your ^0055FFEpisode Clear Ticket^000000 and I shall fulfill your quest progression.";
-    next;
+	mes "[Valkyrie]";
+	mes "Greetings, traveler. With an ^0055FFEpisode Clear Ticket^000000 I can lift the weight of an episode's story from you.";
+	mes "Its main quests count as done, so whatever waits for the finished story opens to you. No rewards come with it.";
+	next;
+	switch (select("Use a ticket:Buy a ticket:Which episodes?:Cancel")) {
+	case 1:
+		.@part = callsub(S_PickPart);
+		if (!.@part)
+			close;
+		.@ep = .@part / 10;
+		.@name$ = callsub(S_Name, .@part);
+		if (callsub(S_Done, .@part)) {
+			mes "[Valkyrie]";
+			mes "You have already finished Episode " + .@name$ + ". Keep your ticket.";
+			close;
+		}
+		.@prev = callsub(S_Prev, .@part);
+		if (.@prev && !callsub(S_Done, .@prev)) {
+			mes "[Valkyrie]";
+			mes "First finish Episode " + callsub(S_Name, .@prev) + ", by playing it or with a ticket.";
+			close;
+		}
+		.@need$ = callsub(S_Need, .@part);
+		if (.@need$ != "") {
+			mes "[Valkyrie]";
+			mes .@need$;
+			close;
+		}
+		if (countitem(.ticket[.@ep]) < 1) {
+			mes "[Valkyrie]";
+			mes "You have no ^0055FFEpisode " + .@ep + " Clear Ticket^000000.";
+			close;
+		}
+		mes "[Valkyrie]";
+		mes "Use an ^0055FFEpisode " + .@ep + " Clear Ticket^000000 for Episode " + .@name$ + "?";
+		mes "Its main story will be marked as finished. Quests of it you have open are closed.";
+		next;
+		if (select("Yes, use it:Cancel") == 2)
+			close;
+		if (countitem(.ticket[.@ep]) < 1)
+			close;
+		delitem .ticket[.@ep], 1;
+		callsub S_Skip, .@part;
+		specialeffect2 154;
+		mes "[Valkyrie]";
+		mes "It is done. Episode " + .@name$ + " is behind you.";
+		close;
+	case 2:
+		.@n = getarraysize(.sell);
+		for (.@i = 0; .@i < .@n; .@i++)
+			.@menu$ += "Episode " + .sell[.@i] + " ticket (" + callfunc("F_InsertComma", .price[.sell[.@i]]) + " z):";
+		.@c = select(.@menu$ + "Cancel") - 1;
+		if (.@c >= .@n)
+			close;
+		.@ep = .sell[.@c];
+		// Refused only when every part it can be used for is finished.
+		.@open = 0;
+		.@n = getarraysize(.ready);
+		for (.@i = 0; .@i < .@n; .@i++) {
+			if (.ready[.@i] / 10 == .@ep && !callsub(S_Done, .ready[.@i]))
+				.@open = 1;
+		}
+		if (!.@open) {
+			mes "[Valkyrie]";
+			mes "You have already finished what an Episode " + .@ep + " ticket is good for.";
+			close;
+		}
+		mes "[Valkyrie]";
+		mes "An ^0055FFEpisode " + .@ep + " Clear Ticket^000000 costs " + callfunc("F_InsertComma", .price[.@ep]) + " Zeny. Each ticket skips one part.";
+		next;
+		if (select("Buy it:Cancel") == 2)
+			close;
+		if (Zeny < .price[.@ep]) {
+			mes "[Valkyrie]";
+			mes "You do not have enough Zeny.";
+			close;
+		}
+		if (!checkweight(.ticket[.@ep], 1)) {
+			mes "[Valkyrie]";
+			mes "You are carrying too much.";
+			close;
+		}
+		Zeny -= .price[.@ep];
+		getitem .ticket[.@ep], 1;
+		mes "[Valkyrie]";
+		mes "Here is your ticket.";
+		close;
+	case 3:
+		mes "[Valkyrie]";
+		.@n = getarraysize(.ready);
+		for (.@i = 0; .@i < .@n; .@i++)
+			mes "Episode " + callsub(S_Name, .ready[.@i]) + ": ready.";
+		mes "One ticket skips one part, in story order. Other episodes will follow; if you hold a ticket for one of them, keep it until then.";
+		close;
+	}
+	close;
 
-    // Direct Divine Pride Item IDs
-    .@ticket_ids[13] = 1000284; // Ep 13
-    .@ticket_ids[14] = 1000285; // Ep 14
-    .@ticket_ids[15] = 1000286; // Ep 15
-    .@ticket_ids[16] = 1000282; // Ep 16
-    .@ticket_ids[17] = 1000287; // Ep 17
-    .@ticket_ids[18] = 1000288; // Ep 18
-    .@ticket_ids[19] = 1000988; // Ep 19
-    .@ticket_ids[20] = 1001214; // Ep 20
+// Asks for a part out of .ready. Returns it, or 0 for Cancel. No ':' in
+// an item's text: select() splits the menu at every ':'.
+S_PickPart:
+	.@n = getarraysize(.ready);
+	for (.@i = 0; .@i < .@n; .@i++)
+		.@menu$ += "Episode " + callsub(S_Name, .ready[.@i]) + " (you have " + countitem(.ticket[.ready[.@i] / 10]) + "):";
+	.@c = select(.@menu$ + "Cancel") - 1;
+	if (.@c >= .@n)
+		return 0;
+	return .ready[.@c];
 
-    // Base/Job EXP Rewards
-    .@b_exp[13] = 5000000;   .@j_exp[13] = 2500000;
-    .@b_exp[14] = 10000000;  .@j_exp[14] = 5000000;
-    .@b_exp[15] = 20000000;  .@j_exp[15] = 10000000;
-    .@b_exp[16] = 35000000;  .@j_exp[16] = 17500000;
-    .@b_exp[17] = 50000000;  .@j_exp[17] = 25000000;
-    .@b_exp[18] = 80000000;  .@j_exp[18] = 40000000;
-    .@b_exp[19] = 120000000; .@j_exp[19] = 60000000;
-    .@b_exp[20] = 200000000; .@j_exp[20] = 100000000;
+// "18" for 180, "17.2" for 172.
+S_Name:
+	if (getarg(0) % 10)
+		return (getarg(0) / 10) + "." + (getarg(0) % 10);
+	return "" + (getarg(0) / 10);
 
-    .@menu$ = "";
-    .@has_tickets = 0;
+// The part before this one in .order, or 0 (also when a 0 in .order
+// is before it).
+S_Prev:
+	.@n = getarraysize(.order);
+	for (.@i = 1; .@i < .@n; .@i++) {
+		if (.order[.@i] == getarg(0))
+			return .order[.@i - 1];
+	}
+	return 0;
 
-    for (.@ep = 13; .@ep <= 20; .@ep++) {
-        .@item_id = .@ticket_ids[.@ep];
-        if (countitem(.@item_id) > 0) {
-            .@menu$ += "Redeem Episode " + .@ep + " Clear Ticket:";
-            .@has_tickets = 1;
-        } else {
-            .@menu$ += "^777777Episode " + .@ep + " Ticket (Missing)^000000:";
-        }
-    }
-    .@menu$ += "Cancel";
+// What the game asks before the part begins, beyond the part before it:
+// "" when nothing is missing, else what to say.
+S_Need:
+	switch (getarg(0)) {
+	case 131:
+		// The Promotional Staff in Izlude (quests_13_1.txt).
+		if (BaseLevel < 70)
+			return "Episode 13.1 needs base level 70.";
+		break;
+	case 132:
+		if (countitem(2782) < 1 && !checkweight(2782, 1))
+			return "You are carrying too much to take the Ring of the Ancient Wise King that comes with Episode 13.2.";
+		break;
+	case 141:
+		// Theore (quests_mora.txt).
+		if (BaseLevel < 100)
+			return "Episode 14.1 needs base level 100.";
+		break;
+	case 142:
+		// The travelers in Eclage (quests_eclage.txt).
+		if (BaseLevel < 99)
+			return "Episode 14.2 needs base level 99.";
+		break;
+	case 143:
+		// The Piled Rags in Morocc (quests_14_3_bis.txt).
+		if (BaseLevel < 140)
+			return "Episode 14.3 needs base level 140.";
+		break;
+	case 151:
+		// Secretary Lime Evenor (quests_15_1.txt).
+		if (BaseLevel < 140)
+			return "Episode 15.1 needs base level 140.";
+		if (countitem(6219) < 1 && countitem(22508) < 1)
+			return "Episode 15.1 needs an Eden Group Mark: the excavation team takes only Eden Group members.";
+		break;
+	case 161:
+		// The Royal Messenger (quests_16_1.txt).
+		if (BaseLevel < 100)
+			return "Episode 16.1 needs base level 100.";
+		if (ep13_ryu < 100 && ep13_start < 100)
+			return "Episode 16.1 needs the way to the New World open: Onward to the New World, or the Cat Paw Agent's quest.";
+		break;
+	}
+	return "";
 
-    if (!.@has_tickets) {
-        mes "[Valkyrie]";
-        mes "You do not have any Episode Clear Tickets (Ep 13 - 20) in your inventory.";
-        close;
-    }
+// Whether the part's main story is finished.
+S_Done:
+	switch (getarg(0)) {
+	case 131:
+		// The four stories' ends (quests_13_1.txt). Report from the New
+		// World ends at 14; Nydhogg's Nest takes it to 15. Its branches
+		// use 61-123 midway.
+		return (ep13_ryu >= 100 && ep13_newbs >= 100 && ep13_1_rhea >= 100
+			&& (ep13_1_edq == 14 || ep13_1_edq == 15));
+	case 132:
+		// The ring is made; Arc's reward in Terra's Yai, 28 is the last
+		// talk after it (quests_13_2.txt).
+		return (ep13_2_rhea >= 100 && ep13_mdrama >= 27);
+	case 133:
+		// El Dicastes opens; the man in black at the camp
+		// (quests_dicastes.txt).
+		return (ep13_3_invite >= 6 && ep13_3_secret >= 24);
+	case 141:
+		// Theore's reward; the young man's last words open the Mora
+		// dailies (quests_mora.txt, HazyForest.txt).
+		return (ep14_1_bs >= 19 && ep14_1_mistwoods >= 10);
+	case 142:
+		// The last of the chief of staff (quests_eclage.txt); Avant at
+		// the Flame Basin takes it to 34.
+		return (ep14_2_mylord >= 33);
+	case 143:
+		// Morse Cave cleared: what Commander Hibba Agip asks before the
+		// Demon God (quests_14_3_bis.txt, MorseCave.txt).
+		return (ep14_3_mors01 >= 1);
+	case 151:
+		// Ian Atnad lets you into the research facilities; Looking for the
+		// Traces ends with Maggi (quests_15_1.txt).
+		return (ep15_1_atnad >= 19 && ep15_1_elb >= 15);
+	case 152:
+		// Tatio at Rekenber's headquarters; Vestige ends at the Last Room's
+		// door (quests_15_2.txt).
+		return (ep15_1_atnad >= 34 && ep15_2_bslast >= 9);
+	case 161:
+		// The end of 16.1: Friedrich Heine (quests_16_1.txt).
+		return (ep16_royal >= 24);
+	case 162:
+		// The end of 16.2 (quests_16_2.txt); 17.1 begins at 25.
+		return (terra_gloria_main >= 25);
+	case 171:
+		// What the game itself checks before 17.2 begins.
+		return (isbegin_quest(16360) == 2);
+	case 172:
+		return (ep17_2_main >= 36);
+	case 180:
+		return (ep18_main >= 57);
+	}
+	return 0;
 
-    .@choice = select(.@menu$);
-    if (.@choice > 8) close;
-
-    .@selected_ep = .@choice + 12;
-    .@selected_ticket = .@ticket_ids[.@selected_ep];
-
-    if (countitem(.@selected_ticket) < 1) {
-        mes "[Valkyrie]";
-        mes "You do not possess the Episode " + .@selected_ep + " Clear Ticket!";
-        close;
-    }
-
-    // Special selection prompt for Episode 17 (17.1 Illusion vs 17.2 Sage's Legacy)
-    .@sub_ep = 0;
-    if (.@selected_ep == 17) {
-        mes "[Valkyrie]";
-        mes "Episode 17 contains two distinct story lines. Which portion would you like to clear?";
-        next;
-        .@sub_choice = select("Episode 17.1 (Illusion):Episode 17.2 (Sage's Legacy & Varmundt):Both 17.1 & 17.2:Cancel");
-        if (.@sub_choice == 4) close;
-        .@sub_ep = .@sub_choice;
-    } else {
-        mes "[Valkyrie]";
-        mes "Are you sure you wish to consume your ^0055FFEpisode " + .@selected_ep + " Clear Ticket^000000?";
-        next;
-        if (select("Yes, complete the episode!:Cancel") == 2) close;
-    }
-
-    if (countitem(.@selected_ticket) < 1) close;
-
-    // Consume Ticket
-    delitem .@selected_ticket, 1;
-
-    // Complete Episode Quest Flags (Sets and completes so @checkquest shows 2)
-    switch (.@selected_ep) {
-        case 13:
-            setquest 7000; completequest 7000;
-            setquest 7001; completequest 7001;
-            break;
-        case 14:
-            setquest 7200; completequest 7200;
-            setquest 7201; completequest 7201;
-            break;
-        case 15:
-            setquest 9000; completequest 9000;
-            setquest 9001; completequest 9001;
-            break;
-        case 16:
-            // Banquet for Heroes (16.1) & Terra Gloria (16.2)
-            setquest 11200; completequest 11200;
-            setquest 11201; completequest 11201;
-            setquest 11333; completequest 11333;
-            setquest 11354; completequest 11354;
-            break;
-        case 17:
-            if (.@sub_ep == 1 || .@sub_ep == 3) {
-                // 17.1 Illusion
-                setquest 16000; completequest 16000;
-                setquest 16001; completequest 16001;
-            }
-            if (.@sub_ep == 2 || .@sub_ep == 3) {
-                // 17.2 Sage's Legacy / Varmundt
-                setquest 16010; completequest 16010;
-                setquest 16011; completequest 16011;
-            }
-            break;
-        case 18:
-            setquest 18000; completequest 18000;
-            setquest 18001; completequest 18001;
-            break;
-        case 19:
-            setquest 19000; completequest 19000;
-            setquest 19001; completequest 19001;
-            break;
-        case 20:
-            setquest 20000; completequest 20000;
-            setquest 20001; completequest 20001;
-            break;
-    }
-
-    // Grant EXP
-    getexp .@b_exp[.@selected_ep], .@j_exp[.@selected_ep];
-
-    specialeffect2 154;
-    mes "[Valkyrie]";
-    mes "It is done! Episode " + .@selected_ep + " has been marked as fully cleared, and your rewards have been granted.";
-    close;
-    end;
+// Marks the part's main story as finished.
+S_Skip:
+	switch (getarg(0)) {
+	case 131:
+		copyarray .@open[0], .q131[0], getarraysize(.q131);
+		copyarray .@done[0], .q131_done[0], getarraysize(.q131_done);
+		if (ep13_ryu < 100)
+			ep13_ryu = 100;
+		if (ep13_newbs < 100)
+			ep13_newbs = 100;
+		if (ep13_1_rhea < 100)
+			ep13_1_rhea = 100;
+		if (ep13_1_edq != 14 && ep13_1_edq != 15)
+			ep13_1_edq = 14;
+		break;
+	case 132:
+		copyarray .@open[0], .q132[0], getarraysize(.q132);
+		copyarray .@done[0], .q132_done[0], getarraysize(.q132_done);
+		ep13_2_rhea = 100;
+		ep13_mdrama = 28;
+		// The translator (Ring_Of_Wise_King); the Saphas speak only to
+		// whoever wears it.
+		if (countitem(2782) < 1)
+			getitem 2782, 1;
+		break;
+	case 133:
+		copyarray .@open[0], .q133[0], getarraysize(.q133);
+		copyarray .@done[0], .q133_done[0], getarraysize(.q133_done);
+		if (ep13_3_invite < 6)
+			ep13_3_invite = 6;
+		if (ep13_3_secret < 24)
+			ep13_3_secret = 24;
+		break;
+	case 141:
+		copyarray .@open[0], .q141[0], getarraysize(.q141);
+		copyarray .@done[0], .q141_done[0], getarraysize(.q141_done);
+		if (ep14_1_bs < 19)
+			ep14_1_bs = 19;
+		if (ep14_1_mistwoods < 10)
+			ep14_1_mistwoods = 10;
+		break;
+	case 142:
+		copyarray .@open[0], .q142[0], getarraysize(.q142);
+		copyarray .@done[0], .q142_done[0], getarraysize(.q142_done);
+		// Eclage's Entrance: the forms for first-time visitors.
+		if (ep14_2_oliver < 3)
+			ep14_2_oliver = 3;
+		ep14_2_mylord = 33;
+		break;
+	case 143:
+		copyarray .@open[0], .q143[0], getarraysize(.q143);
+		copyarray .@done[0], .q143_done[0], getarraysize(.q143_done);
+		// Avant at the Flame Basin.
+		if (ep14_2_mylord < 34)
+			ep14_2_mylord = 34;
+		ep14_3_newerabs = 24;
+		if (ep14_3_isle < 1)
+			ep14_3_isle = 1;
+		ep14_3_mors01 = 1;
+		break;
+	case 151:
+		copyarray .@open[0], .q151[0], getarraysize(.q151);
+		copyarray .@done[0], .q151_done[0], getarraysize(.q151_done);
+		// Core Collection and the excavation report are also dailies:
+		// closed only while they are still the story's.
+		if (ep15_1_atnad < 8 && isbegin_quest(7615) == 1)
+			erasequest 7615;
+		if (ep15_1_atnad < 13 && isbegin_quest(7617) == 1)
+			erasequest 7617;
+		if (ep15_1_atnad < 19) {
+			ep15_1_atnad = 19;
+			// What Ian Atnad gives at the end of 15.1; 15.2 starts with them.
+			if (isbegin_quest(7641) == 0)
+				setquest 7641;
+			if (isbegin_quest(7642) == 0)
+				setquest 7642;
+		}
+		if (ep15_2_permit < 1)
+			ep15_2_permit = 1;
+		if (ep15_1_elb < 15)
+			ep15_1_elb = 15;
+		break;
+	case 152:
+		copyarray .@open[0], .q152[0], getarraysize(.q152);
+		copyarray .@done[0], .q152_done[0], getarraysize(.q152_done);
+		ep15_1_atnad = 34;
+		// Five days of research facilities' Memory Records; 6 is what
+		// sends you to Ian Atnad and Rekenber's headquarters.
+		ep15_2_permit = 6;
+		if (ep15_2_bslast < 9) {
+			ep15_2_bslast = 9;
+			ep15_2_bsmemo = 18;
+		}
+		break;
+	case 161:
+		copyarray .@open[0], .q161[0], getarraysize(.q161);
+		copyarray .@done[0], .q161_done[0], getarraysize(.q161_done);
+		ep16_royal = 24;
+		// The Royal Messenger's letter, taken at the royal villa.
+		if (countitem(6933))
+			delitem 6933, countitem(6933);
+		break;
+	case 162:
+		copyarray .@open[0], .q162[0], getarraysize(.q162);
+		copyarray .@done[0], .q162_done[0], getarraysize(.q162_done);
+		terra_gloria_main = 25;
+		// The second floor's side story; 17 needs it at 10 or more.
+		if (terra_gloria_lady_part < 10)
+			terra_gloria_lady_part = 10;
+		break;
+	case 171:
+		copyarray .@open[0], .q171[0], getarraysize(.q171);
+		copyarray .@done[0], .q171_done[0], getarraysize(.q171_done);
+		// Set by Nihil in Prontera Castle when 17.1 begins.
+		if (terra_gloria_main < 26)
+			terra_gloria_main = 26;
+		break;
+	case 172:
+		copyarray .@open[0], .q172[0], getarraysize(.q172);
+		copyarray .@done[0], .q172_done[0], getarraysize(.q172_done);
+		ep17_2_main = 36;
+		break;
+	case 180:
+		copyarray .@open[0], .q180[0], getarraysize(.q180);
+		copyarray .@done[0], .q180_done[0], getarraysize(.q180_done);
+		ep18_main = 57;
+		break;
+	}
+	// Main quests still open are closed, as the story would have.
+	.@n = getarraysize(.@open);
+	for (.@i = 0; .@i < .@n; .@i++) {
+		if (isbegin_quest(.@open[.@i]) == 1)
+			erasequest .@open[.@i];
+	}
+	// The ones a finished story leaves completed.
+	.@n = getarraysize(.@done);
+	for (.@i = 0; .@i < .@n; .@i++) {
+		if (isbegin_quest(.@done[.@i]) == 0)
+			setquest .@done[.@i];
+		if (isbegin_quest(.@done[.@i]) == 1)
+			completequest .@done[.@i];
+	}
+	return;
 
 OnInit:
-    // Off on Pre-renewal (checkre(0): 1 = Renewal, 0 = Pre-renewal): no
-    // Episode Clear Ticket is in its item db. And when switched off in the
-    // settings window.
-    if (!checkre(0) || callfunc("F_SNPC_Off", "epvalk")) disablenpc strnpcinfo(0);
-    end;
+	// Off on Pre-renewal (checkre(0): 1 = Renewal, 0 = Pre-renewal): no
+	// Episode Clear Ticket is in its item db. And when switched off in the
+	// settings window.
+	if (!checkre(0) || callfunc("F_SNPC_Off", "epvalk")) {
+		disablenpc strnpcinfo(0);
+		end;
+	}
+	// Parts with a real skip, in menu order.
+	setarray .ready[0], 131, 132, 133, 141, 142, 143, 151, 152, 161, 162, 171, 172, 180;
+	// Story order, as far as S_Done can tell a part is finished. 14.1, 14.2,
+	// 15.1 and 16.1 do not need the part before them in the game, so 0
+	// starts a new chain there.
+	setarray .order[0], 131, 132, 133, 0, 141, 0, 142, 143, 0, 151, 152, 0, 161, 162, 171, 172, 180;
+	// Episode Clear Tickets (EpisodClear13 - EpisodClear18).
+	.ticket[13] = 1000284;
+	.ticket[14] = 1000285;
+	.ticket[15] = 1000286;
+	.ticket[16] = 1000282;
+	.ticket[17] = 1000287;
+	.ticket[18] = 1000288;
+	// Ticket prices in Zeny.
+	.price[13] = 1000000;
+	.price[14] = 2000000;
+	.price[15] = 3000000;
+	.price[16] = 4000000;
+	.price[17] = 5000000;
+	.price[18] = 6000000;
+	// Episodes whose tickets are sold: those of the ready parts.
+	.@n = getarraysize(.ready);
+	for (.@i = 0; .@i < .@n; .@i++) {
+		.@ep = .ready[.@i] / 10;
+		if (inarray(.sell, .@ep) < 0)
+			.sell[getarraysize(.sell)] = .@ep;
+	}
+	// Episode 13.1 (npc/quests/quests_13_1.txt): Onward to the New World,
+	// ep13_ryu 1 to 100 (10057-10078), New Surroundings, ep13_newbs 1 to
+	// 100 (11084-11100), The Tripartite Union's Feud, ep13_1_rhea 1 to 100
+	// (8196-8210), and Report from the New World, ep13_1_edq 1 to 14
+	// (3085-3094).
+	setarray .q131[0],
+		10057, 10058, 10059, 10060, 10061, 10062, 10063, 10064, 10065,
+		10066, 10067, 10068, 10069, 10070, 10071, 10072, 10073, 10074,
+		10075, 10076, 10077,
+		11084, 11085, 11087, 11088, 11089, 11091, 11092, 11093, 11094,
+		11095, 11096, 11097, 11099,
+		8196, 8197, 8198, 8199, 8200, 8201, 8202, 8203, 8204, 8205, 8206,
+		8207, 8208, 8209,
+		3085, 3086, 3087, 3088, 3089, 3090, 3091, 3092, 3093;
+	setarray .q131_done[0],
+		10078, 11086, 11090, 11098, 11100, 8210, 3094;
+	// Episode 13.2 (npc/quests/quests_13_2.txt): Otherworld Language,
+	// ep13_2_rhea 1 to 100 (8241-8253, all left completed), and Two
+	// Tribes, ep13_mdrama 1 to 28 (7056-7071). The dailies (7074-7079,
+	// Bradium, Laphine craftsman, Dragon eggs) are left alone.
+	setarray .q132[0],
+		7056, 7057, 7058, 7059, 7060, 7061, 7062, 7063, 7064, 7065, 7066,
+		7067, 7068, 7069, 7070;
+	setarray .q132_done[0],
+		8241, 8242, 8243, 8244, 8245, 8246, 8247, 8248, 8249, 8250, 8251,
+		8252, 8253, 7071;
+	// Episode 13.3 (npc/re/quests/quests_dicastes.txt): Sapha's Visit,
+	// ep13_3_invite 1 to 6 (7182-7184), and Doha's Secret Order,
+	// ep13_3_secret 1 to 24 (7185-7203). Ahat's daily (7200, 7201),
+	// Frede's Request and the departments' quests are left alone.
+	setarray .q133[0],
+		7182, 7183,
+		7185, 7186, 7187, 7188, 7189, 7190, 7191, 7192, 7193, 7194, 7195,
+		7196, 7197, 7198, 7199, 7202;
+	setarray .q133_done[0], 7184, 7203;
+	// Episode 14.1 (npc/re/quests/quests_mora.txt, and the instance
+	// HazyForest in npc/re/instances): Theore's Request, ep14_1_bs 1 to
+	// 19, with its three branches (Kusmi, Theodore, Pauchon), and
+	// Wandering Protector, ep14_1_mistwoods 1 to 10. The Hazy Forest's
+	// entry time (7211) is left alone.
+	setarray .q141[0],
+		11182, 11183, 11184, 11185, 11186, 11187, 11188, 11189, 11190,
+		11191, 11192, 11193, 11194, 11195, 11196, 11197, 11198, 11199,
+		11200, 11201, 11202, 11203, 11204, 11205, 11206, 11207, 7212;
+	setarray .q141_done[0], 11208, 7213;
+	// Episode 14.2 (npc/re/quests/quests_eclage.txt, and the instance
+	// EclageInterior in npc/re/instances): Eclage's Entrance, ep14_2_oliver
+	// 1 to 3, and Encounter in a Strange Land, ep14_2_mylord 1 to 33, with
+	// the errands it sends you on (7428-7433).
+	setarray .q142[0],
+		11310, 7411, 7412, 7413, 7414, 7415, 7416, 7417, 7421, 7422,
+		7423, 7424, 7425, 7426, 7428, 7429, 7430, 7431, 7432, 7433,
+		7434, 7435, 7436, 7437, 7438, 7439, 7440, 7441, 7442, 7443,
+		7445, 7446, 7447, 7448, 7449, 7450, 7451, 7452;
+	setarray .q142_done[0], 11311, 7418, 7419, 7420, 7427, 7444, 7453;
+	// Episode 14.3 (npc/re/quests/quests_14_3_bis.txt, and the instances
+	// IsleOfBios and MorseCave in npc/re/instances): Dimensional Travel
+	// with Specimen Collection and Antidote, ep14_3_newerabs 1 to 24, the
+	// Isle of Bios exploration and Morse Cave's hunt (9318). The instances'
+	// entry times (15005, 15007, 15008, 9319) are left alone.
+	setarray .q143[0],
+		11350, 11351, 11352, 11354, 11355, 11356, 11357, 11358, 11359,
+		11360, 11361, 9318;
+	setarray .q143_done[0], 11349, 11353, 11362, 15006;
+	// Episode 15.1 (npc/re/quests/quests_15_1.txt and quests_15_2.txt):
+	// the excavation team's quests, ep15_1_atnad 1 to 19, and To
+	// Phantasmagorika! with Looking for the Traces, ep15_1_elb 1 to 15
+	// (all left completed). 7615 and 7617 are handled in S_Skip. The
+	// excavation dailies, New Power Source, the police quests and the
+	// Wandering Bard are left alone.
+	setarray .q151[0],
+		7607, 7609, 7620, 7621, 7622, 7623, 7624, 7625, 7626, 7627;
+	setarray .q151_done[0],
+		7608, 7610, 7619,
+		11363, 11364, 11365, 11366, 11367, 11368, 11369, 11370, 11371,
+		11372, 11373, 11374, 11375;
+	// Episode 15.2 (npc/re/quests/quests_15_2.txt): the excavation team's
+	// quests, ep15_1_atnad 19 to 34, and Vestige, ep15_2_bslast 1 to 9
+	// (11381 is erased by the story). The Memory Record dailies
+	// (7650-7655), the bunker's (5341-5370), Krotzel's and the Last Room
+	// itself (11379, 11380) are left alone.
+	setarray .q152[0],
+		7642, 7643, 7644, 7645, 7646, 7647, 7648, 7649, 11381;
+	setarray .q152_done[0],
+		7641, 11382, 11383, 11384, 11385, 11386, 11387, 11388, 11389;
+	// Episode 16.1 (npc/re/quests/quests_16_1.txt, and the instances
+	// RitualOfBlessing and RoomOfConsciousness in npc/re/instances): the
+	// main-story quests, ep16_royal 1 to 24, and the one a finished story
+	// leaves completed. The families' quests (7683, 7684, 7686 and their
+	// own lines) and the repeatable Room of Consciousness (7705, 7706) are
+	// left alone.
+	setarray .q161[0],
+		7681, 7685, 7687, 7688, 7689, 7690, 7691, 7692, 7693, 7694,
+		7695, 7696, 7697, 7698, 7699, 7700, 7701, 7702, 7703;
+	setarray .q161_done[0], 7682;
+	// Episode 16.2 (npc/re/quests/quests_16_2.txt, and the instances
+	// HeartHunterWarBase and WernerLaboratoryCentralRoom in
+	// npc/re/instances): the main-story quests, terra_gloria_main 1 to
+	// 25, with the second floor's (14600-14615) and the Doubt line that
+	// 17 waits for (11454-11462), and the arena quests that may still be
+	// open (16009, 16011, 16060). The dailies (Sweeping the remnants,
+	// Hiding Researcher, Base maintenance) are left alone.
+	setarray .q162[0],
+		7731, 7732, 7733, 7734, 7735, 7736, 7737, 7738, 7739, 7740,
+		14595, 14596, 14597, 14598, 14599, 14614,
+		11454, 11455, 11456, 11457, 11458, 11459, 11460, 11461,
+		16009, 16011, 16060;
+	setarray .q162_done[0],
+		14600, 14601, 14602, 14613, 11462, 14615, 12374, 7741;
+	// Episode 17.1 (npc/re/quests/quests_17_1.txt, and the instances
+	// Regenschirm, SealedOs and CorOperation in npc/re/instances): the
+	// quests the story leaves erased or that may still be open (16352
+	// comes from the Illusion enchanter), and those it leaves completed,
+	// in story order. 17000-17014 are 17.1's here, whatever their titles
+	// in quest_db say. Side quests and dailies are left alone.
+	setarray .q171[0], 7851, 7852, 7854, 7855, 7856, 16352, 16355, 16356, 16376;
+	setarray .q171_done[0],
+		7850, 7853, 7857, 7858, 7859, 7860, 7861, 7862, 7864,
+		17000, 17001, 17002, 17003, 17004, 17005, 17006, 17007, 17008,
+		17009, 17010, 17011, 17012, 17013, 17014, 7865,
+		11596, 11597, 11598, 11599, 11600, 11601, 11602, 11603,
+		17015, 17016, 17017, 17018, 17019,
+		16353, 16354, 16357, 16358, 16359, 16360;
+	// Episode 17.2 (npc/re/quests/quests_17_2.txt): every main-story
+	// quest, ep17_2_main 1 to 36 (1 and 2 are set at the end of 17.1),
+	// and those a finished story leaves completed.
+	setarray .q172[0],
+		18000, 18001, 11615, 11616, 11617, 11618, 11620,
+		17333, 17334, 17335, 17336, 17337, 17338, 17381,
+		16440, 16441, 16442, 16443, 16444, 16445, 16446, 16447, 16448,
+		16449, 16450, 16451, 16452, 16453,
+		18002, 18013, 18014, 18015, 18016, 18017, 18018, 18021, 18020;
+	setarray .q172_done[0], 11620, 16452, 18018, 18021, 18020;
+	// Episode 18 (npc/re/quests/quests_18.txt): every main-story quest,
+	// ep18_main 1 to 57, and those a finished story leaves completed.
+	setarray .q180[0],
+		8681, 8682, 8683, 8684, 8685, 8686, 8687,
+		11696, 11697, 11698, 11699, 11700, 11701, 11702, 11703,
+		11704, 11705, 11706, 11707, 11708, 11709, 11710, 11711, 11712,
+		11713, 11714, 11715, 11716, 11717, 11719, 11720, 11721, 11722,
+		11723, 11724, 18082,
+		16567, 16568, 16569, 16570, 16571, 16572, 16573, 16574, 16575,
+		16576, 16577, 16578, 16579, 16580,
+		17517, 17518, 17519, 17520, 17521, 17525, 18083, 18084, 18085;
+	setarray .q180_done[0], 8681, 11720, 11724, 18085;
+	end;
 }

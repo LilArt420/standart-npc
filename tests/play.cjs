@@ -25,7 +25,9 @@
 //= Lord Knight Lv 99 (Pre-renewal), and its Bounty Hunter progress is
 //= cleared, so every run starts from the same place. It also gets a
 //= +5 Knife [4] with two cards, for the Card Exchanger check, and
-//= its Welcoming gift is cleared.
+//= its Welcoming gift is cleared. On Renewal it stands in the middle of
+//= Episodes 15.1, 15.2, 16.1, 16.2, 17.1, 17.2 and 18, for the Episode
+//= Valkyrie check, with the Zeny for their tickets.
 //============================================================
 'use strict';
 const fs = require('node:fs');
@@ -57,6 +59,70 @@ const PREM_TEST = { gauche: 1207, potion: 503, jellopy: 909 };
 // Shirt on the body, a Shard of Agility Jewel in the bag (Renewal only;
 // checked in the fork's re/pre-re item_db: Hat and Cotton Shirt in both).
 const ENCH_TEST = { hat: 2220, shirt: 2301, jewel: 27422 };
+// Episode Valkyrie (#51), Renewal: with the way to the New World open
+// (ep13_ryu 100, which 16.1 asks for) and an Eden Group Mark (which 15.1
+// asks for), the character stands in the middle of 13.1, 13.2, 13.3, 14.1,
+// 14.2, 14.3, 15.1, 16.1, 16.2, 17.1, 17.2 and 18 (a quest of each open).
+// It first tries to skip 13.2, 13.3, 14.3, 15.2, 16.2, 17.1, 17.2 and 18
+// (refused: the part before is not finished), then buys and uses a ticket
+// for 13.1, 13.2 (which gives the Ring of the Ancient Wise King), 13.3,
+// 14.1, 14.2 (14.1 is not needed), 14.3, 16.1 (15 not finished: 16.1
+// does not need it), 15.1, 15.2, 16.2, 17.1, 17.2, then 18. Parts sharing a variable (15.1
+// and 15.2, 16.2 and 17.1) have the end checked only on the last one; a
+// part with start null has no start of its own. Quest and item IDs from
+// the fork's npc/quests/quests_13_1.txt, quests_13_2.txt,
+// npc/re/quests/quests_dicastes.txt, quests_mora.txt, quests_eclage.txt,
+// quests_14_3_bis.txt, npc/re/instances/HazyForest.txt, IsleOfBios.txt,
+// quests_15_1.txt, quests_15_2.txt,
+// quests_16_1.txt, quests_16_2.txt, quests_17_1.txt, quests_17_2.txt and
+// quests_18.txt, db/re/quest_db.yml, db/re/item_db_etc.yml. `done` is a
+// sample of what each skip completes (all of it for 15). 15.1's open
+// quest 7617 is the excavation report, which S_Skip closes only while it
+// is the story's.
+const VALK_TEST = {
+    parts: [
+        { name: '13.1', ep: 13, ticket: 1000284, price: 1000000, priceText: '1,000,000', key: 'ep13_1_edq', start: 5, end: 14,
+          open: 3088, done: [10078, 11086, 11090, 11098, 11100, 8210, 3094] },
+        { name: '13.2', ep: 13, ticket: 1000284, price: 1000000, priceText: '1,000,000', key: 'ep13_mdrama', start: 10, end: 28,
+          open: 7060, done: [8241, 8242, 8243, 8253, 7071] },
+        { name: '13.3', ep: 13, ticket: 1000284, price: 1000000, priceText: '1,000,000', key: 'ep13_3_secret', start: 10, end: 24,
+          open: 7193, done: [7184, 7203] },
+        { name: '14.1', ep: 14, ticket: 1000285, price: 2000000, priceText: '2,000,000', key: 'ep14_1_bs', start: 11, end: 19,
+          open: 11189, done: [11208, 7213] },
+        { name: '14.2', ep: 14, ticket: 1000285, price: 2000000, priceText: '2,000,000', key: 'ep14_2_oliver', start: 1, end: 3,
+          open: 7440, done: [11311, 7418, 7419, 7420, 7427, 7444, 7453] },
+        { name: '14.3', ep: 14, ticket: 1000285, price: 2000000, priceText: '2,000,000', key: 'ep14_3_newerabs', start: 16, end: 24,
+          open: 11355, done: [11349, 11353, 11362, 15006] },
+        { name: '16.1', ep: 16, ticket: 1000282, price: 4000000, priceText: '4,000,000', key: 'ep16_royal', start: 13, end: 24,
+          open: 7695, done: [7682] },
+        { name: '15.1', ep: 15, ticket: 1000286, price: 3000000, priceText: '3,000,000', key: 'ep15_1_atnad', start: 12, end: 19,
+          open: 7617, done: [7608, 7610, 7619, 11363, 11364, 11365, 11366, 11367, 11368, 11369, 11370, 11371, 11372, 11373, 11374, 11375] },
+        { name: '15.2', ep: 15, ticket: 1000286, price: 3000000, priceText: '3,000,000', key: 'ep15_1_atnad', start: null, end: 34,
+          open: 7642, done: [7641, 11382, 11383, 11384, 11385, 11386, 11387, 11388, 11389] },
+        { name: '16.2', ep: 16, ticket: 1000282, price: 4000000, priceText: '4,000,000', key: 'terra_gloria_main', start: 16, end: 25,
+          open: 14614, done: [14600, 14601, 14602, 14613, 11462, 14615, 12374, 7741], doneBefore: 14601 },
+        { name: '17.1', ep: 17, ticket: 1000287, price: 5000000, priceText: '5,000,000', key: 'terra_gloria_main', start: null, end: 26,
+          open: 7852, done: [7850, 7862, 17014, 11603, 16354, 16360], doneBefore: 7850 },
+        { name: '17.2', ep: 17, ticket: 1000287, price: 5000000, priceText: '5,000,000', key: 'ep17_2_main', start: 21, end: 36,
+          open: 16449, done: [11620, 16452, 18018, 18021, 18020] },
+        { name: '18', ep: 18, ticket: 1000288, price: 6000000, priceText: '6,000,000', key: 'ep18_main', start: 41, end: 57,
+          open: 16573, done: [8681, 11720, 11724, 18085], doneBefore: 8681 },
+    ],
+    // Set before the run (what 16.1 needs), and the other variables the
+    // skips raise to at least these values.
+    // 14.2's main variable is checked here: 14.3 raises it to 34.
+    before: { ep13_ryu: 100, ep14_2_mylord: 18 },
+    after: { ep13_newbs: 100, ep13_1_rhea: 100, ep13_2_rhea: 100, ep13_3_invite: 6, ep14_1_mistwoods: 10, ep14_2_mylord: 34, ep14_3_isle: 1, ep14_3_mors01: 1, terra_gloria_lady_part: 10, ep15_1_elb: 15, ep15_2_permit: 6, ep15_2_bslast: 9, ep15_2_bsmemo: 18 },
+    mark: 6219,   // Eden Group Mark (Para_Team_Mark), db/re/item_db_etc.yml
+    ring: 2782,   // Ring of the Ancient Wise King (Ring_Of_Wise_King), db/re/item_db_equip.yml
+};
+const VALK_PRICE = VALK_TEST.parts.reduce((n, p) => n + p.price, 0);
+const VALK_QUESTS = [...VALK_TEST.parts.flatMap(p => [p.open, ...p.done])];
+const VALK_KEYS = [...new Set([...VALK_TEST.parts.map(p => p.key), ...Object.keys(VALK_TEST.before), ...Object.keys(VALK_TEST.after)])];
+const VALK_REGS = [
+    ...VALK_TEST.parts.filter(p => p.start !== null).map(p => [p.key, p.start]),
+    ...Object.entries(VALK_TEST.before),
+];
 // Smuggler's access quest: a Mr. Smile mask worn (does not count) and a
 // ten 1carat Diamonds in the bag; a second mask is given in game. The free item
 // asked for is a Red Potion. IDs from the fork's db/re and db/pre-re
@@ -91,6 +157,7 @@ const EXPECT = {
         blessing: true,            // Blacksmith Blessing in the Tool Dealer
         mvp90: true,               // Dummy Master's "MVP, 90% less damage": Renewal only
         welcome: true,             // Welcoming in Izlude: Renewal only
+        valkyrie: true,            // Episode Valkyrie: Renewal only
         jewel: true,               // headgear jewels exist (Enchanter check)
         warpFee: true,             // a Dragon Knight is 4th class: the Warper charges
         smugglerMarkup: 2,         // no cash-shop-extended in the test world
@@ -107,6 +174,7 @@ const EXPECT = {
         blessing: false,
         mvp90: false,
         welcome: false,
+        valkyrie: false,
         jewel: false,
         warpFee: false,            // a Lord Knight: no 3rd class here, no fee
         smugglerMarkup: 2,
@@ -141,7 +209,14 @@ function setUpCharacter(era) {
     // For the Card Exchanger: a +5 Knife [4] in the right hand with a Poring
     // Card in slot 0 and a Fabre Card in slot 1, and no loose cards of either.
     const w = W.rotest('server', 'sql', '--write',
-        `UPDATE \`char\` SET class=${e.job}, base_level=${e.level}, job_level=50, zeny=100000, last_map='prontera', last_x=156, last_y=180 WHERE char_id=${id};`
+        `UPDATE \`char\` SET class=${e.job}, base_level=${e.level}, job_level=50, zeny=${100000 + VALK_PRICE}, last_map='prontera', last_x=156, last_y=180 WHERE char_id=${id};`
+        + ` DELETE FROM char_reg_num WHERE char_id=${id} AND \`key\` IN (${VALK_KEYS.map(k => `'${k}'`).join(', ')});`
+        + ` DELETE FROM quest WHERE char_id=${id} AND quest_id IN (${VALK_QUESTS.join(', ')});`
+        + ` DELETE FROM inventory WHERE char_id=${id} AND nameid IN (${[...VALK_TEST.parts.map(p => p.ticket), VALK_TEST.mark, VALK_TEST.ring].join(', ')});`
+        + (e.valkyrie ? ` INSERT INTO inventory (char_id, nameid, amount, equip, identify) VALUES (${id}, ${VALK_TEST.mark}, 1, 0, 1);`
+            + ` INSERT INTO char_reg_num (char_id, \`key\`, \`index\`, value) VALUES ${VALK_REGS.map(([k, v]) => `(${id}, '${k}', 0, ${v})`).join(', ')};`
+            + ` INSERT INTO quest (char_id, quest_id, state) VALUES `
+            + VALK_TEST.parts.map(p => `(${id}, ${p.open}, '1')` + (p.doneBefore ? `, (${id}, ${p.doneBefore}, '2')` : '')).join(', ') + ';' : '')
         + ` DELETE FROM char_reg_num WHERE char_id=${id} AND \`key\` LIKE 'BB\\_%';`
         + ` DELETE FROM char_reg_str WHERE char_id=${id} AND \`key\` LIKE 'BB\\_%';`
         + ` DELETE FROM char_reg_num WHERE char_id=${id} AND \`key\`='SNPC_WelcomeGift';`
@@ -306,10 +381,47 @@ function runEra(era) {
             'Cheffenia Gatekeeper: Zeny only, no testing reset', JSON.stringify(gate));
     }
     if (want('valkyrie')) {
-        if (!e.welcome) {
-            gm('@warp prontera 128 190');
+        gm('@warp prontera 128 190');
+        if (!e.valkyrie) {
             const valk = ev(`snpc.npcs(10).map(n => n.name)`);
             check(Array.isArray(valk) && !valk.some(n => n.startsWith('Valkyrie')), 'Episode Valkyrie: not on Pre-renewal', JSON.stringify(valk));
+        } else {
+            // A part before the one ahead of it is refused; then per part: buy its episode's
+            // ticket and use it (#51). Zeny is read after each talk; the quest
+            // log and the main variables from SQL after logging out.
+            const valkTalk = steps => ev(`(async () => {
+                const sleep = ms => new Promise(r => setTimeout(r, ms));
+                const said = [];
+                await snpc.talk('Valkyrie');
+                let v = snpc.view();
+                for (const want of ${JSON.stringify(steps)}) {
+                    for (let i = 0; i < 20 && !v.menu.some(m => m.text.startsWith(want)); i++) {
+                        if (v.next) v = await snpc.next(); else { await sleep(200); v = snpc.view(); }
+                    }
+                    if (v.text) said.push(v.text);
+                    v = await snpc.pick(want);
+                }
+                for (let i = 0; i < 10 && v.next; i++) { if (v.text) said.push(v.text); v = await snpc.next(); }
+                if (v.text) said.push(v.text);
+                await snpc.close();
+                return said.join(' / ');
+            })()`);
+            for (const [part, prev] of [['13.2', '13.1'], ['13.3', '13.2'], ['14.3', '14.2'], ['15.2', '15.1'], ['16.2', '16.1'], ['17.1', '16.2'], ['17.2', '17.1'], ['18', '17.2']]) {
+                const order = valkTalk(['Use a ticket', `Episode ${part} `]);
+                check(typeof order === 'string' && order.includes(`First finish Episode ${prev}`), `Episode Valkyrie: ${part} needs ${prev} finished first`, String(order).slice(-200));
+            }
+            for (const p of VALK_TEST.parts) {
+                const before = ev('roAgent.modules.Session.zeny');
+                const bought = valkTalk(['Buy a ticket', `Episode ${p.ep} ticket`, 'Buy it']);
+                check(typeof bought === 'string' && bought.includes(`${p.priceText} Zeny`) && bought.includes('Here is your ticket'),
+                    `Episode Valkyrie: sells the Episode ${p.ep} ticket for ${p.priceText} Zeny`, String(bought).slice(-200));
+                const after = ev('roAgent.modules.Session.zeny');
+                check(after === before - p.price, `Episode Valkyrie: takes the Zeny for ${p.ep}`, `${before} -> ${after}`);
+                const used = valkTalk(['Use a ticket', `Episode ${p.name} `, 'Yes, use it']);
+                check(typeof used === 'string' && used.includes(`Episode ${p.name} is behind you`), `Episode Valkyrie: skips Episode ${p.name}`, String(used).slice(-200));
+            }
+            const again = valkTalk(['Use a ticket', 'Episode 18 ']);
+            check(typeof again === 'string' && again.includes('already finished Episode 18'), 'Episode Valkyrie: a finished part keeps the ticket', String(again).slice(-200));
         }
     }
 
@@ -570,6 +682,26 @@ function runEra(era) {
         check(knife && knife.card0 === String(CARD_TEST.keep) && knife.refine === '5',
             'Card Exchanger: Knife keeps its Poring Card and +5, slot 1 empty', JSON.stringify(knife));
         check(loose === '1', 'Card Exchanger: Fabre Card back in the inventory', `${loose} loose`);
+    }
+    if (want('valkyrie') && e.valkyrie) {
+        VALK_TEST.parts.forEach((p, i) => {
+            const main = sqlOne(`SELECT value FROM char_reg_num WHERE char_id=${charId} AND \`key\`='${p.key}'`);
+            const open = sqlOne(`SELECT COUNT(*) FROM quest WHERE char_id=${charId} AND quest_id=${p.open}`);
+            const done = sqlOne(`SELECT COUNT(*) FROM quest WHERE char_id=${charId} AND state='2' AND quest_id IN (${p.done.join(', ')})`);
+            // A later part on the same variable moved it on.
+            if (!VALK_TEST.parts.slice(i + 1).some(q => q.key === p.key))
+                check(main === String(p.end), `Episode Valkyrie: ${p.key} ${p.end}, the last step of ${p.name}`, `${p.key} ${main}`);
+            check(open === '0' && done === String(p.done.length), `Episode Valkyrie: open ${p.name} quest closed, the finished ones completed`,
+                `${p.open}: ${open} rows, completed ${done} of ${p.done.length}`);
+        });
+        for (const [key, min] of Object.entries(VALK_TEST.after)) {
+            const v = sqlOne(`SELECT COALESCE(MAX(value),0) FROM char_reg_num WHERE char_id=${charId} AND \`key\`='${key}'`);
+            check(Number(v) >= min, `Episode Valkyrie: ${key} at least ${min}`, `${key} ${v}`);
+        }
+        const tickets = sqlOne(`SELECT COALESCE(SUM(amount),0) FROM inventory WHERE char_id=${charId} AND nameid IN (${VALK_TEST.parts.map(p => p.ticket).join(', ')})`);
+        check(tickets === '0', 'Episode Valkyrie: the tickets are used up', `${tickets} left`);
+        const ring = sqlOne(`SELECT COALESCE(SUM(amount),0) FROM inventory WHERE char_id=${charId} AND nameid=${VALK_TEST.ring}`);
+        check(ring === '1', 'Episode Valkyrie: 13.2 gives the Ring of the Ancient Wise King', `${ring} rings`);
     }
     if (want('premium')) {
         const count = nameid => sqlOne(`SELECT COALESCE(SUM(amount),0) FROM inventory WHERE char_id=${charId} AND nameid=${nameid}`);
