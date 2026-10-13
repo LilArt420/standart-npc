@@ -39,7 +39,7 @@ const ERAS = W.parseEras(args);
 // The parts of a run, each an NPC (or a few that belong together), in the
 // order they are played.
 const SECTIONS = ['buffer', 'bounty', 'dummies', 'tooldealer', 'nokzin', 'gatekeeper', 'valkyrie',
-    'welcome', 'enchanter', 'warper', 'smuggler', 'cardexchanger', 'plagiarism', 'premium'];
+    'attendance', 'welcome', 'enchanter', 'warper', 'smuggler', 'cardexchanger', 'plagiarism', 'premium'];
 const onlyArg = args.find(a => a.startsWith('--only='));
 const only = onlyArg ? new Set(onlyArg.slice(7).split(',').map(t => t.trim()).filter(Boolean)) : null;
 if (only) for (const name of only) if (!SECTIONS.includes(name)) W.die(`unknown section: ${name} (sections: ${SECTIONS.join(', ')})`);
@@ -95,6 +95,9 @@ const EXPECT = {
         warpFee: true,             // a Dragon Knight is 4th class: the Warper charges
         smugglerMarkup: 2,         // no cash-shop-extended in the test world
         thirdClass: true,          // Shadow Chaser exists: Plagiarism Master's Reproduce check
+        // Attendance Check days 1-3 with tests/world.cjs's settings: day 1
+        // set to 3 Red Potions, days 2 and 3 the mod's own attendance.yml.
+        attendance: ['501:3', '969:7', '14545:3'],
     },
     'pre-renewal': {
         job: 4008, level: 99,    // Lord Knight
@@ -108,6 +111,7 @@ const EXPECT = {
         warpFee: false,            // a Lord Knight: no 3rd class here, no fee
         smugglerMarkup: 2,
         thirdClass: false,
+        attendance: ['501:3', '14545:3', '12412:5'],
     },
 };
 
@@ -309,6 +313,23 @@ function runEra(era) {
         }
     }
 
+    if (want('attendance')) {
+        // Attendance Check reward editor (#84): the window the client draws
+        // from its own CheckAttendance.lub shows, through the mod's client
+        // plugin, the rewards the server really gives.
+        const days = ev(`(async () => {
+            const c = roAgent.modules.UIManager.getComponent('CheckAttendance');
+            if (c._host && c._host.style.display !== 'none') c.toggle();
+            c.toggle();
+            const read = () => { const r = c.getRoot(); return r ? [0, 1, 2].map(i => r.querySelector('#attendance_day_' + i + ' .item')) : []; };
+            for (let i = 0; i < 40 && !(read()[0] && read()[0].dataset.snpcIcon); i++) await new Promise(r => setTimeout(r, 250));
+            const out = read().map(el => el ? (el.dataset.snpcIcon || '-') + ':' + ((el.querySelector('.item-quantity') || {}).textContent || '-') : 'none');
+            if (c._host && c._host.style.display !== 'none') c.toggle();
+            return out;
+        })()`);
+        check(Array.isArray(days) && e.attendance.every((d, i) => days[i] === d),
+            `Attendance Check: window shows ${e.attendance.join(', ')} for days 1-3`, JSON.stringify(days));
+    }
     if (want('welcome')) {
         // Welcoming (Izlude, Renewal only): the gift once; on Pre-renewal no NPC.
         gm('@warp izlude 189 206');

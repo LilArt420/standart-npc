@@ -5,7 +5,7 @@
 <p align="center">
   <a href="../../releases/latest"><img src="https://img.shields.io/github/v/release/MondoTruth/standart-npc?style=for-the-badge&label=latest&color=d9a233" alt="Latest release"></a>
   <a href="../../releases"><img src="https://img.shields.io/github/downloads/MondoTruth/standart-npc/total?style=for-the-badge&color=5da9e0" alt="Downloads"></a>
-  <a href="https://github.com/Flux159/ragnarokoffline.app"><img src="https://img.shields.io/badge/Ragnarok%20Offline-%E2%89%A5%201.5.5-c8503f?style=for-the-badge" alt="Requires Ragnarok Offline 1.5.5 or newer"></a>
+  <a href="https://github.com/Flux159/ragnarokoffline.app"><img src="https://img.shields.io/badge/Ragnarok%20Offline-%E2%89%A5%201.6.0-c8503f?style=for-the-badge" alt="Requires Ragnarok Offline 1.6.0 or newer"></a>
 </p>
 
 <p align="center">
@@ -28,7 +28,7 @@
 3. **Settings → Mods** → tick **standart-npc** → **Apply**. This turns on every NPC in the pack.
 
 > [!IMPORTANT]
-> Requires app version **1.5.5 or newer** — the Attendance Check needs its server (rewards that start over after day 20), and the settings window, the per-NPC switches, Bounty Hunter credit for party bot kills, the separate Pre-renewal spawn files and the Card Exchanger pulling one card need 1.4.8.
+> Requires app version **1.6.0 or newer** — the Attendance Check reward editor needs its server extension; rewards that start over after day 20 need 1.5.5, and the settings window, the per-NPC switches, Bounty Hunter credit for party bot kills, the separate Pre-renewal spawn files and the Card Exchanger pulling one card need 1.4.8.
 
 ---
 
@@ -54,7 +54,7 @@ Everything is on by default. Any NPC can be switched off in the settings window.
 | ✨ | **Buffer** | Free instant buffs + full heal on click, no dialog window. You choose the buffs (see below). Duplicated in every major town. | Every major town |
 | 📦 | **Premium Service Manager** | Save point, storage, free identify-all, and disposing of items that cannot be dropped or traded (account-bound and the like). | Prontera (160, 187) |
 | 🏋️ | **Weight Maxxer** | Trades a Gym Pass for +1 permanent carry capacity, up to 10 times. Gym Pass: the Cash Shop with cash-shop-extended, the Tool Dealer (100,000 Zeny) without it. | Prontera (147, 172) |
-| 📅 | **Attendance Check** | The game's own attendance window after login: one reward a day by mail, 20 days that start over. Own rewards per era. Setting "Attendance Check". | Window, no NPC |
+| 📅 | **Attendance Check** | The game's own attendance window after login: one reward a day by mail, 20 days that start over. Own rewards per era; change them in Settings… → Attendance Check → Rewards…. Setting "Attendance Check". | Window, no NPC |
 
 #### 🎓 Character
 
