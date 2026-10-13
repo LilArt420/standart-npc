@@ -14,6 +14,7 @@
 
 <p align="center">
   <a href="#-install">📥 Install</a> &nbsp;•&nbsp;
+  <a href="#settings">⚙️ Settings</a> &nbsp;•&nbsp;
   <a href="#-whats-included">🗺️ What's included</a> &nbsp;•&nbsp;
   <a href="#-credits">🏆 Credits</a> &nbsp;•&nbsp;
   <a href="#-contributing">🤝 Contributing</a>
@@ -23,38 +24,47 @@
 
 ## 📥 Install
 
-1. Download the [latest release](../../releases/latest) (or clone this repo).
-2. Drop the folder into your Ragnarok Offline mods directory.
-3. **Settings → Mods** → tick **standart-npc** → **Apply**. This turns on every NPC in the pack.
+In Ragnarok Offline: **Settings → Mods → Find Mods** → install **standart-npc**. Updates show up in **Settings → Mods → Updates**.
+
+Or by hand: download the zip from the [latest release](../../releases/latest), then **Settings → Mods → Add mod from folder…** and pick the zip.
 
 > [!IMPORTANT]
-> Requires app version **1.6.0 or newer** — the Attendance Check reward editor needs its server extension; rewards that start over after day 20 need 1.5.5, and the settings window, the per-NPC switches, Bounty Hunter credit for party bot kills, the separate Pre-renewal spawn files and the Card Exchanger pulling one card need 1.4.8.
+> Needs Ragnarok Offline **1.6.0 or newer**. On an older app you keep the version you have until you update the app.
 
 ---
 
-## Settings
+<a id="settings"></a>
 
-Open **Settings → Mods → standart-npc → Settings…**
+## ⚙️ Settings
 
-- Every NPC has its own checkbox, grouped the same way as the list below. A group's checkbox switches the whole group.
-- **Buffer → Choose buffs…** picks which buffs the Buffer casts, grouped by class, each with a short description.
-- **Save** keeps your choice for the next server start, **Save and restart server** applies it right away.
+Everything is on after install. To change it: **Settings → Mods → standart-npc → Settings…**
+
+| What | Where in the window |
+|---|---|
+| 🧩 **Pick the NPCs you want** | Every NPC has its own checkbox, grouped as in the list below; a group's checkbox switches the whole group. Quick presets on top: **All on**, **Essentials** (Warper, Buffer, Premium Service Manager, Job Master, Reset Girl, Stylist), **All off**. |
+| ✨ **Buffer: which buffs** | **Buffer → Choose buffs…**: tick the buffs, grouped by class, each with a short description. Presets: Default, Acolyte line, Everything, 4th class, Heal only. |
+| 🌀 **Warper: fees and locked dungeons** | **Warper → Options…**: switch off the fee for 3rd/4th classes, or open the quest-locked dungeons (Bio Lab, the Culvert, Dewata Dungeon, Nidhoggur's Dungeon, Rachel Sanctuary) without the quest. |
+| 🕵️ **Smuggler: banned goods** | **Smuggler → Options…**: keep him from selling cards, MVP cards, mini-boss cards, costumes, or any item IDs you list. |
+| 📅 **Attendance Check: your own rewards** | **Attendance Check → Rewards…**: an item ID and amount for each of the 20 days, separately for Renewal and Pre-renewal. An empty day keeps the mod's reward. |
+
+**Save and restart server** applies the changes right away; **Save** keeps them for the next server start. A switched-off NPC disappears from the world, but players' progress with it stays on their characters.
+
+> [!TIP]
+> Need an item ID? In game: `@iteminfo <name>`.
 
 ---
 
 ## 🗺️ What's included
 
-Everything is on by default. Any NPC can be switched off in the settings window.
-
 #### 🧭 Travel & services
 
 | | NPC | What it does | Location |
 |:-:|---|---|---|
-| 🌀 | **Warper** | Menu-based travel — towns, fields, dungeons, guild castles, instances. Duplicated in every major town. On by default, each can be switched off: a fee for 3rd/4th classes (5,000 / 15,000 Zeny) and quest-locked dungeons. | Every major town |
-| ✨ | **Buffer** | Free instant buffs + full heal on click, no dialog window. You choose the buffs (see below). Duplicated in every major town. | Every major town |
+| 🌀 | **Warper** | Menu-based travel — towns, fields, dungeons, guild castles, instances. 3rd/4th classes pay 5,000 Zeny (15,000 for dungeons and instances); some dungeons need their quest first. Both can be switched off. | Every major town |
+| ✨ | **Buffer** | Free instant buffs + full heal on click, no dialog window. You choose the buffs ([list](#-buffer)). | Every major town |
 | 📦 | **Premium Service Manager** | Save point, storage, free identify-all, and disposing of items that cannot be dropped or traded (account-bound and the like). | Prontera (160, 187) |
 | 🏋️ | **Weight Maxxer** | Trades a Gym Pass for +1 permanent carry capacity, up to 10 times. Gym Pass: the Cash Shop with cash-shop-extended, the Tool Dealer (100,000 Zeny) without it. | Prontera (147, 172) |
-| 📅 | **Attendance Check** | The game's own attendance window after login: one reward a day by mail, 20 days that start over. Own rewards per era; change them in Settings… → Attendance Check → Rewards…. Setting "Attendance Check". | Window, no NPC |
+| 📅 | **Attendance Check** | The game's own attendance window after login: one reward a day by mail, 20 days that start over. Rewards can be changed in the settings. | Window, no NPC |
 
 #### 🎓 Character
 
@@ -63,7 +73,7 @@ Everything is on by default. Any NPC can be switched off in the settings window.
 | 🎓 | **Job Master** | Full job changer up to 4th class, including job-change equipment (Wolf Flute for Ranger, etc.). | Prontera (157, 195) |
 | 🔄 | **Reset Girl** | Resets skills, stats, or both, for Zeny. | Prontera (154, 195) |
 | 💇 | **Stylist** | Hair style, hair color, cloth color changer. | Prontera (169, 180) |
-| 🛡️ | **Episode Valkyrie** | Episode Clear Tickets skip an episode's main story, as on official servers: its instances and daily quests open, no rewards. One ticket per part, in story order. Episodes 13.1 (Nydhogg's Nest), 13.2 (the Sapha translator ring), 13.3 (El Dicastes), 14.1 (Mora dailies), 14.2 (Eclage), 14.3 (Flame Basin, the Demon God), 15.1 (Verus research facilities), 15.2 (Last Room), 16.1 (Room of Consciousness), 16.2 (Heart Hunter War Base, Werner Laboratory, Einbech), 17.1 (Rekenber, Rudus, Clana Nemieri), 17.2 (the Mansion areas, Lost Farm, Hidden Garden) and 18 (Villa of Deception) for now. Sells the tickets for Zeny; [cash-shop-extended](https://github.com/LilArt420/cashshopmod)'s Cash Shop sells 16-18 too. Renewal only. | Prontera (128, 193) |
+| 🛡️ | **Episode Valkyrie** | Sells Episode Clear Tickets for Zeny. A ticket skips one part of an episode's main story, as on official servers: its maps, instances and daily quests open, no rewards. Parts 13.1 – 18 for now, in story order ([what each opens](#episode-valkyrie)). Renewal only. | Prontera (128, 193) |
 | 🎭 | **Plagiarism Master** | Rogue, Stalker, Shadow Chaser and Abyss Chaser copy any skill Plagiarism can copy. The level goes up to your Plagiarism level. Shadow Chaser and Abyss Chaser can also put a 3rd class skill into their Reproduce slot (Renewal). | Prontera (171, 182) |
 
 #### 🛒 Shops & cards
@@ -71,7 +81,7 @@ Everything is on by default. Any NPC can be switched off in the settings window.
 | | NPC | What it does | Location |
 |:-:|---|---|---|
 | 🧪 | **Tool Dealer** | Standard fixed-price shop — potions, wings, Blacksmith Blessing, and a few other staples. | Prontera (143, 178) |
-| 🕵️ | **Smuggler** | Buy any item by ID, as many as you want at once. First earn his trust with a short quest, once per character (a quest bubble shows until it is done). Detects the server era automatically: on Renewal the price depends on item type, on Pre-renewal every item costs its normal price x2. Settings… → Smuggler → Options… can keep him from selling cards, MVP or mini-boss cards, costumes or any item IDs you list. | Prontera (144, 174) |
+| 🕵️ | **Smuggler** | Buy any item by ID, as many as you want at once. First earn his trust with a short quest, once per character (a quest bubble shows until it is done). On Renewal the price depends on item type, on Pre-renewal every item costs its normal price x2. What he won't sell is up to you (settings). | Prontera (144, 174) |
 | 🃏 | **Card Exchanger** | 10 cards → Old Card Album, 30 cards → Mystical Card Album. Also pulls one card of your choice out of equipped gear. | Prontera (151, 187) |
 | 🦅 | **Falcon Breeder** | Falcon for Hunters and Snipers, Wolf Flute for Rangers and Windhawks, Hawk Flute for Windhawks (Renewal only). | Prontera (128, 211) |
 
@@ -95,7 +105,7 @@ Everything is on by default. Any NPC can be switched off in the settings window.
 
 | | NPC | What it does | Location |
 |:-:|---|---|---|
-| 🎯 | **Training Dummies** | A training dummy for testing damage output, always there. The Dummy Master next to it sets its size, element and element level, race, DEF, MDEF and type: Normal, Boss, MVP, or (Renewal) MVP taking 90% less damage. Both eras. | Prontera: dummy (156, 225), Dummy Master (150, 225) |
+| 🎯 | **Training Dummies** | A training dummy for testing damage output, always there. The Dummy Master next to it sets its size, element and element level, race, DEF, MDEF and type: Normal, Boss, MVP, or (Renewal) MVP taking 90% less damage. | Prontera: dummy (156, 225), Dummy Master (150, 225) |
 
 #### 🎁 Other
 
@@ -119,11 +129,33 @@ Gramps, Overlook Fisherman, Illusion Manager and Lucky John in one NPC. Each kin
 
 All contracts, maps and rewards are one table: [`npc/when/enable_bounties/bounty_contracts.txt`](./npc/when/enable_bounties/bounty_contracts.txt).
 
+<a id="episode-valkyrie"></a>
+
+### 🛡️ Episode Valkyrie
+
+One ticket per part. A part needs the one before it finished, played or skipped, except where the game itself lets you start fresh (14.1, 14.2, 15.1, 16.1). [cash-shop-extended](https://github.com/LilArt420/cashshopmod)'s Cash Shop also sells tickets 16 – 18.
+
+| Part | Opens |
+|---|---|
+| 13.1 | Nydhogg's Nest |
+| 13.2 | the Sapha translator ring |
+| 13.3 | El Dicastes |
+| 14.1 | Mora dailies |
+| 14.2 | Eclage |
+| 14.3 | Flame Basin, the Demon God |
+| 15.1 | Verus research facilities |
+| 15.2 | Last Room |
+| 16.1 | Room of Consciousness |
+| 16.2 | Heart Hunter War Base, Werner Laboratory, Einbech |
+| 17.1 | Rekenber, Rudus, Clana Nemieri |
+| 17.2 | the Mansion areas, Lost Farm, Hidden Garden |
+| 18 | Villa of Deception |
+
 ### ✨ Buffer
 
 On by default: **Blessing, Increase AGI, Kyrie Eleison, Magnificat**. The full heal always comes last.
 
-Can be switched on in the settings window:
+Can be switched on in **Settings… → Buffer → Choose buffs…**:
 
 | Class | Buffs |
 |---|---|
