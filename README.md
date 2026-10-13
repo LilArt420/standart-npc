@@ -89,7 +89,7 @@ Everything is on by default. Any NPC can be switched off in the settings window.
 | ⚒️ | **Safe Refiner** | Refine gear to +7 through +15 using certificates (Pre-renewal: +7, +8, +9, +11). | Prontera (164, 172) |
 | 📊 | **Grade Refiner** | Opens the game's grading and refining windows. Renewal only. | Prontera (164, 166) |
 | 💎 | **Universal Enchanter** | Attach an Enchant/Class Stone (or similar item) to costume, shadow or regular gear, for free. Keeps the refine level. | Prontera (164, 169) |
-| 🔥 | **Master Nokzin** | Endows your weapon with an element for an hour, works on carded weapons too. Can also remove an endow for free. Portable Elemental Converter scrolls: the Cash Shop with cash-shop-extended; without it he sells them himself (5,000z). | Prontera (144, 229) |
+| 🔥 | **Elemental Endower** | Endows your weapon with an element for an hour, works on carded weapons too. Can also remove an endow for free. Portable Elemental Converter scrolls: the Cash Shop with cash-shop-extended; without it he sells them himself (5,000z). | Prontera (164, 163) |
 
 #### 🥊 Training
 
@@ -104,7 +104,7 @@ Everything is on by default. Any NPC can be switched off in the settings window.
 | 👼 | **Welcoming** | A one-time starter gift for every new character: 150,000 Zeny, a Premium Booster Box and two costumes. Renewal only. | Izlude (189, 209) |
 
 > [!NOTE]
-> Lil Art's **cash-shop-extended** (Find Mods, Renewal only) adds a Cash Shop and Cash Points. With it, the Cheffenia Gatekeeper also takes Cash Points, the Smuggler charges more (so it does not undercut the shop) and Master Nokzin points to the Cash Shop for converters. Without it, Zeny only, the Smuggler's lower prices, Master Nokzin sells the converters and the Tool Dealer the Gym Pass.
+> Lil Art's **cash-shop-extended** (Find Mods, Renewal only) adds a Cash Shop and Cash Points. With it, the Cheffenia Gatekeeper also takes Cash Points, the Smuggler charges more (so it does not undercut the shop) and the Elemental Endower points to the Cash Shop for converters. Without it, Zeny only, the Smuggler's lower prices, the Elemental Endower sells the converters and the Tool Dealer the Gym Pass.
 
 ### 🏹 Bounty Hunter
 
@@ -154,7 +154,7 @@ Buffs that cancel each other in the game can't be ticked together. 3rd and 4th c
 - 👑 **MondoTruth** — pack owner/maintainer, and just a good guy.
 - 🎨 **Lil Art** — Safe Refiner, Grade Refiner, Universal Enchanter, the Daily Rewards (now Attendance Check) rewards, Welcoming, Gramps, Overlook Fisherman, the 231+ Gramps bracket, Cheffenia MVP Dungeon, Illusion Dungeon bounties, Weight Maxxer, Training Dummies, Episode Valkyrie, and the Tool Dealer's Blacksmith Blessing.
 - ❄️ **IceGlaive** — Lucky John, Gramps per-character progress tracking, live kill notifications, the original 3 extended Gramps level brackets (with monster IDs verified live via `@mobinfo`), the bounty penalty/abandon system, the Gramps EXP rebalance, the reduced over-level penalty, the 231+ bracket monster fix, and the shared bounty rewards file with the EXP rebalance for Gramps, Lucky John, and Illusion Manager.
-- 🔥 **Nokzin** — Master Nokzin (elemental weapon endows).
+- 🔥 **Nokzin** — the Elemental Endower (elemental weapon endows).
 - 🎭 **iguera** — Plagiarism Master (from his arpg-equipments mod, used with permission).
 - 🌍 **The Ragnarok Offline community** — bug reports and testing.
 - 🤖 **Claude** (Anthropic) — AI assistant used throughout development: writing and reviewing NPC scripts, diagnosing bugs, and packaging releases.
