@@ -41,7 +41,7 @@ const ERAS = W.parseEras(args);
 // The parts of a run, each an NPC (or a few that belong together), in the
 // order they are played.
 const SECTIONS = ['buffer', 'bounty', 'dummies', 'tooldealer', 'nokzin', 'gatekeeper', 'valkyrie',
-    'attendance', 'welcome', 'enchanter', 'warper', 'smuggler', 'cardexchanger', 'plagiarism', 'premium'];
+    'attendance', 'welcome', 'enchanter', 'warper', 'smuggler', 'cardexchanger', 'plagiarism', 'premium', 'stylist'];
 const onlyArg = args.find(a => a.startsWith('--only='));
 const only = onlyArg ? new Set(onlyArg.slice(7).split(',').map(t => t.trim()).filter(Boolean)) : null;
 if (only) for (const name of only) if (!SECTIONS.includes(name)) W.die(`unknown section: ${name} (sections: ${SECTIONS.join(', ')})`);
@@ -145,6 +145,13 @@ const PLAG_TEST = { job: 4072, bash: 5, comet: 2213,
     skills: [[1, 9], [225, 10], [2285, 10], [219, 5], [212, 4], [211, 4], [210, 4], [50, 5], [214, 5], [213, 2], [51, 1]],
     regs: ['jobchange_level', 'jobchange_level_3rd'] };
 const PLAG_IDS = PLAG_TEST.skills.map(([id]) => id).join(', ');
+// Stylist's alternative outfit (Renewal): the run's Dragon Knight (4th class,
+// gets the Rune Knight's) and a Rune Knight (4054) wear it; a Super Novice
+// (23) is not offered one. JOB_RUNE_KNIGHT_2ND = 4332, all from the fork's
+// src/common/mmo.hpp.
+const STYLE_TEST = { at: '169 182', rk2nd: 4332,
+    jobs: [{ id: 4252, name: 'Dragon Knight' }, { id: 4054, name: 'Rune Knight' }],
+    none: { id: 23, name: 'Super Novice' } };
 let charId = null;
 
 // Per era: the character, and what the NPCs should show.
@@ -209,7 +216,7 @@ function setUpCharacter(era) {
     // For the Card Exchanger: a +5 Knife [4] in the right hand with a Poring
     // Card in slot 0 and a Fabre Card in slot 1, and no loose cards of either.
     const w = W.rotest('server', 'sql', '--write',
-        `UPDATE \`char\` SET class=${e.job}, base_level=${e.level}, job_level=50, zeny=${100000 + VALK_PRICE}, last_map='prontera', last_x=156, last_y=180 WHERE char_id=${id};`
+        `UPDATE \`char\` SET class=${e.job}, body=${e.job}, base_level=${e.level}, job_level=50, zeny=${100000 + VALK_PRICE}, last_map='prontera', last_x=156, last_y=180 WHERE char_id=${id};`
         + ` DELETE FROM char_reg_num WHERE char_id=${id} AND \`key\` IN (${VALK_KEYS.map(k => `'${k}'`).join(', ')});`
         + ` DELETE FROM quest WHERE char_id=${id} AND quest_id IN (${VALK_QUESTS.join(', ')});`
         + ` DELETE FROM inventory WHERE char_id=${id} AND nameid IN (${[...VALK_TEST.parts.map(p => p.ticket), VALK_TEST.mark, VALK_TEST.ring].join(', ')});`
@@ -675,6 +682,57 @@ function runEra(era) {
             'Premium Service Manager: asks before disposing', said.slice(-400));
         check((said.match(/is gone\./g) || []).length === 2, 'Premium Service Manager: disposes of both', said.slice(-400));
     }
+    if (want('stylist')) {
+        // Stylist: the 3rd class alternative outfit (Renewal only). The
+        // server sends a body style 1 (outfit) or 0 to this client
+        // (clif_sprite_change, packetver < 20231220), and the client then
+        // draws a costume_1 body. Relog visuals are not checked: the
+        // installed client still has Flux159/roBrowserLegacy#147's bugs.
+        gm(`@warp prontera ${STYLE_TEST.at}`);
+        const body = () => ev(`(async () => {
+            await new Promise(r => setTimeout(r, 2000));
+            const p = roAgent.modules.Session.Entity;
+            return { body: p._body, spr: (p.files && p.files.body && p.files.body.spr) || '' };
+        })()`);
+        // Opens the Stylist; with `choice`, picks the outfit option and then
+        // `choice` in its menu. Returns the first menu.
+        const outfit = choice => ev(`(async () => {
+            await snpc.talk('Stylist');
+            const menu = snpc.view().menu.map(m => m.text);
+            if (!${JSON.stringify(choice)}) { await snpc.choose(255); return { menu }; }
+            await snpc.pick('~ Alternative outfit');
+            const v = await snpc.go(${JSON.stringify(choice || '')});
+            await snpc.close();
+            return { menu, error: v.error };
+        })()`);
+        const hasOutfit = r => r && Array.isArray(r.menu) && r.menu.includes('~ Alternative outfit');
+        const wearing = b => b && b.body === 1 && /costume_1/.test(b.spr);
+        const plain = b => b && b.body === 0 && b.spr && !/costume_1/.test(b.spr);
+        if (!e.thirdClass) {
+            const none = outfit(null);
+            check(none && Array.isArray(none.menu) && none.menu.length === 3, 'Stylist: no alternative outfit on Pre-renewal', JSON.stringify(none));
+        } else {
+            for (const job of STYLE_TEST.jobs) {
+                if (job.id !== e.job) { gm(`@jobchange ${job.id}`); ev('new Promise(r => setTimeout(r, 1500))'); }
+                const on = outfit('~ Alternative outfit');
+                check(hasOutfit(on) && !on.error, `Stylist: outfit offered to a ${job.name}`, JSON.stringify(on));
+                const b1 = body();
+                check(wearing(b1), `Stylist: ${job.name} wears the alternative outfit (costume_1)`, JSON.stringify(b1));
+                const off = outfit('~ Standard outfit');
+                const b2 = body();
+                check(!off.error && plain(b2), `Stylist: ${job.name} back to the standard outfit`, JSON.stringify({ off, b2 }));
+            }
+            gm(`@jobchange ${STYLE_TEST.none.id}`);
+            ev('new Promise(r => setTimeout(r, 1500))');
+            const none = outfit(null);
+            check(none && Array.isArray(none.menu) && none.menu.length === 3 && !hasOutfit(none),
+                `Stylist: no outfit for a ${STYLE_TEST.none.name}`, JSON.stringify(none));
+            // Back to the run's class, outfit on: logging out must save it.
+            gm(`@jobchange ${e.job}`);
+            ev('new Promise(r => setTimeout(r, 1500))');
+            outfit('~ Alternative outfit');
+        }
+    }
     const shot = W.rotestJson('shot', `play-${era}`);
     if (shot.file) checks.push({ ok: true, text: 'screenshot', detail: shot.file, info: true });
 
@@ -693,6 +751,15 @@ function runEra(era) {
         check(knife && knife.card0 === String(CARD_TEST.keep) && knife.refine === '5',
             'Card Exchanger: Knife keeps its Poring Card and +5, slot 1 empty', JSON.stringify(knife));
         check(loose === '1', 'Card Exchanger: Fabre Card back in the inventory', `${loose} loose`);
+    }
+    if (want('stylist') && e.thirdClass) {
+        // The outfit was left on: logging out saves it as the body style.
+        let saved = null;
+        for (let i = 0; i < 10 && saved !== String(STYLE_TEST.rk2nd); i++) {
+            if (i) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 1000);
+            saved = sqlOne(`SELECT body FROM \`char\` WHERE char_id=${charId}`);
+        }
+        check(saved === String(STYLE_TEST.rk2nd), 'Stylist: the outfit is saved with the character (body = Rune_Knight_2nd)', `body ${saved}`);
     }
     if (want('valkyrie') && e.valkyrie) {
         VALK_TEST.parts.forEach((p, i) => {
@@ -739,7 +806,7 @@ function plagiarism() {
     const checks = [];
     const check = (ok, text, detail = '') => checks.push({ ok: !!ok, text, detail });
     const w = W.rotest('server', 'sql', '--write',
-        `UPDATE \`char\` SET class=${PLAG_TEST.job}, base_level=175, last_map='prontera', last_x=171, last_y=180 WHERE char_id=${charId};`
+        `UPDATE \`char\` SET class=${PLAG_TEST.job}, body=${PLAG_TEST.job}, base_level=175, last_map='prontera', last_x=171, last_y=180 WHERE char_id=${charId};`
         + ` DELETE FROM skill WHERE char_id=${charId} AND id IN (${PLAG_IDS});`
         + ` INSERT INTO skill (char_id, id, lv, flag) VALUES ${PLAG_TEST.skills.map(([id, lv]) => `(${charId}, ${id}, ${lv}, 0)`).join(', ')};`
         + ` DELETE FROM char_reg_num WHERE char_id=${charId} AND \`key\` IN (${PLAG_TEST.regs.map(k => `'${k}'`).join(', ')});`
