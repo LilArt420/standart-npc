@@ -262,8 +262,12 @@ If warps or Fly Wings get slower the longer you play, update Ragnarok Offline to
 ### Renewal and Pre-renewal
 - Smuggler: Settings… → Smuggler → Options… can keep him from selling cards, MVP cards, mini-boss cards, costumes, or any item IDs you list. Banned items are refused both for sale and as the free item after his quest. Requested on Discord.
 
-## Next version
+## 4.9.8
+
 Needs Ragnarok Offline 1.6.1 or newer.
+
+### Renewal and Pre-renewal
+- Attendance Check: the rewards you set stay in the window after you log in again with another character or account (before, the window could show the mod's own rewards).
 
 ### Renewal only
 - Stylist: 3rd classes (also transcendent, mounted and baby) and 4th classes can now switch to the 3rd class's alternative outfit (the "second costume"), for free. A 4th class gets its 3rd class's outfit (Dragon Knight the Rune Knight's, Arch Mage the Warlock's, and so on). The outfit stays when you log out; a job change takes it off.
