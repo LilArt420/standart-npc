@@ -5,7 +5,7 @@
 <p align="center">
   <a href="../../releases/latest"><img src="https://img.shields.io/github/v/release/MondoTruth/standart-npc?style=for-the-badge&label=latest&color=d9a233" alt="Latest release"></a>
   <a href="../../releases"><img src="https://img.shields.io/github/downloads/MondoTruth/standart-npc/total?style=for-the-badge&color=5da9e0" alt="Downloads"></a>
-  <a href="https://github.com/Flux159/ragnarokoffline.app"><img src="https://img.shields.io/badge/Ragnarok%20Offline-%E2%89%A5%201.6.0-c8503f?style=for-the-badge" alt="Requires Ragnarok Offline 1.6.0 or newer"></a>
+  <a href="https://github.com/Flux159/ragnarokoffline.app"><img src="https://img.shields.io/badge/Ragnarok%20Offline-%E2%89%A5%201.6.1-c8503f?style=for-the-badge" alt="Requires Ragnarok Offline 1.6.1 or newer"></a>
 </p>
 
 <p align="center">
@@ -29,7 +29,7 @@ In Ragnarok Offline: **Settings → Mods → Find Mods** → install **standart-
 Or by hand: download the zip from the [latest release](../../releases/latest), then **Settings → Mods → Add mod from folder…** and pick the zip.
 
 > [!IMPORTANT]
-> Needs Ragnarok Offline **1.6.0 or newer**. On an older app you keep the version you have until you update the app.
+> Needs Ragnarok Offline **1.6.1 or newer**. On an older app you keep the version you have until you update the app.
 
 ---
 
@@ -72,7 +72,7 @@ Everything is on after install. To change it: **Settings → Mods → standart-n
 |:-:|---|---|---|
 | 🎓 | **Job Master** | Full job changer up to 4th class, including job-change equipment (Wolf Flute for Ranger, etc.). | Prontera (157, 195) |
 | 🔄 | **Reset Girl** | Resets skills, stats, or both, for Zeny. | Prontera (154, 195) |
-| 💇 | **Stylist** | Hair style, hair color, cloth color changer. | Prontera (169, 180) |
+| 💇 | **Stylist** | Hair style, hair color, cloth color changer; on Renewal, the 3rd class alternative outfit (free). | Prontera (169, 180) |
 | 🛡️ | **Episode Valkyrie** | Sells Episode Clear Tickets for Zeny. A ticket skips one part of an episode's main story, as on official servers: its maps, instances and daily quests open, no rewards. Parts 13.1 – 18 for now, in story order ([what each opens](#episode-valkyrie)). Renewal only. | Prontera (128, 193) |
 | 🎭 | **Plagiarism Master** | Rogue, Stalker, Shadow Chaser and Abyss Chaser copy any skill Plagiarism can copy. The level goes up to your Plagiarism level. Shadow Chaser and Abyss Chaser can also put a 3rd class skill into their Reproduce slot (Renewal). | Prontera (171, 182) |
 
