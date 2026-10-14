@@ -271,6 +271,7 @@ Needs Ragnarok Offline 1.6.1 or newer.
 
 ### Renewal only
 - Stylist: 3rd classes (also transcendent, mounted and baby) and 4th classes can now switch to the 3rd class's alternative outfit (the "second costume"), for free. A 4th class gets its 3rd class's outfit (Dragon Knight the Rune Knight's, Arch Mage the Warlock's, and so on). The outfit stays when you log out; a job change takes it off.
+- Known problem: the character selection window still shows the usual outfit. In the game you wear the alternative one. This is on the game client's side.
 
 ## 4.9.7
 
