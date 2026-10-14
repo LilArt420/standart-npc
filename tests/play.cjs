@@ -434,13 +434,24 @@ function runEra(era) {
             if (c._host && c._host.style.display !== 'none') c.toggle();
             c.toggle();
             const read = () => { const r = c.getRoot(); return r ? [0, 1, 2].map(i => r.querySelector('#attendance_day_' + i + ' .item')) : []; };
+            const shown = () => read().map(el => el ? (el.dataset.snpcIcon || '-') + ':' + ((el.querySelector('.item-quantity') || {}).textContent || '-') : 'none');
             for (let i = 0; i < 40 && !(read()[0] && read()[0].dataset.snpcIcon); i++) await new Promise(r => setTimeout(r, 250));
-            const out = read().map(el => el ? (el.dataset.snpcIcon || '-') + ':' + ((el.querySelector('.item-quantity') || {}).textContent || '-') : 'none');
+            const first = shown();
+            // Reopened in game, the window redraws its days from its own list
+            // again: the plugin has to put the server's rewards back (Discord
+            // report after 4.9.7).
+            c.toggle();
+            await new Promise(r => setTimeout(r, 500));
+            c.toggle();
+            for (let i = 0; i < 40 && !(read()[0] && read()[0].dataset.snpcIcon); i++) await new Promise(r => setTimeout(r, 250));
+            await new Promise(r => setTimeout(r, 1000));
+            const again = shown();
             if (c._host && c._host.style.display !== 'none') c.toggle();
-            return out;
+            return [first, again];
         })()`);
-        check(Array.isArray(days) && e.attendance.every((d, i) => days[i] === d),
-            `Attendance Check: window shows ${e.attendance.join(', ')} for days 1-3`, JSON.stringify(days));
+        for (const [n, label] of [[0, 'window shows'], [1, 'reopened window shows']])
+            check(Array.isArray(days) && Array.isArray(days[n]) && e.attendance.every((d, i) => days[n][i] === d),
+                `Attendance Check: ${label} ${e.attendance.join(', ')} for days 1-3`, JSON.stringify(days && days[n]));
     }
     if (want('welcome')) {
         // Welcoming (Izlude, Renewal only): the gift once; on Pre-renewal no NPC.
