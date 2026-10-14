@@ -173,12 +173,6 @@ function serverChecks(era, up) {
         check(m && Number(m[1]) >= 1, `db/import/${table}.yml read`, m ? `${m[1]} entries` : 'not in the log');
     }
 
-    // The 3rd class alternative outfits declared as jobs (Stylist): one
-    // Jobs block, no warnings.
-    const jobs = log.map(l => l.match(/Done reading '(\d+)' entries in 'db\/import\/job_stats\.yml'/)).find(Boolean);
-    const jobsBad = log.find(l => /import\/job_stats\.yml/.test(l) && /\[(Error|Warning)\]/.test(l));
-    check(jobs && Number(jobs[1]) === 1 && !jobsBad, 'db/import/job_stats.yml read, no warnings', jobsBad || (jobs ? `${jobs[1]} entries` : 'not in the log'));
-
     // Attendance Check rewards from the settings (#84): the extension is on,
     // day 1 changed without a word, day 3's unknown item refused and logged.
     const attOff = log.find(l => /attendance_script_rewards extension is off|Extension attendance_script_rewards is off/.test(l));

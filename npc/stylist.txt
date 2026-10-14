@@ -13,8 +13,6 @@
 //=   (max_hair_style, max_hair_color, max_cloth_color), not from
 //=   this script.
 //= - Which classes get which outfit: the S_Map lines in OnInit.
-//=   The outfit IDs (JOB_*_2ND) must be in the server's job_db:
-//=   db/job_stats.yml of this mod declares them.
 //= License: GPL-3.0, based on rAthena's npc/custom/stylist.txt
 //=   (see LICENSE and LICENSE-GPL-3.0).
 //============================================================
@@ -53,12 +51,6 @@ S_Outfit:
     else
         mes "Your class has an alternative outfit. I can put it on for free.";
     mes "A job change takes it off.";
-    next;
-    mes "[Stylist]";
-    mes "^FF0000Known display problems^000000 until a game client update:";
-    mes "- After you log in again you may see your usual outfit. It is still on.";
-    mes "- Arch Bishop and Cardinal may look like a Novice.";
-    mes "- After a job change the outfit may stay until you log in again.";
     switch (select(" ~ Alternative outfit: ~ Standard outfit: ~ Cancel")) {
         case 1: setlook LOOK_BODY2, .@alt; break;
         case 2: setlook LOOK_BODY2, Class; break;
