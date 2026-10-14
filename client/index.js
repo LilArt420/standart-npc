@@ -22,26 +22,34 @@ export default function init(parameters, api) {
 
     let rewards = null;    // the running list, once the server has sent it
     let asking = null;     // the request in flight
-    let failed = false;    // no answer on this connection: don't ask again
+    let tries = 0;         // requests on this connection; a few, then give up
     const watched = new Map();  // component host -> { observer, style }
 
-    api.on('connection', () => { rewards = null; asking = null; failed = false; });
+    api.on('connection', () => { rewards = null; asking = null; tries = 0; });
 
     function ask() {
-        if (rewards || failed) return Promise.resolve(rewards);
+        if (rewards || tries >= 3) return Promise.resolve(rewards);
         if (!asking) {
+            tries++;
             asking = api.server.request('snpcattendance', 'get')
                 .then(text => { rewards = parseRewards(text); return rewards; })
-                .catch(() => { failed = true; return null; })
+                .catch(() => null)
                 .finally(() => { asking = null; });
         }
         return asking;
     }
 
     async function redraw(list) {
-        if (!list.children.length) return;
+        // After a character change the map load redraws the window with the
+        // last character's data before the new one is in the game, and a
+        // request sent then gets no answer: wait until that load is over.
+        await new Promise(resolve => setTimeout(resolve));
+        if (!list.isConnected || !list.children.length) return;
         const days = await ask();
-        if (!days) return;
+        if (!days) {
+            if (tries < 3) setTimeout(() => redraw(list), 1000);
+            return;
+        }
         for (let i = 0; i < days.length; i++) {
             const day = days[i];
             const slot = list.querySelector(`#attendance_day_${i} .item`);
