@@ -262,6 +262,11 @@ If warps or Fly Wings get slower the longer you play, update Ragnarok Offline to
 ### Renewal and Pre-renewal
 - Smuggler: Settings… → Smuggler → Options… can keep him from selling cards, MVP cards, mini-boss cards, costumes, or any item IDs you list. Banned items are refused both for sale and as the free item after his quest. Requested on Discord.
 
+## Next version
+
+### Renewal only
+- Stylist: with Ragnarok Offline 1.6.2 or newer the character selection window shows the alternative outfit too (the known problem from 4.9.8 is fixed in the game client).
+
 ## 4.9.8
 
 Needs Ragnarok Offline 1.6.1 or newer.
