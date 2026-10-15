@@ -39,5 +39,8 @@ formulas) is a server extension in the rAthena fork: an entry in its
 `db/extension_db.yml`; scripts check `getextension("<id>")`. In game:
 `@extensions`, `@extensioninfo <id>`. Guide: `doc/extensions.md` in
 `Flux159/rathena` (branch `ragnarokoffline`). A mod using one needs an app
-version whose pinned fork has it. We use `attendance_repeat`
-(`db/when/enable_attendance/extension_db.yml`).
+version whose pinned fork has it. We use `attendance_repeat` and
+`attendance_script_rewards` (`db/when/enable_attendance/extension_db.yml`)
+and `stylist_script_costs` (`db/extension_db.yml`, always on: the Stylist
+sets the styling window's costs with `setstylistcost` in OnInit). The app
+merges a mod's `db/extension_db.yml` with its `db/when/<key>/` copies.

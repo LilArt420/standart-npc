@@ -262,6 +262,16 @@ If warps or Fly Wings get slower the longer you play, update Ragnarok Offline to
 ### Renewal and Pre-renewal
 - Smuggler: Settings… → Smuggler → Options… can keep him from selling cards, MVP cards, mini-boss cards, costumes, or any item IDs you list. Banned items are refused both for sale and as the free item after his quest. Requested on Discord.
 
+## Next version
+
+Needs Ragnarok Offline 1.6.2 or newer.
+
+### Renewal and Pre-renewal
+- Stylist: hair style, hair color and cloth color are now chosen in the styling window, where you see the new look on your character before you pay. Each change costs 100,000 Zeny by default; Settings… → Stylist → Prices… sets the price of each, or makes hair style and cloth color take a Hairstyle Coupon and a Clothing Dye Coupon instead (hair color stays in Zeny). A change of several things at once is paid in full or not made at all. The Stylist used to change them for free. (Not tested in game yet.)
+
+### Renewal only
+- Stylist: the alternative outfit stays free, in the Stylist's menu.
+
 ## 4.9.8
 
 Needs Ragnarok Offline 1.6.1 or newer.
