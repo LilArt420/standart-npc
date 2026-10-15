@@ -77,6 +77,15 @@
       "description": "What a new cloth color costs in the Stylist's window. 0 = free."
     },
     {
+      "key": "stylist_price_outfit",
+      "type": "number",
+      "default": 100000,
+      "min": 0,
+      "max": 1000000000,
+      "label": "Stylist: outfit price (Zeny)",
+      "description": "What switching between the standard and the alternative outfit (3rd and 4th classes, Renewal) costs in the Stylist's window. 0 = free."
+    },
+    {
       "key": "smuggler_no_cards",
       "type": "boolean",
       "default": false,

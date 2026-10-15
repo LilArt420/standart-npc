@@ -270,7 +270,7 @@ Needs Ragnarok Offline 1.6.2 or newer.
 - Stylist: hair style, hair color and cloth color are now chosen in the new styling window: pictures of your own character with each hair style and color, a big preview you can turn, and the price of what you picked. Each change costs 100,000 Zeny by default; Settings… → Stylist → Prices… sets the price of each. In the window you pay with Zeny or with coupons: a New Style Coupon for a hair style, a Clothing Dye Coupon for a cloth color (a hair color is always Zeny). A change of several things at once is paid in full or not made at all. The Stylist used to change them for free. (Not tested in game yet.)
 
 ### Renewal only
-- Stylist: the alternative outfit stays free, in the Stylist's menu.
+- Stylist: the alternative outfit moved from the Stylist's menu into the styling window, on its own Outfit tab with a picture of each outfit. Switching costs 100,000 Zeny by default (Settings… → Stylist → Prices…) or a Costume Change Ticket. It used to be free. (Not tested in game yet.)
 
 ## 4.9.8
 
