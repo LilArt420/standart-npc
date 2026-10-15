@@ -133,7 +133,7 @@ All contracts, maps and rewards are one table: [`npc/when/enable_bounties/bounty
 
 ### 🛡️ Episode Valkyrie
 
-One ticket per part. A part needs the one before it finished, played or skipped, except where the game itself lets you start fresh (14.1, 14.2, 15.1, 16.1). [cash-shop-extended](https://github.com/LilArt420/cashshopmod)'s Cash Shop also sells tickets 16 – 18.
+One ticket per part. A part needs the one before it finished, played or skipped, except where the game itself lets you start fresh (14.1, 14.2, 15.1, 16.1). [cash-shop-extended](https://github.com/LilArt420/cashshopmod)'s Cash Shop also sells tickets 13 – 18.
 
 | Part | Opens |
 |---|---|
