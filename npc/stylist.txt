@@ -4,7 +4,7 @@
 //===== Description: =========================================
 //= Opens the styling window (openstylist) for hair style, hair
 //= color and cloth color; the player pays there on Apply, in
-//= Zeny or coupons as the settings say. A change of several
+//= Zeny as the settings say. A change of several
 //= things at once is paid in full or not made at all.
 //= Renewal: 3rd classes (also transcendent, mounted and baby)
 //= and 4th classes can switch for free to the 3rd class's
@@ -12,8 +12,8 @@
 //= its 3rd class's one. Kept on log-in, taken off by a job change.
 //===== How to customize: ====================================
 //= - Location/sprite: the first line (map,x,y,dir / sprite).
-//= - Prices and coupons: the Stylist's "Prices..." page in the
-//=   mod's settings window (stylist_price_*, stylist_coupons).
+//= - Prices: the Stylist's "Prices..." page in the mod's
+//=   settings window (stylist_price_*).
 //=   They need the fork's stylist_script_costs extension, which
 //=   db/extension_db.yml switches on.
 //= - Which styles the window offers: rAthena's db/re/stylist.yml
@@ -85,19 +85,9 @@ OnInit:
     // Switched off in the settings window? Hide.
     if (callfunc("F_SNPC_Off", "stylist")) disablenpc strnpcinfo(0);
     // The styling window's costs, also for @stylist while the NPC is hidden.
-    set .@hair, callfunc("F_ModSetting", "standart-npc", "stylist_price_hair", 100000);
-    set .@cloth, callfunc("F_ModSetting", "standart-npc", "stylist_price_cloth_color", 100000);
-    set .@hair_item, 0;
-    set .@cloth_item, 0;
-    if (callfunc("F_ModSetting", "standart-npc", "stylist_coupons", 0)) {
-        set .@hair, 0;
-        set .@hair_item, 7622;	// New_Style_Coupon (Hairstyle Coupon)
-        set .@cloth, 0;
-        set .@cloth_item, 6046;	// Clothing_Dye_Coupon
-    }
-    callsub S_Cost, LOOK_HAIR, .@hair, .@hair_item;
+    callsub S_Cost, LOOK_HAIR, callfunc("F_ModSetting", "standart-npc", "stylist_price_hair", 100000), 0;
     callsub S_Cost, LOOK_HAIR_COLOR, callfunc("F_ModSetting", "standart-npc", "stylist_price_hair_color", 100000), 0;
-    callsub S_Cost, LOOK_CLOTHES_COLOR, .@cloth, .@cloth_item;
+    callsub S_Cost, LOOK_CLOTHES_COLOR, callfunc("F_ModSetting", "standart-npc", "stylist_price_cloth_color", 100000), 0;
     // Alternative outfits are Renewal only (checkre(0): 1 = Renewal).
     if (!checkre(0)) end;
     callsub S_Map, JOB_RUNE_KNIGHT_2ND, JOB_RUNE_KNIGHT, JOB_RUNE_KNIGHT2, JOB_RUNE_KNIGHT_T, JOB_RUNE_KNIGHT_T2, JOB_BABY_RUNE_KNIGHT, JOB_BABY_RUNE_KNIGHT2, JOB_DRAGON_KNIGHT, JOB_DRAGON_KNIGHT2;

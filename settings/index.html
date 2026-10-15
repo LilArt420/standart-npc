@@ -32,10 +32,8 @@
   their own too: "Options..." next to the Warper.
 
   So are the Stylist's window prices: "Prices..." next to the Stylist. Three
-  number settings (STY_PRICES, Zeny, typed in boxes) and the boolean
-  "stylist_coupons"; npc/stylist.txt hands them to the server in OnInit.
-  While coupons are on, the hair style and cloth color boxes are greyed out
-  (their prices are kept, but unused).
+  number settings (STY_PRICES, Zeny, typed in boxes); npc/stylist.txt hands
+  them to the server in OnInit.
 
   So are the Smuggler's banned goods: booleans (SMUG_KEYS) and a list
   of item IDs typed in one box, split over the strings in BAN_KEYS (three
@@ -129,11 +127,10 @@
   .att input::placeholder { color: var(--dim); opacity: .6; }
   .att input.bad { border-color: var(--warn); }
   .price { display: grid; grid-template-columns: 1fr 130px; gap: 12px; align-items: center; padding: 9px 14px; }
-  .price + .price, .price + label.row { border-top: 1px solid var(--line); }
+  .price + .price { border-top: 1px solid var(--line); }
   .price small { display: block; color: var(--dim); }
   .price input { width: 100%; font: 12px ui-monospace, monospace; padding: 3px 6px; border-radius: 6px; text-align: right;
                  border: 1px solid var(--line); background: var(--card); color: var(--text); }
-  .price input:disabled { opacity: .5; }
   .price input.bad { border-color: var(--warn); }
 </style>
 </head>
@@ -235,7 +232,7 @@ const ALWAYS_LOADED = {
   'npc:warper':    { label: 'Warper',            description: 'Teleports to towns, fields and dungeons. Every major town, Prontera (160,192).' },
   'npc:jobmaster': { label: 'Job Master',        description: 'Job changes up to 4th class, with job equipment. Prontera (157,195).' },
   'npc:reset':     { label: 'Reset Girl',        description: 'Resets skills, stats, or both. Prontera (154,195).' },
-  'npc:stylist':   { label: 'Stylist',           description: 'Opens the styling window for hair style, hair color and cloth color, paid in Zeny or coupons; on Renewal, the 3rd class alternative outfit for free. Prontera (169,180).' },
+  'npc:stylist':   { label: 'Stylist',           description: 'Opens the styling window for hair style, hair color and cloth color, paid in Zeny; on Renewal, the 3rd class alternative outfit for free. Prontera (169,180).' },
   'npc:epvalk':    { label: 'Episode Valkyrie',  description: 'Episode Clear Tickets skip the main story of an episode, as on official servers (no rewards). One ticket per part, in story order; 13.1 to 18 for now. Sells the tickets for Zeny. Renewal only. Prontera (128,193).' },
   'npc:falcon':    { label: 'Falcon Breeder',    description: 'Falcon for Hunters/Snipers, Wolf Flute for Rangers/Windhawks, Hawk Flute for Windhawks. Prontera (128,211).' },
   'npc:buffer':    { label: 'Buffer',            description: 'Free instant buffs + full heal on click. Every major town.' },
@@ -381,11 +378,8 @@ const WARP_KEYS = ['warp_fee', 'warp_quests'];
 const warpBoxes = {}; // Warper option key -> checkbox (on the Warper page)
 let hasWarpOpts = false;
 const STY_PRICES = ['stylist_price_hair', 'stylist_price_hair_color', 'stylist_price_cloth_color'];
-const STY_COUPONS = 'stylist_coupons';
 const STY_MAX = 1000000000; // "max" of the STY_PRICES settings in mod.json
-const STY_BY_COUPON = ['stylist_price_hair', 'stylist_price_cloth_color']; // unused while coupons are on
 const styInputs = {}; // price key -> number box (on the Stylist page)
-const styBoxes = {};  // STY_COUPONS -> checkbox (on the Stylist page)
 let hasStyOpts = false;
 const SMUG_KEYS = ['smuggler_no_cards', 'smuggler_no_mvp_cards', 'smuggler_no_boss_cards', 'smuggler_no_costumes'];
 const BAN_KEYS = ['smuggler_ban', 'smuggler_ban2', 'smuggler_ban3'];
@@ -440,7 +434,6 @@ function values() {
   if (hasOffKey) out[OFF_KEY] = [...off, ...offExtra].join(',');
   for (const [k, box] of Object.entries(warpBoxes)) out[k] = box.checked;
   for (const [k, box] of Object.entries(smugBoxes)) out[k] = box.checked;
-  for (const [k, box] of Object.entries(styBoxes)) out[k] = box.checked;
   for (const [k, input] of Object.entries(styInputs)) out[k] = styBad(input) ? input.value : Number(input.value);
   if (banKeys.length) Object.assign(out, packBans(banIds()).values);
   if (hasAttKeys) Object.assign(out, attValues());
@@ -482,7 +475,6 @@ function setValues(v) {
   for (const [code, box] of Object.entries(buffBoxes)) box.checked = chosen.includes(code);
   for (const [k, box] of Object.entries(warpBoxes)) box.checked = v[k] === true;
   for (const [k, box] of Object.entries(smugBoxes)) box.checked = v[k] === true;
-  for (const [k, box] of Object.entries(styBoxes)) box.checked = v[k] === true;
   for (const [k, input] of Object.entries(styInputs)) input.value = String(v[k] ?? '');
   if (hasStyOpts) styCheck();
   if (banKeys.length) { $('ban-ids').value = banKeys.map(k => v[k] || '').filter(Boolean).join(','); banCount(); }
@@ -698,15 +690,11 @@ $('stylist-back').onclick = () => showPage('stylist', false);
 function styBad(input) {
   return !(/^\d+$/.test(input.value.trim()) && Number(input.value) <= STY_MAX);
 }
-// Marks wrong prices and greys out the ones coupons replace.
+// Marks wrong prices.
 function styCheck() {
-  const coupons = !!(styBoxes[STY_COUPONS] && styBoxes[STY_COUPONS].checked);
-  for (const [k, input] of Object.entries(styInputs)) {
-    input.classList.toggle('bad', styBad(input));
-    input.disabled = coupons && STY_BY_COUPON.includes(k);
-  }
+  for (const input of Object.values(styInputs)) input.classList.toggle('bad', styBad(input));
 }
-function drawStylist(prices, coupons) {
+function drawStylist(prices) {
   for (const s of prices) {
     const row = document.createElement('label');
     row.className = 'price';
@@ -727,10 +715,6 @@ function drawStylist(prices, coupons) {
     row.append(text, input);
     $('stylist-opts').append(row);
     styInputs[s.key] = input;
-  }
-  if (coupons) {
-    drawOpts([coupons], 'stylist-opts', styBoxes);
-    styBoxes[STY_COUPONS].onchange = () => { styCheck(); markDirty(); };
   }
   styCheck();
 }
@@ -916,9 +900,7 @@ async function save() {
     WARP_KEYS.forEach(k => byKey.delete(k));
     if (warpOpts.length) { hasWarpOpts = true; drawOpts(warpOpts, 'warper-opts', warpBoxes); }
     const styPrices = STY_PRICES.map(k => mod.settings.find(s => s.key === k && s.type === 'number')).filter(Boolean);
-    const styCoupons = byKey.get(STY_COUPONS);
-    byKey.delete(STY_COUPONS);
-    if (styPrices.length || styCoupons) { hasStyOpts = true; drawStylist(styPrices, styCoupons); }
+    if (styPrices.length) { hasStyOpts = true; drawStylist(styPrices); }
     const smugOpts = SMUG_KEYS.filter(k => byKey.has(k)).map(k => byKey.get(k));
     SMUG_KEYS.forEach(k => byKey.delete(k));
     banKeys = BAN_KEYS.filter(k => mod.settings.some(s => s.key === k));

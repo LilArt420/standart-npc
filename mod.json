@@ -56,7 +56,7 @@
       "min": 0,
       "max": 1000000000,
       "label": "Stylist: hair style price (Zeny)",
-      "description": "What a new hair style costs in the Stylist's window. 0 = free. Not used while the Stylist takes coupons."
+      "description": "What a new hair style costs in the Stylist's window. 0 = free."
     },
     {
       "key": "stylist_price_hair_color",
@@ -65,7 +65,7 @@
       "min": 0,
       "max": 1000000000,
       "label": "Stylist: hair color price (Zeny)",
-      "description": "What a new hair color costs in the Stylist's window. 0 = free. Hair color is always paid in Zeny, also while the Stylist takes coupons."
+      "description": "What a new hair color costs in the Stylist's window. 0 = free."
     },
     {
       "key": "stylist_price_cloth_color",
@@ -74,14 +74,7 @@
       "min": 0,
       "max": 1000000000,
       "label": "Stylist: cloth color price (Zeny)",
-      "description": "What a new cloth color costs in the Stylist's window. 0 = free. Not used while the Stylist takes coupons."
-    },
-    {
-      "key": "stylist_coupons",
-      "type": "boolean",
-      "default": false,
-      "label": "Stylist: pay with coupons",
-      "description": "The Stylist's window takes a Hairstyle Coupon (7622) for a hair style and a Clothing Dye Coupon (6046) for a cloth color, in place of Zeny. Hair color stays in Zeny."
+      "description": "What a new cloth color costs in the Stylist's window. 0 = free."
     },
     {
       "key": "smuggler_no_cards",
