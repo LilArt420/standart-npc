@@ -3,8 +3,10 @@
 //===== By: Euphy, MondoTruth ================================
 //===== Description: =========================================
 //= Opens the styling window (openstylist) for hair style, hair
-//= color and cloth color; the player pays there on Apply, in
-//= Zeny as the settings say. A change of several
+//= color and cloth color; the player pays there on Buy, in Zeny
+//= as the settings say or with a coupon (New Style Coupon for
+//= hair style, Clothing Dye Coupon for cloth color; hair color
+//= is Zeny only), chosen in the window. A change of several
 //= things at once is paid in full or not made at all.
 //= Renewal: 3rd classes (also transcendent, mounted and baby)
 //= and 4th classes can switch for free to the 3rd class's
@@ -13,9 +15,12 @@
 //===== How to customize: ====================================
 //= - Location/sprite: the first line (map,x,y,dir / sprite).
 //= - Prices: the Stylist's "Prices..." page in the mod's
-//=   settings window (stylist_price_*).
+//=   settings window (stylist_price_*). Coupons: the S_Cost
+//=   lines in OnInit (item ID, 0 = Zeny only).
 //=   They need the fork's stylist_script_costs extension, which
-//=   db/extension_db.yml switches on.
+//=   db/extension_db.yml switches on. The window learns the
+//=   prices and sends the player's way to pay through
+//=   "@@event stylist" and @snpcstylist (app docs/MODDING.md).
 //= - Which styles the window offers: rAthena's db/re/stylist.yml
 //=   (Pre-renewal: this mod's pre-renewal/db/stylist.yml).
 //= - Which classes get which outfit: the S_Map lines in OnInit.
@@ -30,14 +35,26 @@ prontera,169,180,5	script	Stylist#custom_stylist	122,{
         if (.@s == 2) callsub S_Outfit;
         if (.@s == 3) close;
     }
-    // The window shows no prices, so say them first.
     mes "[Stylist]";
-    mes "Pick a new look in my styling window. You pay when you press Apply:";
+    mes "Pick a new look in my styling window. You pay when you press Buy:";
     mes "Hair style: " + .cost$[LOOK_HAIR];
     mes "Hair color: " + .cost$[LOOK_HAIR_COLOR];
     mes "Cloth color: " + .cost$[LOOK_CLOTHES_COLOR];
     close2;
+    // The prices and the way to pay, for the window (the app's stylist
+    // window keeps this line out of chat).
+    if (.offer$ != "") dispbottom "@@event stylist " + .offer$;
     openstylist;
+    end;
+
+// The window's "Pay with Zeny / coupons": @snpcstylist <request> pay <0|1>,
+// sent by the window before the purchase. setstylistpayment needs the
+// stylist_script_costs extension; opening the window resets it to Zeny.
+OnPay:
+    if (.@atcmd_parameters$[1] == "pay" && setstylistpayment(atoi(.@atcmd_parameters$[2])))
+        dispbottom "@@reply " + .@atcmd_parameters$[0] + " 1/1 ok";
+    else
+        dispbottom "@@reply " + .@atcmd_parameters$[0] + " 1/1 refused";
     end;
 
 // The 3rd class's alternative outfit, free. setlook LOOK_BODY2 saves it
@@ -56,22 +73,25 @@ S_Outfit:
     }
     close;
 
-// Sets one look's cost in the styling window and the text shown for it.
-// arg 0 = the look, 1 = Zeny, 2 = item ID (0 = none).
+// Sets one look's cost in the styling window, the text shown for it and
+// its part of the window's offer.
+// arg 0 = the look, 1 = Zeny, 2 = the coupon that pays instead (0 = none),
+// 3 = the look's name in the offer.
 S_Cost:
     set .@zeny, getarg(1);
     set .@item, getarg(2);
+    // A coupon the era's item table does not have: Zeny only.
+    if (.@item && getitemname(.@item) == "null") set .@item, 0;
     if (!setstylistcost(getarg(0), .@zeny, .@item)) {
         // Refused (the reason is in the map server log): stylist.yml's cost stays.
         set .cost$[getarg(0)], "the server's own price";
         return;
     }
-    set .@text$, "";
-    if (.@item) set .@text$, "1 " + getitemname(.@item);
-    if (.@zeny && .@text$ != "") set .@text$, .@text$ + " and ";
-    if (.@zeny) set .@text$, .@text$ + callfunc("F_InsertComma", .@zeny) + " Zeny";
-    if (.@text$ == "") set .@text$, "free";
+    if (.@zeny) set .@text$, callfunc("F_InsertComma", .@zeny) + " Zeny";
+    else set .@text$, "free";
+    if (.@item) set .@text$, .@text$ + " or 1 " + getitemname(.@item);
     set .cost$[getarg(0)], .@text$;
+    set .offer$, .offer$ + " " + getarg(3) + "=" + .@zeny + ":" + .@item;
     return;
 
 // .outfit[<class>] = the outfit's job ID; arg 0 is the outfit, the rest
@@ -84,10 +104,14 @@ S_Map:
 OnInit:
     // Switched off in the settings window? Hide.
     if (callfunc("F_SNPC_Off", "stylist")) disablenpc strnpcinfo(0);
+    bindatcmd "snpcstylist", strnpcinfo(3) + "::OnPay", 0, 99;
     // The styling window's costs, also for @stylist while the NPC is hidden.
-    callsub S_Cost, LOOK_HAIR, callfunc("F_ModSetting", "standart-npc", "stylist_price_hair", 100000), 0;
-    callsub S_Cost, LOOK_HAIR_COLOR, callfunc("F_ModSetting", "standart-npc", "stylist_price_hair_color", 100000), 0;
-    callsub S_Cost, LOOK_CLOTHES_COLOR, callfunc("F_ModSetting", "standart-npc", "stylist_price_cloth_color", 100000), 0;
+    // Coupons: 7622 New_Style_Coupon, 6046 Clothing_Dye_Coupon.
+    set .offer$, "";
+    callsub S_Cost, LOOK_HAIR, callfunc("F_ModSetting", "standart-npc", "stylist_price_hair", 100000), 7622, "head";
+    callsub S_Cost, LOOK_HAIR_COLOR, callfunc("F_ModSetting", "standart-npc", "stylist_price_hair_color", 100000), 0, "headpalette";
+    callsub S_Cost, LOOK_CLOTHES_COLOR, callfunc("F_ModSetting", "standart-npc", "stylist_price_cloth_color", 100000), 6046, "bodypalette";
+    if (.offer$ != "") set .offer$, "pay=snpcstylist" + .offer$;
     // Alternative outfits are Renewal only (checkre(0): 1 = Renewal).
     if (!checkre(0)) end;
     callsub S_Map, JOB_RUNE_KNIGHT_2ND, JOB_RUNE_KNIGHT, JOB_RUNE_KNIGHT2, JOB_RUNE_KNIGHT_T, JOB_RUNE_KNIGHT_T2, JOB_BABY_RUNE_KNIGHT, JOB_BABY_RUNE_KNIGHT2, JOB_DRAGON_KNIGHT, JOB_DRAGON_KNIGHT2;

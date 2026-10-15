@@ -723,6 +723,36 @@ function runEra(era) {
         check(win && win.open, 'Stylist: Close opens the styling window', JSON.stringify(win));
         check(win && win.after.color === win.want && win.after.zeny === win.before.zeny - 100000,
             'Stylist: a hair color from the window costs 100,000 Zeny', JSON.stringify(win));
+        // Paying with a coupon: the window's "Pay with coupons" sends
+        // @snpcstylist <request> pay 1 before the purchase; a cloth color then
+        // takes one Clothing Dye Coupon (6046) and no Zeny.
+        gm('@item 6046 1');
+        ev(`(async () => {
+            let v = await snpc.talk('Stylist');
+            if (v.menu && v.menu.length) v = await snpc.pick('~ Styling window');
+            await snpc.close();
+            await new Promise(r => setTimeout(r, 1500));
+        })()`);
+        gm('@snpcstylist 1 pay 1');
+        const coupon = ev(`(async () => {
+            const sleep = ms => new Promise(r => setTimeout(r, ms));
+            await sleep(1000);
+            const M = roAgent.modules;
+            const c = M.UIManager.getComponent('Stylist');
+            const p = M.Session.Entity;
+            const inv = M.UIManager.getComponent('Inventory');
+            const coupons = () => { const i = inv.getItemById(6046); return i ? i.count || 1 : 0; };
+            const before = { zeny: M.Session.zeny, coupons: coupons(), color: p.bodypalette | 0 };
+            const pkt = new M.PACKET.CZ.REQ_STYLE_CHANGE2();
+            pkt.BodyPalette = before.color === 3 ? 4 : 3;
+            M.Network.sendPacket(pkt);
+            await sleep(2500);
+            try { if (c._host && c._host.isConnected) c.remove(); } catch { /* closed */ }
+            return { want: pkt.BodyPalette, before, after: { zeny: M.Session.zeny, coupons: coupons(), color: p.bodypalette | 0 } };
+        })()`);
+        check(coupon && coupon.after.color === coupon.want && coupon.after.zeny === coupon.before.zeny
+            && coupon.after.coupons === coupon.before.coupons - 1,
+            'Stylist: paying with coupons takes a Clothing Dye Coupon, not Zeny', JSON.stringify(coupon));
         // Opens the Stylist; with `choice`, picks the outfit option and then
         // `choice` in its menu. Without, leaves (Cancel, or Close and the
         // window shut again). Returns the first menu.
