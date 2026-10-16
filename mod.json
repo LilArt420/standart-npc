@@ -1,13 +1,13 @@
 {
   "name": "standart-npc",
-  "version": "4.9.8",
+  "version": "5.0.0",
   "author": "MondoTruth, Lil Art, IceGlaive, Nokzin, iguera, Claude, and the Ragnarok Offline community",
   "description": "Works with or without Lil Art's cash-shop-extended (Find Mods): with it, some NPCs also take Cash Points. Turning the mod on turns on every NPC; switch single ones off with Settings… (Warper, Job Master, Reset Girl, Stylist, Episode Valkyrie and all the others).",
   "settingsPage": "settings/index.html",
   "prerenewalFolder": "pre-renewal",
   "default": "off",
   "requires": {
-    "app": ">=1.6.1",
+    "app": ">=1.6.3",
     "era": "any"
   },
   "settings": [
@@ -40,7 +40,7 @@
       "type": "boolean",
       "default": true,
       "label": "Warper: paid warps for 3rd and 4th classes",
-      "description": "Characters in a 3rd or 4th class (also Kagerou, Oboro, Rebellion, Spirit Handler) pay the Warper 5,000 Zeny for towns, fields and guild castles and 15,000 Zeny for dungeons, instances and guild dungeons. Special Areas stay free. Off = every warp is free."
+      "description": "Characters in a 3rd or 4th class (also Kagerou, Oboro, Rebellion, Spirit Handler, Karnos) pay the Warper 5,000 Zeny for towns, fields and guild castles and 15,000 Zeny for dungeons, instances and guild dungeons. Special Areas stay free. Off = every warp is free."
     },
     {
       "key": "warp_quests",
@@ -48,6 +48,42 @@
       "default": true,
       "label": "Warper: quest-locked dungeons",
       "description": "The Warper only takes a character to Bio Lab, the Culvert, Dewata Dungeon, Nidhoggur's Dungeon and Rachel Sanctuary after the quest that opens their official entrance. Off = every dungeon is open."
+    },
+    {
+      "key": "stylist_price_hair",
+      "type": "number",
+      "default": 100000,
+      "min": 0,
+      "max": 1000000000,
+      "label": "Stylist: hair style price (Zeny)",
+      "description": "What a new hair style costs in the Stylist's window. 0 = free."
+    },
+    {
+      "key": "stylist_price_hair_color",
+      "type": "number",
+      "default": 100000,
+      "min": 0,
+      "max": 1000000000,
+      "label": "Stylist: hair color price (Zeny)",
+      "description": "What a new hair color costs in the Stylist's window. 0 = free."
+    },
+    {
+      "key": "stylist_price_cloth_color",
+      "type": "number",
+      "default": 100000,
+      "min": 0,
+      "max": 1000000000,
+      "label": "Stylist: cloth color price (Zeny)",
+      "description": "What a new cloth color costs in the Stylist's window. 0 = free."
+    },
+    {
+      "key": "stylist_price_outfit",
+      "type": "number",
+      "default": 100000,
+      "min": 0,
+      "max": 1000000000,
+      "label": "Stylist: outfit price (Zeny)",
+      "description": "What switching between the standard and the alternative outfit (3rd and 4th classes, Renewal) costs in the Stylist's window. 0 = free."
     },
     {
       "key": "smuggler_no_cards",

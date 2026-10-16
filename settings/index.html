@@ -31,6 +31,10 @@
   The Warper's options ("warp_fee", "warp_quests", WARP_KEYS) are on a page of
   their own too: "Options..." next to the Warper.
 
+  So are the Stylist's window prices: "Prices..." next to the Stylist. Four
+  number settings (STY_PRICES, Zeny, typed in boxes); npc/stylist.txt hands
+  them to the server in OnInit.
+
   So are the Smuggler's banned goods: booleans (SMUG_KEYS) and a list
   of item IDs typed in one box, split over the strings in BAN_KEYS (three
   of 200 characters, about 100 IDs) and read by npc/smuggler.txt.
@@ -122,6 +126,12 @@
                border: 1px solid var(--line); background: var(--card); color: var(--text); }
   .att input::placeholder { color: var(--dim); opacity: .6; }
   .att input.bad { border-color: var(--warn); }
+  .price { display: grid; grid-template-columns: 1fr 130px; gap: 12px; align-items: center; padding: 9px 14px; }
+  .price + .price { border-top: 1px solid var(--line); }
+  .price small { display: block; color: var(--dim); }
+  .price input { width: 100%; font: 12px ui-monospace, monospace; padding: 3px 6px; border-radius: 6px; text-align: right;
+                 border: 1px solid var(--line); background: var(--card); color: var(--text); }
+  .price input.bad { border-color: var(--warn); }
 </style>
 </head>
 <body>
@@ -152,6 +162,16 @@
   <h2>Warper — options</h2>
   <p>Both are on by default. Each one applies to every Warper in every town, and to Last Warp.</p>
   <div id="warper-opts"></div>
+</main>
+<main id="stylist" hidden>
+  <div class="tools">
+    <button id="stylist-back">← Back</button>
+  </div>
+  <h2>Stylist — prices</h2>
+  <p>The Stylist opens the styling window; a player pays when pressing Buy there, in Zeny or with a coupon (New Style Coupon for a hair style, Clothing Dye Coupon for a cloth color, Costume Change Ticket for the outfit; a hair color is always Zeny). A change of several things at once is paid in full or not made at all. The outfit (standard or alternative, 3rd and 4th classes) is Renewal only.</p>
+  <details open><summary><span class="name">What the window costs</span></summary>
+    <div id="stylist-opts"></div>
+  </details>
 </main>
 <main id="smuggler" hidden>
   <div class="tools">
@@ -212,7 +232,7 @@ const ALWAYS_LOADED = {
   'npc:warper':    { label: 'Warper',            description: 'Teleports to towns, fields and dungeons. Every major town, Prontera (160,192).' },
   'npc:jobmaster': { label: 'Job Master',        description: 'Job changes up to 4th class, with job equipment. Prontera (157,195).' },
   'npc:reset':     { label: 'Reset Girl',        description: 'Resets skills, stats, or both. Prontera (154,195).' },
-  'npc:stylist':   { label: 'Stylist',           description: 'Hair style, hair color and cloth color; on Renewal, the 3rd class alternative outfit. Prontera (169,180).' },
+  'npc:stylist':   { label: 'Stylist',           description: 'Opens the styling window for hair style, hair color, cloth color and, on Renewal, the 3rd class alternative outfit, paid in Zeny or with a coupon. Prontera (169,180).' },
   'npc:epvalk':    { label: 'Episode Valkyrie',  description: 'Episode Clear Tickets skip the main story of an episode, as on official servers (no rewards). One ticket per part, in story order; 13.1 to 18 for now. Sells the tickets for Zeny. Renewal only. Prontera (128,193).' },
   'npc:falcon':    { label: 'Falcon Breeder',    description: 'Falcon for Hunters/Snipers, Wolf Flute for Rangers/Windhawks, Hawk Flute for Windhawks. Prontera (128,211).' },
   'npc:buffer':    { label: 'Buffer',            description: 'Free instant buffs + full heal on click. Every major town.' },
@@ -357,6 +377,10 @@ let hasBuffKey = false;
 const WARP_KEYS = ['warp_fee', 'warp_quests'];
 const warpBoxes = {}; // Warper option key -> checkbox (on the Warper page)
 let hasWarpOpts = false;
+const STY_PRICES = ['stylist_price_hair', 'stylist_price_hair_color', 'stylist_price_cloth_color', 'stylist_price_outfit'];
+const STY_MAX = 1000000000; // "max" of the STY_PRICES settings in mod.json
+const styInputs = {}; // price key -> number box (on the Stylist page)
+let hasStyOpts = false;
 const SMUG_KEYS = ['smuggler_no_cards', 'smuggler_no_mvp_cards', 'smuggler_no_boss_cards', 'smuggler_no_costumes'];
 const BAN_KEYS = ['smuggler_ban', 'smuggler_ban2', 'smuggler_ban3'];
 const BAN_LEN = 200;  // max_length of each BAN_KEYS string
@@ -410,6 +434,7 @@ function values() {
   if (hasOffKey) out[OFF_KEY] = [...off, ...offExtra].join(',');
   for (const [k, box] of Object.entries(warpBoxes)) out[k] = box.checked;
   for (const [k, box] of Object.entries(smugBoxes)) out[k] = box.checked;
+  for (const [k, input] of Object.entries(styInputs)) out[k] = styBad(input) ? input.value : Number(input.value);
   if (banKeys.length) Object.assign(out, packBans(banIds()).values);
   if (hasAttKeys) Object.assign(out, attValues());
   for (const key of Object.keys(buffExtra))
@@ -450,6 +475,8 @@ function setValues(v) {
   for (const [code, box] of Object.entries(buffBoxes)) box.checked = chosen.includes(code);
   for (const [k, box] of Object.entries(warpBoxes)) box.checked = v[k] === true;
   for (const [k, box] of Object.entries(smugBoxes)) box.checked = v[k] === true;
+  for (const [k, input] of Object.entries(styInputs)) input.value = String(v[k] ?? '');
+  if (hasStyOpts) styCheck();
   if (banKeys.length) { $('ban-ids').value = banKeys.map(k => v[k] || '').filter(Boolean).join(','); banCount(); }
   if (hasAttKeys) { attLoad(v); attDraw(); }
   groups.forEach(syncGroup);
@@ -517,6 +544,12 @@ function drawGroup(title, settings, note = '') {
       const open = document.createElement('button');
       open.textContent = 'Options…';
       open.onclick = e => { e.preventDefault(); showWarper(true); };
+      text.append(open);
+    }
+    if (s.key === 'npc:stylist' && hasStyOpts) {
+      const open = document.createElement('button');
+      open.textContent = 'Prices…';
+      open.onclick = e => { e.preventDefault(); showPage('stylist', true); };
       text.append(open);
     }
     if (s.key === 'npc:smuggler' && hasSmugOpts) {
@@ -650,6 +683,41 @@ function drawOpts(settings, where, boxes) {
   }
 }
 $('warper-back').onclick = () => showWarper(false);
+$('stylist-back').onclick = () => showPage('stylist', false);
+
+// ---- Stylist page ----------------------------------------------------------
+// A price is a whole number of Zeny, 0 to STY_MAX.
+function styBad(input) {
+  return !(/^\d+$/.test(input.value.trim()) && Number(input.value) <= STY_MAX);
+}
+// Marks wrong prices.
+function styCheck() {
+  for (const input of Object.values(styInputs)) input.classList.toggle('bad', styBad(input));
+}
+function drawStylist(prices) {
+  for (const s of prices) {
+    const row = document.createElement('label');
+    row.className = 'price';
+    const text = document.createElement('span');
+    const title = document.createElement('b');
+    title.textContent = s.label || s.key;
+    text.append(title);
+    if (s.description) {
+      const hint = document.createElement('small');
+      hint.textContent = s.description;
+      text.append(hint);
+    }
+    const input = document.createElement('input');
+    input.inputMode = 'numeric';
+    input.title = `Zeny, 0 to ${STY_MAX.toLocaleString('en')}`;
+    input.value = String(s.value ?? '');
+    input.oninput = () => { styCheck(); markDirty(); };
+    row.append(text, input);
+    $('stylist-opts').append(row);
+    styInputs[s.key] = input;
+  }
+  styCheck();
+}
 $('smuggler-back').onclick = () => showPage('smuggler', false);
 
 // The IDs in the box, without repeats, in the order typed.
@@ -779,6 +847,7 @@ async function run(button, work) {
 async function save() {
   if (banKeys.length && packBans(banIds()).left) throw new Error("the Smuggler's banned item IDs don't all fit");
   if (hasAttKeys && attInvalid()) throw new Error('an Attendance Check reward has a wrong item ID or amount (marked in orange)');
+  if (Object.values(styInputs).some(styBad)) throw new Error(`a Stylist price is not a whole number from 0 to ${STY_MAX.toLocaleString('en')} (marked in orange)`);
   const v = values();
   await window.modSettings.set(v);
   saved = v;
@@ -830,6 +899,8 @@ async function save() {
     const warpOpts = WARP_KEYS.filter(k => byKey.has(k)).map(k => byKey.get(k));
     WARP_KEYS.forEach(k => byKey.delete(k));
     if (warpOpts.length) { hasWarpOpts = true; drawOpts(warpOpts, 'warper-opts', warpBoxes); }
+    const styPrices = STY_PRICES.map(k => mod.settings.find(s => s.key === k && s.type === 'number')).filter(Boolean);
+    if (styPrices.length) { hasStyOpts = true; drawStylist(styPrices); }
     const smugOpts = SMUG_KEYS.filter(k => byKey.has(k)).map(k => byKey.get(k));
     SMUG_KEYS.forEach(k => byKey.delete(k));
     banKeys = BAN_KEYS.filter(k => mod.settings.some(s => s.key === k));

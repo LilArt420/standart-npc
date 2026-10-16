@@ -683,8 +683,8 @@ function runEra(era) {
         check((said.match(/is gone\./g) || []).length === 2, 'Premium Service Manager: disposes of both', said.slice(-400));
     }
     if (want('stylist')) {
-        // Stylist: the 3rd class alternative outfit (Renewal only). The
-        // server sends a body style 1 (outfit) or 0 to this client
+        // Stylist: the styling window, then the 3rd class alternative outfit
+        // bought in it (Renewal only). The server sends a body style 1 (outfit) or 0 to this client
         // (clif_sprite_change, packetver < 20231220), and the client then
         // draws a costume_1 body. Relog visuals are not checked: the
         // installed client still has Flux159/roBrowserLegacy#147's bugs.
@@ -694,43 +694,113 @@ function runEra(era) {
             const p = roAgent.modules.Session.Entity;
             return { body: p._body, spr: (p.files && p.files.body && p.files.body.spr) || '' };
         })()`);
-        // Opens the Stylist; with `choice`, picks the outfit option and then
-        // `choice` in its menu. Returns the first menu.
-        const outfit = choice => ev(`(async () => {
-            await snpc.talk('Stylist');
-            const menu = snpc.view().menu.map(m => m.text);
-            if (!${JSON.stringify(choice)}) { await snpc.choose(255); return { menu }; }
-            await snpc.pick('~ Alternative outfit');
-            const v = await snpc.go(${JSON.stringify(choice || '')});
+        // The styling window (both eras): the Stylist says the prices (the
+        // settings' defaults), Close opens the window, and a hair color
+        // bought through it (the packet its Apply sends) costs 100,000 Zeny.
+        gm('@zeny 200000');
+        ev('new Promise(r => setTimeout(r, 1000))');
+        const win = ev(`(async () => {
+            const sleep = ms => new Promise(r => setTimeout(r, ms));
+            const v = await snpc.talk('Stylist');
+            const said = v.text;
             await snpc.close();
-            return { menu, error: v.error };
+            await sleep(1500);
+            const M = roAgent.modules;
+            const c = M.UIManager.getComponent('Stylist');
+            const open = !!(c && c._host && c._host.isConnected);
+            const p = M.Session.Entity;
+            const before = { zeny: M.Session.zeny, color: p.headpalette | 0 };
+            const pkt = new M.PACKET.CZ.REQ_STYLE_CHANGE2();
+            pkt.HeadPalette = before.color % 8 + 1;
+            M.Network.sendPacket(pkt);
+            await sleep(2500);
+            try { if (c._host && c._host.isConnected) c.remove(); } catch { /* closed */ }
+            return { said, open, want: pkt.HeadPalette, before, after: { zeny: M.Session.zeny, color: p.headpalette | 0 } };
         })()`);
-        const hasOutfit = r => r && Array.isArray(r.menu) && r.menu.includes('~ Alternative outfit');
+        check(win && ['Hair style: 100,000 Zeny', 'Hair color: 100,000 Zeny', 'Cloth color: 100,000 Zeny'].every(t => String(win.said).includes(t)),
+            'Stylist: says the window prices', JSON.stringify(win));
+        check(win && win.open, 'Stylist: Close opens the styling window', JSON.stringify(win));
+        check(win && win.after.color === win.want && win.after.zeny === win.before.zeny - 100000,
+            'Stylist: a hair color from the window costs 100,000 Zeny', JSON.stringify(win));
+        // Paying with a coupon: the window's "Pay with coupons" sends
+        // @snpcstylist <request> pay 1 before the purchase; a cloth color then
+        // takes one Clothing Dye Coupon (6046) and no Zeny.
+        gm('@item 6046 1');
+        ev(`(async () => {
+            await snpc.talk('Stylist');
+            await snpc.close();
+            await new Promise(r => setTimeout(r, 1500));
+        })()`);
+        gm('@snpcstylist 1 pay 1');
+        const coupon = ev(`(async () => {
+            const sleep = ms => new Promise(r => setTimeout(r, ms));
+            await sleep(1000);
+            const M = roAgent.modules;
+            const c = M.UIManager.getComponent('Stylist');
+            const p = M.Session.Entity;
+            const inv = M.UIManager.getComponent('Inventory');
+            const coupons = () => { const i = inv.getItemById(6046); return i ? i.count || 1 : 0; };
+            const before = { zeny: M.Session.zeny, coupons: coupons(), color: p.bodypalette | 0 };
+            const pkt = new M.PACKET.CZ.REQ_STYLE_CHANGE2();
+            pkt.BodyPalette = before.color === 3 ? 4 : 3;
+            M.Network.sendPacket(pkt);
+            await sleep(2500);
+            try { if (c._host && c._host.isConnected) c.remove(); } catch { /* closed */ }
+            return { want: pkt.BodyPalette, before, after: { zeny: M.Session.zeny, coupons: coupons(), color: p.bodypalette | 0 } };
+        })()`);
+        check(coupon && coupon.after.color === coupon.want && coupon.after.zeny === coupon.before.zeny
+            && coupon.after.coupons === coupon.before.coupons - 1,
+            'Stylist: paying with coupons takes a Clothing Dye Coupon, not Zeny', JSON.stringify(coupon));
+        // The outfit, bought in the styling window (Renewal): opens the
+        // Stylist, keeps what it says, and with `style` buys it the way the
+        // window's Outfit tab does (BodyStyle 1 standard, 2 alternative; the
+        // indices of db/re/stylist.yml's Body2). Needs the fork's Body2 fix.
+        const outfit = style => ev(`(async () => {
+            const sleep = ms => new Promise(r => setTimeout(r, ms));
+            const v = await snpc.talk('Stylist');
+            const said = v.text;
+            await snpc.close();
+            await sleep(1500);
+            const M = roAgent.modules;
+            const c = M.UIManager.getComponent('Stylist');
+            const before = M.Session.zeny;
+            if (${style || 0}) {
+                const pkt = new M.PACKET.CZ.REQ_STYLE_CHANGE2();
+                pkt.BodyStyle = ${style || 0};
+                M.Network.sendPacket(pkt);
+                await sleep(2500);
+            }
+            try { if (c._host && c._host.isConnected) c.remove(); } catch { /* closed */ }
+            return { said, paid: before - M.Session.zeny };
+        })()`);
+        const offered = r => r && /Outfit: 100,000 Zeny/.test(String(r.said));
         const wearing = b => b && b.body === 1 && /costume_1/.test(b.spr);
         const plain = b => b && b.body === 0 && b.spr && !/costume_1/.test(b.spr);
         if (!e.thirdClass) {
-            const none = outfit(null);
-            check(none && Array.isArray(none.menu) && none.menu.length === 3, 'Stylist: no alternative outfit on Pre-renewal', JSON.stringify(none));
+            const none = outfit(0);
+            check(none && !offered(none) && !/Outfit:/.test(String(none.said)), 'Stylist: no outfit on Pre-renewal', JSON.stringify(none));
         } else {
+            gm('@zeny 1000000');
             for (const job of STYLE_TEST.jobs) {
                 if (job.id !== e.job) { gm(`@jobchange ${job.id}`); ev('new Promise(r => setTimeout(r, 1500))'); }
-                const on = outfit('~ Alternative outfit');
-                check(hasOutfit(on) && !on.error, `Stylist: outfit offered to a ${job.name}`, JSON.stringify(on));
+                const on = outfit(2);
+                check(offered(on), `Stylist: outfit offered to a ${job.name}`, JSON.stringify(on));
                 const b1 = body();
-                check(wearing(b1), `Stylist: ${job.name} wears the alternative outfit (costume_1)`, JSON.stringify(b1));
-                const off = outfit('~ Standard outfit');
+                check(wearing(b1) && on.paid === 100000, `Stylist: ${job.name} buys the alternative outfit (costume_1) for 100,000 Zeny`, JSON.stringify({ on, b1 }));
+                const off = outfit(1);
                 const b2 = body();
-                check(!off.error && plain(b2), `Stylist: ${job.name} back to the standard outfit`, JSON.stringify({ off, b2 }));
+                check(plain(b2) && off.paid === 100000, `Stylist: ${job.name} back to the standard outfit`, JSON.stringify({ off, b2 }));
             }
             gm(`@jobchange ${STYLE_TEST.none.id}`);
             ev('new Promise(r => setTimeout(r, 1500))');
-            const none = outfit(null);
-            check(none && Array.isArray(none.menu) && none.menu.length === 3 && !hasOutfit(none),
-                `Stylist: no outfit for a ${STYLE_TEST.none.name}`, JSON.stringify(none));
+            const none = outfit(2);
+            const b3 = body();
+            check(none && !/Outfit:/.test(String(none.said)) && none.paid === 0 && plain(b3),
+                `Stylist: no outfit for a ${STYLE_TEST.none.name}, and the server refuses one`, JSON.stringify({ none, b3 }));
             // Back to the run's class, outfit on: logging out must save it.
             gm(`@jobchange ${e.job}`);
             ev('new Promise(r => setTimeout(r, 1500))');
-            outfit('~ Alternative outfit');
+            outfit(2);
         }
     }
     const shot = W.rotestJson('shot', `play-${era}`);

@@ -70,9 +70,9 @@ Everything is on after install. To change it: **Settings → Mods → standart-n
 
 | | NPC | What it does | Location |
 |:-:|---|---|---|
-| 🎓 | **Job Master** | Full job changer up to 4th class, including job-change equipment (Wolf Flute for Ranger, etc.). | Prontera (157, 195) |
+| 🎓 | **Job Master** | Full job changer up to 4th class (and the Druid line on servers that have it), including job-change equipment (Wolf Flute for Ranger, etc.). | Prontera (157, 195) |
 | 🔄 | **Reset Girl** | Resets skills, stats, or both, for Zeny. | Prontera (154, 195) |
-| 💇 | **Stylist** | Hair style, hair color, cloth color changer; on Renewal, the 3rd class alternative outfit (free). | Prontera (169, 180) |
+| 💇 | **Stylist** | Styling window for hair style, hair color, cloth color and, on Renewal, the 3rd class alternative outfit, paid in Zeny (prices in Settings…) or with a coupon. | Prontera (169, 180) |
 | 🛡️ | **Episode Valkyrie** | Sells Episode Clear Tickets for Zeny. A ticket skips one part of an episode's main story, as on official servers: its maps, instances and daily quests open, no rewards. Parts 13.1 – 18 for now, in story order ([what each opens](#episode-valkyrie)). Renewal only. | Prontera (128, 193) |
 | 🎭 | **Plagiarism Master** | Rogue, Stalker, Shadow Chaser and Abyss Chaser copy any skill Plagiarism can copy. The level goes up to your Plagiarism level. Shadow Chaser and Abyss Chaser can also put a 3rd class skill into their Reproduce slot (Renewal). | Prontera (171, 182) |
 
@@ -184,7 +184,7 @@ Buffs that cancel each other in the game can't be ticked together. 3rd and 4th c
 ## 🏆 Credits
 
 - 👑 **MondoTruth** — pack owner/maintainer, and just a good guy.
-- 🎨 **Lil Art** — Safe Refiner, Grade Refiner, Universal Enchanter, the Daily Rewards (now Attendance Check) rewards, Welcoming, Gramps, Overlook Fisherman, the 231+ Gramps bracket, Cheffenia MVP Dungeon, Illusion Dungeon bounties, Weight Maxxer, Training Dummies, Episode Valkyrie, and the Tool Dealer's Blacksmith Blessing.
+- 🎨 **Lil Art** — Safe Refiner, Grade Refiner, Universal Enchanter, the Daily Rewards (now Attendance Check) rewards, Welcoming, Gramps, Overlook Fisherman, the 231+ Gramps bracket, Cheffenia MVP Dungeon, Illusion Dungeon bounties, Weight Maxxer, Training Dummies, Episode Valkyrie, the Tool Dealer's Blacksmith Blessing, and the Job Master's Druid line.
 - ❄️ **IceGlaive** — Lucky John, Gramps per-character progress tracking, live kill notifications, the original 3 extended Gramps level brackets (with monster IDs verified live via `@mobinfo`), the bounty penalty/abandon system, the Gramps EXP rebalance, the reduced over-level penalty, the 231+ bracket monster fix, and the shared bounty rewards file with the EXP rebalance for Gramps, Lucky John, and Illusion Manager.
 - 🔥 **Nokzin** — the Elemental Endower (elemental weapon endows).
 - 🎭 **iguera** — Plagiarism Master (from his arpg-equipments mod, used with permission).
@@ -203,4 +203,4 @@ Found a bug or want to add something? [Open an issue](../../issues) or a [pull r
 
 [MIT](./LICENSE) — use, change and share it freely, just keep the authors' names and the licence text.
 
-Exception: `npc/warper.txt`, `npc/jobmaster.txt`, `npc/resetnpc.txt` and `npc/stylist.txt` are based on rAthena's custom scripts and stay under rAthena's [GPL-3.0](./LICENSE-GPL-3.0).
+Exception: `npc/warper.txt`, `npc/jobmaster.txt`, `npc/resetnpc.txt` and `npc/stylist.txt` are based on rAthena's custom scripts, and `pre-renewal/db/stylist.yml` on rAthena's `db/re/stylist.yml`, and stay under rAthena's [GPL-3.0](./LICENSE-GPL-3.0).

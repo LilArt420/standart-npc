@@ -262,9 +262,17 @@ If warps or Fly Wings get slower the longer you play, update Ragnarok Offline to
 ### Renewal and Pre-renewal
 - Smuggler: Settings… → Smuggler → Options… can keep him from selling cards, MVP cards, mini-boss cards, costumes, or any item IDs you list. Banned items are refused both for sale and as the free item after his quest. Requested on Discord.
 
-## Next version
+## 5.0.0
+
+Needs Ragnarok Offline 1.6.3 or newer.
+
+### Renewal and Pre-renewal
+- Stylist: hair style, hair color and cloth color are now chosen in the new styling window: pictures of your own character with each hair style and color, a big preview you can turn, and the price of what you picked. Each change costs 100,000 Zeny by default; Settings… → Stylist → Prices… sets the price of each. In the window you pay with Zeny or with coupons: a New Style Coupon for a hair style, a Clothing Dye Coupon for a cloth color (a hair color is always Zeny). A change of several things at once is paid in full or not made at all. The Stylist used to change them for free.
 
 ### Renewal only
+- Stylist: the alternative outfit moved from the Stylist's menu into the styling window, on its own Outfit tab with a picture of each outfit. Switching costs 100,000 Zeny by default (Settings… → Stylist → Prices…) or a Costume Change Ticket. It used to be free.
+- Job Master: the Druid line. A Novice can become a **Druid** (Job 10), a Druid a **Karnos** (Base 99, Job 70) and a Karnos an **Alitea** (Base 200, Job 70, like the other 4th jobs); Baby Novices get Baby Druid and Baby Karnos. New Druids get an Axe, new Karnos a Two-Handed Axe. The options only appear on a server that has the Druid jobs (Ragnarok Offline with Flux159/rathena#50); on every other server the Job Master is unchanged. Thanks to Lil Art. (Not tested in game yet: no server has the Druid jobs so far.)
+- Warper: Karnos and Baby Karnos pay for warps, like Rebellion (Alitea already does, as a 3rd class). (Not tested in game yet.)
 - Stylist: with Ragnarok Offline 1.6.2 or newer the character selection window shows the alternative outfit too (the known problem from 4.9.8 is fixed in the game client).
 
 ## 4.9.8
