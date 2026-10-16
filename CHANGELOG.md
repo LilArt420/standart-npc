@@ -266,6 +266,7 @@ If warps or Fly Wings get slower the longer you play, update Ragnarok Offline to
 
 ### Renewal only
 - Job Master: the Druid line. A Novice can become a **Druid** (Job 10), a Druid a **Karnos** (Base 99, Job 70) and a Karnos an **Alitea** (Base 200, Job 70, like the other 4th jobs); Baby Novices get Baby Druid and Baby Karnos. New Druids get an Axe, new Karnos a Two-Handed Axe. The options only appear on a server that has the Druid jobs (Ragnarok Offline with Flux159/rathena#50); on every other server the Job Master is unchanged.
+- Warper: Karnos and Baby Karnos pay for warps, like Rebellion (Alitea already does, as a 3rd class).
 - Stylist: with Ragnarok Offline 1.6.2 or newer the character selection window shows the alternative outfit too (the known problem from 4.9.8 is fixed in the game client).
 
 ## 4.9.8
