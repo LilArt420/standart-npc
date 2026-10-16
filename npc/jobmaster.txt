@@ -49,6 +49,8 @@ function Is_Expanded	{
 		case JOB_KAGEROU:
 		case JOB_OBORO:
 		case JOB_SUMMONER:
+		case 4351:	// Druid (when the server has the Druid jobs)
+		case 4353:	// Karnos
 			return true;
 		default:
 			return false;
@@ -133,6 +135,7 @@ function	Can_Rebirth	{
 //
 // Gunslinger (1st class) => Rebellion (2nd class) (renewal class) => Night Watch (3rd class) (trait class)
 // Summoner (1st class) => Spirit Handler (2nd class) (trait class)
+// Druid (1st class) => Karnos (2nd class) (renewal class) => Alitea (3rd class) (trait class)
 function	Is_First_Cls	{
 	return (getarg(0) <= EAJ_TAEKWON);
 }
@@ -259,6 +262,20 @@ function	Job_Options	{
 		Job_Options(.@job_opt, roclass(EAJ_SOUL_ASCETIC));	// .@eac|EAJL_FOURTH
 	}
 
+	// Druid line: Druid -> Karnos -> Alitea (job ids 4351-4355, only on a server that has them)
+	if (.DruidClass) {
+		if (Class == 4351 || (Class == 4352 && .BabyClass && .BabyExpanded)) {
+			// (Baby) Druid to (Baby) Karnos
+			Require_Level(.Req_Karnos[0], .Req_Karnos[1]);
+			Job_Options(.@job_opt, Class + 2);
+		}
+		if (Class == 4353 && .TraitExpanded) {
+			// Karnos to Alitea
+			Require_Level(.Req_Fourth[0], .Req_Fourth[1]);
+			Job_Options(.@job_opt, 4355);
+		}
+	}
+
 	// Whether the character can become renewal (baby) expanded class - a class above level 99 without trait points : Rebellion, Kagerou/Oboro, Star Emperor, Soul Reaper
 	if (.RenewalExpanded) {
 		// .BabyClass & .BabyExpanded must be enabled if the is a baby
@@ -294,6 +311,8 @@ function	Job_Options	{
 				Job_Options(.@job_opt,Job_Swordman,
 					Job_Mage, Job_Archer, Job_Acolyte, Job_Merchant, Job_Thief,
 					Job_Super_Novice, Job_Taekwon, Job_Gunslinger, Job_Ninja);
+				if( .DruidClass )
+					Job_Options(.@job_opt, 4351);	// Druid
 				if( .BabyNovice )
 					Job_Options(.@job_opt, Job_Baby);
 				break;
@@ -319,6 +338,8 @@ function	Job_Options	{
 						Job_Baby_Gunslinger, Job_Baby_Ninja);
 				if( .BabySummoner )
 					Job_Options(.@job_opt, Job_Baby_Summoner);
+				if( .DruidClass && .BabyExpanded )
+					Job_Options(.@job_opt, 4352);	// Baby Druid
 				break;
 			default:
 				mes "An error has occurred.";
@@ -462,6 +483,14 @@ function	Get_Job_Equip	{
 	// Note: The item is dropping, when the player can't hold it.
 	// But that's better than not giving the item at all.
 	.@eac = eaclass();
+	if( Class == 4351 || Class == 4352 ) {
+		getitem 1301,1;	//	Axe [3] (Druid)
+		return;
+	}
+	if( Class == 4353 || Class == 4354 ) {
+		getitem 1360,1;	//	Two-Handed Axe [1] (Karnos)
+		return;
+	}
 	if( .@eac&EAJL_FOURTH ) {
 		// Fourth Class Items
 		getitem 490087,1; // Hourglass Necklace
@@ -584,6 +613,7 @@ OnInit:
 	.SkillPointCheck = true;			// Force player to use up all skill points?
 	.Platinum = true;					// Get platinum skills automatically?
 	.GetJobEquip = true;				// Get job equipment (mostly weapons) on job change?
+	.DruidClass = (eaclass(4351) != -1 && checkre(0));	// Druid line (Druid, Karnos, Alitea): on when the server has those jobs, Renewal only
 
 	// Level Requirements
 	setarray .Req_First[0],1,10; 		// Minimum base level, job level to turn into 1st class
@@ -594,6 +624,7 @@ OnInit:
 	setarray .Req_Exp_NJ_GS[0],99,70; 	// Minimum base level, job level to turn into Ninja -> Kagerou/Oboro, Gunslinger -> Rebellion
 	setarray .Req_Exp_SNOVI[0],99,99; 	// Minimum base level, job level to turn into Expanded Super Novice
 	setarray .Req_SHandler[0],200,60;	// Minimum base level, job level to turn into Spirit Handler
+	setarray .Req_Karnos[0],99,70;		// Minimum base level, job level to turn Druid -> Karnos (Karnos -> Alitea uses .Req_Fourth)
 	.SNovice = 45;						// Minimum base level to turn into Super Novice
 
 	// Setting adjustments by PACKETVER
