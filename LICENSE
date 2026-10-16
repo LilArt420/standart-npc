@@ -32,6 +32,7 @@ not under the MIT licence above:
   npc/jobmaster.txt  based on npc/custom/jobmaster.txt (Euphy)
   npc/resetnpc.txt   based on npc/custom/resetnpc.txt
   npc/stylist.txt    based on npc/custom/stylist.txt (Euphy)
+  pre-renewal/db/stylist.yml  based on db/re/stylist.yml
 
 -------------------------------------------------------------------------------
 Third-party code under the MIT licence

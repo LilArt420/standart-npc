@@ -72,7 +72,7 @@ Everything is on after install. To change it: **Settings → Mods → standart-n
 |:-:|---|---|---|
 | 🎓 | **Job Master** | Full job changer up to 4th class, including job-change equipment (Wolf Flute for Ranger, etc.). | Prontera (157, 195) |
 | 🔄 | **Reset Girl** | Resets skills, stats, or both, for Zeny. | Prontera (154, 195) |
-| 💇 | **Stylist** | Hair style, hair color, cloth color changer; on Renewal, the 3rd class alternative outfit (free). | Prontera (169, 180) |
+| 💇 | **Stylist** | Styling window for hair style, hair color, cloth color and, on Renewal, the 3rd class alternative outfit, paid in Zeny (prices in Settings…) or with a coupon. | Prontera (169, 180) |
 | 🛡️ | **Episode Valkyrie** | Sells Episode Clear Tickets for Zeny. A ticket skips one part of an episode's main story, as on official servers: its maps, instances and daily quests open, no rewards. Parts 13.1 – 18 for now, in story order ([what each opens](#episode-valkyrie)). Renewal only. | Prontera (128, 193) |
 | 🎭 | **Plagiarism Master** | Rogue, Stalker, Shadow Chaser and Abyss Chaser copy any skill Plagiarism can copy. The level goes up to your Plagiarism level. Shadow Chaser and Abyss Chaser can also put a 3rd class skill into their Reproduce slot (Renewal). | Prontera (171, 182) |
 
@@ -203,4 +203,4 @@ Found a bug or want to add something? [Open an issue](../../issues) or a [pull r
 
 [MIT](./LICENSE) — use, change and share it freely, just keep the authors' names and the licence text.
 
-Exception: `npc/warper.txt`, `npc/jobmaster.txt`, `npc/resetnpc.txt` and `npc/stylist.txt` are based on rAthena's custom scripts and stay under rAthena's [GPL-3.0](./LICENSE-GPL-3.0).
+Exception: `npc/warper.txt`, `npc/jobmaster.txt`, `npc/resetnpc.txt` and `npc/stylist.txt` are based on rAthena's custom scripts, and `pre-renewal/db/stylist.yml` on rAthena's `db/re/stylist.yml`, and stay under rAthena's [GPL-3.0](./LICENSE-GPL-3.0).

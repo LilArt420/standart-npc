@@ -7,7 +7,7 @@
   "prerenewalFolder": "pre-renewal",
   "default": "off",
   "requires": {
-    "app": ">=1.6.1",
+    "app": ">=1.6.2",
     "era": "any"
   },
   "settings": [
@@ -48,6 +48,42 @@
       "default": true,
       "label": "Warper: quest-locked dungeons",
       "description": "The Warper only takes a character to Bio Lab, the Culvert, Dewata Dungeon, Nidhoggur's Dungeon and Rachel Sanctuary after the quest that opens their official entrance. Off = every dungeon is open."
+    },
+    {
+      "key": "stylist_price_hair",
+      "type": "number",
+      "default": 100000,
+      "min": 0,
+      "max": 1000000000,
+      "label": "Stylist: hair style price (Zeny)",
+      "description": "What a new hair style costs in the Stylist's window. 0 = free."
+    },
+    {
+      "key": "stylist_price_hair_color",
+      "type": "number",
+      "default": 100000,
+      "min": 0,
+      "max": 1000000000,
+      "label": "Stylist: hair color price (Zeny)",
+      "description": "What a new hair color costs in the Stylist's window. 0 = free."
+    },
+    {
+      "key": "stylist_price_cloth_color",
+      "type": "number",
+      "default": 100000,
+      "min": 0,
+      "max": 1000000000,
+      "label": "Stylist: cloth color price (Zeny)",
+      "description": "What a new cloth color costs in the Stylist's window. 0 = free."
+    },
+    {
+      "key": "stylist_price_outfit",
+      "type": "number",
+      "default": 100000,
+      "min": 0,
+      "max": 1000000000,
+      "label": "Stylist: outfit price (Zeny)",
+      "description": "What switching between the standard and the alternative outfit (3rd and 4th classes, Renewal) costs in the Stylist's window. 0 = free."
     },
     {
       "key": "smuggler_no_cards",
