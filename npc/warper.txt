@@ -1448,11 +1448,13 @@ function	script	F_SNPC_WarpCheck	{
 
 	// The fee: only 3rd and 4th classes. EAJL_THIRD is set on both; the
 	// expanded classes the server files as 2nd class (Kagerou, Oboro,
-	// Rebellion) or as Doram (Spirit Handler) are added by hand.
+	// Rebellion, Karnos) or as Doram (Spirit Handler) are added by hand.
+	// Karnos is a number: only servers with the Druid jobs know JOB_KARNOS.
 	if (.@group > 0 && callfunc("F_ModSetting", "standart-npc", "warp_fee", 1)) {
 		.@pays = eaclass() & EAJL_THIRD;
 		if (Class == JOB_KAGEROU || Class == JOB_OBORO || Class == JOB_REBELLION || Class == JOB_SPIRIT_HANDLER
-			|| Class == JOB_BABY_KAGEROU || Class == JOB_BABY_OBORO || Class == JOB_BABY_REBELLION)
+			|| Class == JOB_BABY_KAGEROU || Class == JOB_BABY_OBORO || Class == JOB_BABY_REBELLION
+			|| Class == 4353 || Class == 4354)	// Karnos, Baby Karnos
 			.@pays = 1;
 		if (.@pays) {
 			.@fee = 5000;
