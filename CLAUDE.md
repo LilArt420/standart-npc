@@ -101,8 +101,8 @@ README.md, assets/, CLAUDE.md, docs/, tools/, tests/  -- repo only, never in the
 - Files in `db/` load even when the related NPC is switched off. Since app
   1.4.3 the `when/<key>/` switch also works for `db/when/<key>/`,
   `lua/when/<key>/` and `conf/when/<key>/` (`groups.yml`/`atcommands.yml`).
-  We require app 1.6.2 (for the `stylist_script_costs` extension,
-  Flux159/rathena#47 -- confirm the version once it ships;
+  We require app 1.6.3 (for the `stylist_script_costs` extension,
+  Flux159/rathena#47;
   `attendance_script_rewards` came in 1.6.0, `attendance_repeat` in 1.5.5).
 - A `db/` file only loads if its name is a table rAthena imports
   (`mob_db.yml`, `item_db.yml`, ... — the stubs in rAthena's
