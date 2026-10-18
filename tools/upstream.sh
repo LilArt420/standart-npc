@@ -4,7 +4,7 @@
 #   2. config/VENDOR_PINS changes between the clone's tag and the latest release
 #   3. syncs MondoTruth's forks (fast-forward only; a fork that is ahead is
 #      reported and left alone)
-#   4. open PRs in Flux159's app, rathena and roBrowserLegacy
+#   4. open PRs in Flux159's app, rathena, roBrowserLegacy and RemoteClient-Rust
 #   5. `prontera,` lines of registry mods new or changed since the clone's
 #      tag, with any within 2 cells of one of our NPCs
 # Needs gh (logged in) and the app clone with an `upstream` remote.
@@ -67,11 +67,12 @@ fork() {
 fork Flux159/ragnarokoffline.app ragnarokoffline.app main
 fork Flux159/rathena rathena ragnarokoffline
 fork Flux159/roBrowserLegacy roBrowserLegacy ragnarokoffline
+fork Flux159/roBrowserLegacy-RemoteClient-Rust roBrowserLegacy-RemoteClient-Rust main
 fork LilArt420/cashshopmod cashshopmod main
 
 echo
 echo "== Open PRs"
-for r in "$APP" Flux159/rathena Flux159/roBrowserLegacy; do
+for r in "$APP" Flux159/rathena Flux159/roBrowserLegacy Flux159/roBrowserLegacy-RemoteClient-Rust; do
 	echo " $r:"
 	out=$(retry gh pr list -R "$r" --state open --limit 50 --json number,author,title \
 		--jq '.[] | "  #\(.number)\t\(.author.login)\t\(.title)"') || out="  (failed)"
