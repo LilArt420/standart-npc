@@ -9,8 +9,8 @@
 //= within 5 cells.
 //= Renewal only: Pre-renewal has none of the three items, and
 //= 189,209 is not walkable on its old Izlude.
-//= Hides itself when the mega-booster mod is on: its Booster Guide
-//= hands out the same box.
+//= Switched off while the mega-booster mod is installed and on: its
+//= Booster Guide hands out the same box.
 //===== How to customize: ====================================
 //= - Zeny: .zeny in OnInit.
 //= - Items: .items in OnInit (item IDs, one of each).
@@ -82,15 +82,15 @@ OnTouch:
 	end;
 
 OnInit:
-	// Off on Pre-renewal (checkre(0): 1 = Renewal, 0 = Pre-renewal),
-	// and when switched off in the settings window.
-	if (!checkre(0) || callfunc("F_SNPC_Off", "welcome")) disablenpc strnpcinfo(0);
+	// Off on Pre-renewal (checkre(0): 1 = Renewal, 0 = Pre-renewal), when
+	// switched off in the settings window, and while the mega-booster mod is on
+	// (its Booster Guide gives the same box). F_ModSetting knows only the mods
+	// that are on, so the default -1 means mega-booster is not.
+	if (!checkre(0) || callfunc("F_SNPC_Off", "welcome")
+		|| callfunc("F_ModSetting", "mega-booster", "box_per_character", -1) != -1)
+		disablenpc strnpcinfo(0);
 	.zeny = 150000;
 	// Premium Booster Box, Costume Angeling Bread Hat, Costume Adventurer's Backpack
 	setarray .items, 103048, 400115, 20512;
-	// The mega-booster mod has its own Booster Guide with the same box. Mods load
-	// in no fixed order, so give it a moment to load, then step aside if it did.
-	sleep 2000;
-	if (getnpcid(0, "Booster Guide#bst")) disablenpc strnpcinfo(0);
 	end;
 }
