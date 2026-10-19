@@ -79,6 +79,13 @@
 //= quests (bathhouse, library, basement, Water Garden ...).
 //= Episode 18: ep18_main = 57. Opens Villa of Deception
 //= (wolfvill 79,260) and the Wolfvill dailies.
+//= Episode 19: ep19_main = 100. Needs base level 200, as the Grey Wolf
+//= Villager does. Opens Issgard: the Ice Castle, the snake's nest and
+//= their dailies (Iwin patrol, lunch, the Rgans' work), Airship
+//= Destruction, Bagot's Laboratory and the side quests the finished
+//= story unlocks. Starts the Purification Saint side story if you have
+//= not (the story gives it at the Ice Castle); the side stories
+//= themselves are left as they are.
 //===== How to customize: ====================================
 //= OnInit: .price[<episode>] is the ticket price in Zeny,
 //= .ready the parts with a skip, .order the story order (0 starts a
@@ -252,6 +259,11 @@ S_Need:
 		if (ep13_ryu < 100 && ep13_start < 100)
 			return "Episode 16.1 needs the way to the New World open: Onward to the New World, or the Cat Paw Agent's quest.";
 		break;
+	case 190:
+		// The Grey Wolf Villager in Wolfvill (quests_19.txt).
+		if (BaseLevel < 200)
+			return "Episode 19 needs base level 200.";
+		break;
 	}
 	return "";
 
@@ -305,6 +317,10 @@ S_Done:
 		return (ep17_2_main >= 36);
 	case 180:
 		return (ep18_main >= 57);
+	case 190:
+		// Aurelie's last talk (quests_19.txt): 61 to 100, which opens the
+		// remaining dailies and side quests.
+		return (ep19_main >= 100);
 	}
 	return 0;
 
@@ -435,6 +451,25 @@ S_Skip:
 		copyarray .@done[0], .q180_done[0], getarraysize(.q180_done);
 		ep18_main = 57;
 		break;
+	case 190:
+		copyarray .@open[0], .q190[0], getarraysize(.q190);
+		copyarray .@done[0], .q190_done[0], getarraysize(.q190_done);
+		// Guardian Leon starts the Purification Saint side story at
+		// ep19_main 9 (Boclind's errand, 18128).
+		if (ep19_side_saint < 1) {
+			ep19_side_saint = 1;
+			if (isbegin_quest(18128) == 0)
+				setquest 18128;
+		}
+		ep19_main = 100;
+		// The story's own items, taken back by the story: the letter, the
+		// Rgans' egg shell, the ledger, the Ice Cookie and the test tubes.
+		setarray .@item[0], 1000607, 1000606, 1000845, 1000846, 1000604, 1000605;
+		for (.@i = 0; .@i < 6; .@i++) {
+			if (countitem(.@item[.@i]))
+				delitem .@item[.@i], countitem(.@item[.@i]);
+		}
+		break;
 	}
 	// Main quests still open are closed, as the story would have.
 	.@n = getarraysize(.@open);
@@ -461,18 +496,19 @@ OnInit:
 		end;
 	}
 	// Parts with a real skip, in menu order.
-	setarray .ready[0], 131, 132, 133, 141, 142, 143, 151, 152, 161, 162, 171, 172, 180;
+	setarray .ready[0], 131, 132, 133, 141, 142, 143, 151, 152, 161, 162, 171, 172, 180, 190;
 	// Story order, as far as S_Done can tell a part is finished. 14.1, 14.2,
 	// 15.1 and 16.1 do not need the part before them in the game, so 0
 	// starts a new chain there.
-	setarray .order[0], 131, 132, 133, 0, 141, 0, 142, 143, 0, 151, 152, 0, 161, 162, 171, 172, 180;
-	// Episode Clear Tickets (EpisodClear13 - EpisodClear18).
+	setarray .order[0], 131, 132, 133, 0, 141, 0, 142, 143, 0, 151, 152, 0, 161, 162, 171, 172, 180, 190;
+	// Episode Clear Tickets (EpisodClear13 - EpisodClear19).
 	.ticket[13] = 1000284;
 	.ticket[14] = 1000285;
 	.ticket[15] = 1000286;
 	.ticket[16] = 1000282;
 	.ticket[17] = 1000287;
 	.ticket[18] = 1000288;
+	.ticket[19] = 1000988;
 	// Ticket prices in Zeny.
 	.price[13] = 1000000;
 	.price[14] = 2000000;
@@ -480,6 +516,7 @@ OnInit:
 	.price[16] = 4000000;
 	.price[17] = 5000000;
 	.price[18] = 6000000;
+	.price[19] = 7000000;
 	// Episodes whose tickets are sold: those of the ready parts.
 	.@n = getarraysize(.ready);
 	for (.@i = 0; .@i < .@n; .@i++) {
@@ -632,5 +669,23 @@ OnInit:
 		16576, 16577, 16578, 16579, 16580,
 		17517, 17518, 17519, 17520, 17521, 17525, 18083, 18084, 18085;
 	setarray .q180_done[0], 8681, 11720, 11724, 18085;
+	// Episode 19 (npc/re/quests/quests_19.txt, and the instances IwinPatrol,
+	// BaggotLaboratory and ConfusedSnakesNest in npc/re/instances): every
+	// main-story quest, ep19_main 1 to 100, and those a finished story
+	// leaves completed (the clues of step 34 and Those who disappeared).
+	// Airship Destruction's starter (17637), the dailies (Eagle Patrol
+	// 5972-5975, lunch 5985, the Rgans' and Iwins' work) and the side
+	// stories (Purification Saint, Frozen Sea, 17650-17662, 18130-18144)
+	// are left alone.
+	setarray .q190[0],
+		18119, 18120, 18121, 18122, 18123, 18129, 18124, 18125, 18126,
+		18127, 5983, 5984, 17639,
+		17619, 17620, 17621, 17622, 17623, 17624, 17625, 17626, 17627,
+		17628, 17629, 17630, 17631, 17632, 17633, 17634, 17635, 17636,
+		17638, 16636, 16637, 16638, 16645,
+		16646, 16647, 16648, 16649, 16650, 16651, 16652, 16653, 16654,
+		16655, 16656, 16657, 16658, 16659, 16661,
+		17640, 17641, 17642, 17643, 17644, 17645, 17646, 17647;
+	setarray .q190_done[0], 16639, 16640, 16641, 16642, 16643, 16644, 17649;
 	end;
 }
