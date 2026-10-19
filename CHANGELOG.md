@@ -262,6 +262,13 @@ If warps or Fly Wings get slower the longer you play, update Ragnarok Offline to
 ### Renewal and Pre-renewal
 - Smuggler: Settings… → Smuggler → Options… can keep him from selling cards, MVP cards, mini-boss cards, costumes, or any item IDs you list. Banned items are refused both for sale and as the free item after his quest. Requested on Discord.
 
+## Next version
+
+Needs Ragnarok Offline 1.6.5 or newer.
+
+### Renewal only
+- Episode Valkyrie: Episode 19. An Eps 19 Clear Ticket (7,000,000 Zeny) skips Episode 19's main story, so Issgard opens: the Ice Castle, the snake's nest and their dailies, Airship Destruction, Bagot's Laboratory and the side quests for a finished story. It needs Episode 18 finished and base level 200, as the game does. The Purification Saint side story starts if you have not started it; the side stories themselves are left to you. No EXP or quest rewards. Episode 19's quests came with Ragnarok Offline 1.6.5.
+
 ## 5.0.0
 
 Needs Ragnarok Offline 1.6.3 or newer.

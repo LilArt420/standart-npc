@@ -73,7 +73,7 @@ Everything is on after install. To change it: **Settings → Mods → standart-n
 | 🎓 | **Job Master** | Full job changer up to 4th class (and the Druid line on servers that have it), including job-change equipment (Wolf Flute for Ranger, etc.). | Prontera (157, 195) |
 | 🔄 | **Reset Girl** | Resets skills, stats, or both, for Zeny. | Prontera (154, 195) |
 | 💇 | **Stylist** | Styling window for hair style, hair color, cloth color and, on Renewal, the 3rd class alternative outfit, paid in Zeny (prices in Settings…) or with a coupon. | Prontera (169, 180) |
-| 🛡️ | **Episode Valkyrie** | Sells Episode Clear Tickets for Zeny. A ticket skips one part of an episode's main story, as on official servers: its maps, instances and daily quests open, no rewards. Parts 13.1 – 18 for now, in story order ([what each opens](#episode-valkyrie)). Renewal only. | Prontera (128, 193) |
+| 🛡️ | **Episode Valkyrie** | Sells Episode Clear Tickets for Zeny. A ticket skips one part of an episode's main story, as on official servers: its maps, instances and daily quests open, no rewards. Parts 13.1 – 19 for now, in story order ([what each opens](#episode-valkyrie)). Renewal only. | Prontera (128, 193) |
 | 🎭 | **Plagiarism Master** | Rogue, Stalker, Shadow Chaser and Abyss Chaser copy any skill Plagiarism can copy. The level goes up to your Plagiarism level. Shadow Chaser and Abyss Chaser can also put a 3rd class skill into their Reproduce slot (Renewal). | Prontera (171, 182) |
 
 #### 🛒 Shops & cards
@@ -150,6 +150,7 @@ One ticket per part. A part needs the one before it finished, played or skipped,
 | 17.1 | Rekenber, Rudus, Clana Nemieri |
 | 17.2 | the Mansion areas, Lost Farm, Hidden Garden |
 | 18 | Villa of Deception |
+| 19 | Issgard: the Ice Castle, the snake's nest, Airship Destruction, Bagot's Laboratory |
 
 ### ✨ Buffer
 

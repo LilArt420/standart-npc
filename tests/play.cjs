@@ -62,20 +62,22 @@ const ENCH_TEST = { hat: 2220, shirt: 2301, jewel: 27422 };
 // Episode Valkyrie (#51), Renewal: with the way to the New World open
 // (ep13_ryu 100, which 16.1 asks for) and an Eden Group Mark (which 15.1
 // asks for), the character stands in the middle of 13.1, 13.2, 13.3, 14.1,
-// 14.2, 14.3, 15.1, 16.1, 16.2, 17.1, 17.2 and 18 (a quest of each open).
-// It first tries to skip 13.2, 13.3, 14.3, 15.2, 16.2, 17.1, 17.2 and 18
+// 14.2, 14.3, 15.1, 16.1, 16.2, 17.1, 17.2, 18 and 19 (a quest of each
+// open). It first tries to skip 13.2, 13.3, 14.3, 15.2, 16.2, 17.1, 17.2,
+// 18 and 19
 // (refused: the part before is not finished), then buys and uses a ticket
 // for 13.1, 13.2 (which gives the Ring of the Ancient Wise King), 13.3,
 // 14.1, 14.2 (14.1 is not needed), 14.3, 16.1 (15 not finished: 16.1
-// does not need it), 15.1, 15.2, 16.2, 17.1, 17.2, then 18. Parts sharing a variable (15.1
+// does not need it), 15.1, 15.2, 16.2, 17.1, 17.2, 18, then 19 (base
+// level 200: the Dragon Knight is 210). Parts sharing a variable (15.1
 // and 15.2, 16.2 and 17.1) have the end checked only on the last one; a
 // part with start null has no start of its own. Quest and item IDs from
 // the fork's npc/quests/quests_13_1.txt, quests_13_2.txt,
 // npc/re/quests/quests_dicastes.txt, quests_mora.txt, quests_eclage.txt,
 // quests_14_3_bis.txt, npc/re/instances/HazyForest.txt, IsleOfBios.txt,
 // quests_15_1.txt, quests_15_2.txt,
-// quests_16_1.txt, quests_16_2.txt, quests_17_1.txt, quests_17_2.txt and
-// quests_18.txt, db/re/quest_db.yml, db/re/item_db_etc.yml. `done` is a
+// quests_16_1.txt, quests_16_2.txt, quests_17_1.txt, quests_17_2.txt,
+// quests_18.txt and quests_19.txt, db/re/quest_db.yml, db/re/item_db_etc.yml. `done` is a
 // sample of what each skip completes (all of it for 15). 15.1's open
 // quest 7617 is the excavation report, which S_Skip closes only while it
 // is the story's.
@@ -107,12 +109,14 @@ const VALK_TEST = {
           open: 16449, done: [11620, 16452, 18018, 18021, 18020] },
         { name: '18', ep: 18, ticket: 1000288, price: 6000000, priceText: '6,000,000', key: 'ep18_main', start: 41, end: 57,
           open: 16573, done: [8681, 11720, 11724, 18085], doneBefore: 8681 },
+        { name: '19', ep: 19, ticket: 1000988, price: 7000000, priceText: '7,000,000', key: 'ep19_main', start: 30, end: 100,
+          open: 17635, done: [16639, 16640, 16641, 16642, 16643, 16644, 17649] },
     ],
     // Set before the run (what 16.1 needs), and the other variables the
     // skips raise to at least these values.
     // 14.2's main variable is checked here: 14.3 raises it to 34.
     before: { ep13_ryu: 100, ep14_2_mylord: 18 },
-    after: { ep13_newbs: 100, ep13_1_rhea: 100, ep13_2_rhea: 100, ep13_3_invite: 6, ep14_1_mistwoods: 10, ep14_2_mylord: 34, ep14_3_isle: 1, ep14_3_mors01: 1, terra_gloria_lady_part: 10, ep15_1_elb: 15, ep15_2_permit: 6, ep15_2_bslast: 9, ep15_2_bsmemo: 18 },
+    after: { ep13_newbs: 100, ep13_1_rhea: 100, ep13_2_rhea: 100, ep13_3_invite: 6, ep14_1_mistwoods: 10, ep14_2_mylord: 34, ep14_3_isle: 1, ep14_3_mors01: 1, terra_gloria_lady_part: 10, ep15_1_elb: 15, ep15_2_permit: 6, ep15_2_bslast: 9, ep15_2_bsmemo: 18, ep19_side_saint: 1 },
     mark: 6219,   // Eden Group Mark (Para_Team_Mark), db/re/item_db_etc.yml
     ring: 2782,   // Ring of the Ancient Wise King (Ring_Of_Wise_King), db/re/item_db_equip.yml
 };
@@ -413,7 +417,7 @@ function runEra(era) {
                 await snpc.close();
                 return said.join(' / ');
             })()`);
-            for (const [part, prev] of [['13.2', '13.1'], ['13.3', '13.2'], ['14.3', '14.2'], ['15.2', '15.1'], ['16.2', '16.1'], ['17.1', '16.2'], ['17.2', '17.1'], ['18', '17.2']]) {
+            for (const [part, prev] of [['13.2', '13.1'], ['13.3', '13.2'], ['14.3', '14.2'], ['15.2', '15.1'], ['16.2', '16.1'], ['17.1', '16.2'], ['17.2', '17.1'], ['18', '17.2'], ['19', '18']]) {
                 const order = valkTalk(['Use a ticket', `Episode ${part} `]);
                 check(typeof order === 'string' && order.includes(`First finish Episode ${prev}`), `Episode Valkyrie: ${part} needs ${prev} finished first`, String(order).slice(-200));
             }
