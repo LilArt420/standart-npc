@@ -1,0 +1,9 @@
+//===== rAthena Script =======================================
+//= Warper -- Renewal-only towns (Pre-renewal: none)
+//===== By: MondoTruth, Claude =================================
+//===== Description: =========================================
+//= Replaces npc/warper_era.txt on Pre-renewal ("prerenewalFolder" in
+//= mod.json): Pre-renewal has none of those towns.
+//===== How to customize: ====================================
+//= Nothing to change.
+//============================================================

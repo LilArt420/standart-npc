@@ -577,6 +577,97 @@ function runEra(era) {
         }
         // The warp to Izlude is still loading; a GM command typed now is lost.
         W.rotest('wait', '4000');
+        // Maps app 1.6.6's world sync filled with monsters: every new entry
+        // lands on its map in Renewal; Pre-renewal has none of them.
+        const synced = [
+            [['Fields', 'Destroyed Geffen Field'], 'hem_fild'],
+            [['Fields', 'Power Twisted Plains'], 'ra_pol01'],
+            [['Fields', 'Twisted Land of Darkness'], 'ygg_roots'],
+            [['Fields', 'Volund Fields', 'Outside the Volund Valley'], 'mu_fild01'],
+            [['Fields', 'Volund Fields', 'Volund Plain'], 'mu_fild02'],
+            [['Fields', 'Volund Fields', 'Volund Forest'], 'mu_fild03'],
+            [['Fields', 'Niflheim Fields', 'Niflheim Pumpkin Farm'], 'nif_fild03'],
+            [['Fields', 'Frozen Scale Fields', 'Frozen Scale Beach'], 'jor_back4'],
+            [['Fields', 'Frozen Scale Fields', 'Ancient Ice Canyon East'], 'jor_back5'],
+            [['Fields', 'Frozen Scale Fields', 'Ancient Ice Canyon West'], 'jor_back6'],
+            [['Fields', 'Frozen Scale Fields', 'Drift Ice Zone'], 'jor_twice'],
+            [['Fields', 'Frozen Scale Fields', 'Northern Rising Land'], 'jor_raise1'],
+            [['Fields', 'Frozen Scale Fields', 'Southern Rising Land'], 'jor_raise2'],
+            [['Fields', 'Frozen Scale Fields', 'Jornville'], 'jor_base'],
+            [['Dungeons', 'Ancient Temple Akhet'], 'moc_akhet'],
+            [['Dungeons', 'Destroyed Valkyrie Realm'], 'hem_dun02'],
+            [['Dungeons', 'Destroyed Verus'], 'hem_dun01'],
+            [['Dungeons', 'Devoured Geffenia', 'Devoured Geffenia East'], 'ch1_gfn01'],
+            [['Dungeons', 'Devoured Geffenia', 'Devoured Geffenia West'], 'ch1_gfn03'],
+            [['Dungeons', 'Distorted Brimir', 'Distorted Brimir 1'], 'uknw_ruin'],
+            [['Dungeons', 'Distorted Brimir', 'Distorted Brimir 2'], 'uknw_ruin2'],
+            [['Dungeons', 'Distorted Ragsrut'], 'rgs_dun1'],
+            [['Dungeons', 'Issgard Dungeon', "Snake God's Root 1st"], 'jor_root1'],
+            [['Dungeons', 'Issgard Dungeon', "Snake God's Root 2nd"], 'jor_root2'],
+            [['Dungeons', 'Issgard Dungeon', 'Deep Root Cave'], 'jor_root3'],
+            [['Dungeons', 'Issgard Dungeon', 'Snake Labyrinth'], 'jor_maze'],
+            [['Dungeons', 'Jormungand Cult Temple', 'Cult Temple 1st'], 'jor_sklf1'],
+            [['Dungeons', 'Jormungand Cult Temple', 'Cult Temple 2nd'], 'jor_sklf2'],
+            [['Dungeons', 'Jormungand Cult Temple', 'Gimleh 1st'], 'jor_tmple1'],
+            [['Dungeons', 'Jormungand Cult Temple', 'Gimleh 2nd'], 'jor_tmple2'],
+            [['Dungeons', 'Mjolnir Underground Cave'], 'mjo_wst01'],
+            [['Dungeons', 'Primordial Flame', 'Primordial Flame 1'], 'mu_dun01'],
+            [['Dungeons', 'Primordial Flame', 'Primordial Flame 2'], 'mu_dun02'],
+            [['Dungeons', 'Root of Death'], 'deadroot'],
+            [['Dungeons', 'Unknown Blue Hole'], 'cmd_bhole'],
+            [['Dungeons', "Varmundt's Dungeon", 'Soul Rune'], 'bl_soul'],
+            [['Dungeons', "Varmundt's Dungeon", 'Temple Rune'], 'bl_temple'],
+            [['Dungeons', "Varmundt's Dungeon", 'Venom Rune'], 'bl_venom'],
+            [['Dungeons', "Varmundt's Dungeon", 'Biosphere Depth 1'], 'bl_depth1'],
+            [['Dungeons', "Varmundt's Dungeon", 'Biosphere Depth 2'], 'bl_depth2'],
+            [['Dungeons', 'Zerocell Sector', 'Lux'], 'ch1zero1'],
+            [['Dungeons', 'Zerocell Sector', 'Nox'], 'ch1zero2'],
+            [['Dungeons', 'Zerocell Sector', 'Vita'], 'ch1zero3'],
+            [['Dungeons', 'Zerocell Sector', 'Arc'], 'ch1zero4'],
+            ...['death', 'factory', 'ground', 'ice', 'jungle', 'lava', 'soul', 'temple', 'valley', 'venom']
+                .map(k => [['Dungeons', 'Dimensional Biosphere', k[0].toUpperCase() + k.slice(1)], `ab_${k}1`]),
+            [['Towns', 'Yongjirak'], 'kindlbrk'],
+            [['Dungeons', 'Herosria Dungeon'], 'hero_dun1'],
+        ];
+        // The monsters there are level 205+: while it is on, they leave the
+        // tester alone (a dead character's chat no longer takes GM commands).
+        gm('@monsterignore');
+        const list = era === 'renewal' ? synced : synced.slice(0, 1);
+        for (const [i, [path, map]] of list.entries()) {
+            // Dozens of big maps in a row crash the test browser: a fresh
+            // client every 12 (monsterignore ends with the session).
+            if (i && i % 12 === 0) {
+                W.rotest('stop');
+                Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 5000);
+                const again = enterGame();
+                if (!again.ok) { check(false, 'Warper: client restarted', again.detail); break; }
+                gm('@monsterignore');
+            }
+            // A big map may still be loading: a GM command typed then is lost.
+            for (let k = 0; k < 3 && !/prontera/.test(ev('roAgent.player() && roAgent.player().map')); k++) {
+                gm('@alive');
+                gm('@warp prontera 160 189');
+                W.rotest('wait', '4000');
+            }
+            const r = warper(path, 'Pay');
+            // Pre-renewal: "not enabled" is a message over the head, not in the window.
+            const ok = era === 'renewal' ? r && String(r.map).replace(/\.gat$/, '') === map
+                : r && /prontera/.test(r.map);
+            check(ok, `Warper: ${path.slice(1).join(' > ')} ${era === 'renewal' ? 'lands on ' + map : 'closed in Pre-renewal'}`,
+                JSON.stringify(r).slice(-200));
+            W.rotest('wait', '4000');
+        }
+        // Yongjirak has its own Warper and Buffer (npc/*_era.txt, Renewal only).
+        if (era === 'renewal') {
+            gm('@warp kindlbrk 181 125');
+            W.rotest('wait', '6000');
+            const town = ev(`roAgent.entities({ type: 'NPC', radius: 12 }).map(n => n.name + '@' + n.position.join(','))`);
+            check(Array.isArray(town) && town.includes('Warper@184,128') && town.includes('Buffer@174,120'),
+                'Warper and Buffer stand in Yongjirak', JSON.stringify(town).slice(-200));
+        }
+        gm('@warp prontera 160 189');
+        W.rotest('wait', '4000');
+        gm('@monsterignore');
     }
 
     if (want('smuggler')) {
