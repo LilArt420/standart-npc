@@ -1,0 +1,14 @@
+//===== rAthena Script =======================================
+//= Warper -- Renewal-only towns
+//===== By: MondoTruth, Claude =================================
+//===== Description: =========================================
+//= Warpers in towns that only Renewal has: Yongjirak (kindlbrk,
+//= app 1.6.6+). Loads after warper.txt, so the duplicate finds its
+//= source. On Pre-renewal this file is replaced by
+//= pre-renewal/npc/warper_era.txt, so the server logs no
+//= "Unknown map" there.
+//===== How to customize: ====================================
+//= One duplicate line per town (fields separated by TABs).
+//============================================================
+
+kindlbrk,184,128,4	duplicate(Warper)	Warper#kindl	651

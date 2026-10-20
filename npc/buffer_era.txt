@@ -1,0 +1,14 @@
+//===== rAthena Script =======================================
+//= Buffer -- Renewal-only towns
+//===== By: MondoTruth, Claude =================================
+//===== Description: =========================================
+//= Buffers in towns that only Renewal has: Yongjirak (kindlbrk,
+//= app 1.6.6+). Loads after buffer.txt, so the duplicate finds its
+//= source. On Pre-renewal this file is replaced by
+//= pre-renewal/npc/buffer_era.txt, so the server logs no
+//= "Unknown map" there.
+//===== How to customize: ====================================
+//= One duplicate line per town (fields separated by TABs).
+//============================================================
+
+kindlbrk,174,120,5	duplicate(Buffer)	Buffer#kindl	936

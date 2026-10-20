@@ -657,6 +657,14 @@ function runEra(era) {
                 JSON.stringify(r).slice(-200));
             W.rotest('wait', '4000');
         }
+        // Yongjirak has its own Warper and Buffer (npc/*_era.txt, Renewal only).
+        if (era === 'renewal') {
+            gm('@warp kindlbrk 181 125');
+            W.rotest('wait', '6000');
+            const town = ev(`roAgent.entities({ type: 'NPC', radius: 12 }).map(n => n.name + '@' + n.position.join(','))`);
+            check(Array.isArray(town) && town.includes('Warper@184,128') && town.includes('Buffer@174,120'),
+                'Warper and Buffer stand in Yongjirak', JSON.stringify(town).slice(-200));
+        }
         gm('@warp prontera 160 189');
         W.rotest('wait', '4000');
         gm('@monsterignore');

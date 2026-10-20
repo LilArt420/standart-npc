@@ -230,7 +230,7 @@ T43: Restrict("RE");
 T44: Restrict("RE");
 	 Go("wolfvill",144,144);
 T45: Restrict("RE");
-	 Go("kindlbrk",174,124);
+	 Go("kindlbrk",181,125);
 
 // --------------------------------------------------
 	Fields:
