@@ -262,12 +262,15 @@ If warps or Fly Wings get slower the longer you play, update Ragnarok Offline to
 ### Renewal and Pre-renewal
 - Smuggler: Settings… → Smuggler → Options… can keep him from selling cards, MVP cards, mini-boss cards, costumes, or any item IDs you list. Banned items are refused both for sale and as the free item after his quest. Requested on Discord.
 
-## Next version
+## 5.0.1
 
-Needs Ragnarok Offline 1.6.5 or newer.
+Needs Ragnarok Offline 1.6.5 or newer (the Warper's new maps: 1.6.6).
 
 ### Renewal only
+- Warper: 58 new destinations on the maps Ragnarok Offline 1.6.6 filled with monsters. Towns: Yongjirak. Fields: Destroyed Geffen Field, Power Twisted Plains, Twisted Land of Darkness, Volund Fields, and more Frozen Scale and Niflheim fields. Dungeons: Dimensional Biosphere, Jormungand Cult Temple, Zerocell Sector, Devoured Geffenia, Distorted Brimir, Distorted Ragsrut, Destroyed Verus, Destroyed Valkyrie Realm, Primordial Flame, Herosria Dungeon, Root of Death, Ancient Temple Akhet, Unknown Blue Hole, Mjolnir Underground Cave, and more floors in Issgard Dungeon and Varmundt's Dungeon. On an older app these maps are not there: the Warper says so and takes no Zeny.
+- Yongjirak has its own Warper and Buffer.
 - Episode Valkyrie: Episode 19. An Eps 19 Clear Ticket (7,000,000 Zeny) skips Episode 19's main story, so Issgard opens: the Ice Castle, the snake's nest and their dailies, Airship Destruction, Bagot's Laboratory and the side quests for a finished story. It needs Episode 18 finished and base level 200, as the game does. The Purification Saint side story starts if you have not started it; the side stories themselves are left to you. No EXP or quest rewards. Episode 19's quests came with Ragnarok Offline 1.6.5.
+- Welcoming: steps aside while the mega-booster mod is on, as its Booster Guide hands out the same box.
 
 ## 5.0.0
 
