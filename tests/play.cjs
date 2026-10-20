@@ -62,20 +62,22 @@ const ENCH_TEST = { hat: 2220, shirt: 2301, jewel: 27422 };
 // Episode Valkyrie (#51), Renewal: with the way to the New World open
 // (ep13_ryu 100, which 16.1 asks for) and an Eden Group Mark (which 15.1
 // asks for), the character stands in the middle of 13.1, 13.2, 13.3, 14.1,
-// 14.2, 14.3, 15.1, 16.1, 16.2, 17.1, 17.2 and 18 (a quest of each open).
-// It first tries to skip 13.2, 13.3, 14.3, 15.2, 16.2, 17.1, 17.2 and 18
+// 14.2, 14.3, 15.1, 16.1, 16.2, 17.1, 17.2, 18 and 19 (a quest of each
+// open). It first tries to skip 13.2, 13.3, 14.3, 15.2, 16.2, 17.1, 17.2,
+// 18 and 19
 // (refused: the part before is not finished), then buys and uses a ticket
 // for 13.1, 13.2 (which gives the Ring of the Ancient Wise King), 13.3,
 // 14.1, 14.2 (14.1 is not needed), 14.3, 16.1 (15 not finished: 16.1
-// does not need it), 15.1, 15.2, 16.2, 17.1, 17.2, then 18. Parts sharing a variable (15.1
+// does not need it), 15.1, 15.2, 16.2, 17.1, 17.2, 18, then 19 (base
+// level 200: the Dragon Knight is 210). Parts sharing a variable (15.1
 // and 15.2, 16.2 and 17.1) have the end checked only on the last one; a
 // part with start null has no start of its own. Quest and item IDs from
 // the fork's npc/quests/quests_13_1.txt, quests_13_2.txt,
 // npc/re/quests/quests_dicastes.txt, quests_mora.txt, quests_eclage.txt,
 // quests_14_3_bis.txt, npc/re/instances/HazyForest.txt, IsleOfBios.txt,
 // quests_15_1.txt, quests_15_2.txt,
-// quests_16_1.txt, quests_16_2.txt, quests_17_1.txt, quests_17_2.txt and
-// quests_18.txt, db/re/quest_db.yml, db/re/item_db_etc.yml. `done` is a
+// quests_16_1.txt, quests_16_2.txt, quests_17_1.txt, quests_17_2.txt,
+// quests_18.txt and quests_19.txt, db/re/quest_db.yml, db/re/item_db_etc.yml. `done` is a
 // sample of what each skip completes (all of it for 15). 15.1's open
 // quest 7617 is the excavation report, which S_Skip closes only while it
 // is the story's.
@@ -107,12 +109,14 @@ const VALK_TEST = {
           open: 16449, done: [11620, 16452, 18018, 18021, 18020] },
         { name: '18', ep: 18, ticket: 1000288, price: 6000000, priceText: '6,000,000', key: 'ep18_main', start: 41, end: 57,
           open: 16573, done: [8681, 11720, 11724, 18085], doneBefore: 8681 },
+        { name: '19', ep: 19, ticket: 1000988, price: 7000000, priceText: '7,000,000', key: 'ep19_main', start: 30, end: 100,
+          open: 17635, done: [16639, 16640, 16641, 16642, 16643, 16644, 17649] },
     ],
     // Set before the run (what 16.1 needs), and the other variables the
     // skips raise to at least these values.
     // 14.2's main variable is checked here: 14.3 raises it to 34.
     before: { ep13_ryu: 100, ep14_2_mylord: 18 },
-    after: { ep13_newbs: 100, ep13_1_rhea: 100, ep13_2_rhea: 100, ep13_3_invite: 6, ep14_1_mistwoods: 10, ep14_2_mylord: 34, ep14_3_isle: 1, ep14_3_mors01: 1, terra_gloria_lady_part: 10, ep15_1_elb: 15, ep15_2_permit: 6, ep15_2_bslast: 9, ep15_2_bsmemo: 18 },
+    after: { ep13_newbs: 100, ep13_1_rhea: 100, ep13_2_rhea: 100, ep13_3_invite: 6, ep14_1_mistwoods: 10, ep14_2_mylord: 34, ep14_3_isle: 1, ep14_3_mors01: 1, terra_gloria_lady_part: 10, ep15_1_elb: 15, ep15_2_permit: 6, ep15_2_bslast: 9, ep15_2_bsmemo: 18, ep19_side_saint: 1 },
     mark: 6219,   // Eden Group Mark (Para_Team_Mark), db/re/item_db_etc.yml
     ring: 2782,   // Ring of the Ancient Wise King (Ring_Of_Wise_King), db/re/item_db_equip.yml
 };
@@ -413,7 +417,7 @@ function runEra(era) {
                 await snpc.close();
                 return said.join(' / ');
             })()`);
-            for (const [part, prev] of [['13.2', '13.1'], ['13.3', '13.2'], ['14.3', '14.2'], ['15.2', '15.1'], ['16.2', '16.1'], ['17.1', '16.2'], ['17.2', '17.1'], ['18', '17.2']]) {
+            for (const [part, prev] of [['13.2', '13.1'], ['13.3', '13.2'], ['14.3', '14.2'], ['15.2', '15.1'], ['16.2', '16.1'], ['17.1', '16.2'], ['17.2', '17.1'], ['18', '17.2'], ['19', '18']]) {
                 const order = valkTalk(['Use a ticket', `Episode ${part} `]);
                 check(typeof order === 'string' && order.includes(`First finish Episode ${prev}`), `Episode Valkyrie: ${part} needs ${prev} finished first`, String(order).slice(-200));
             }
@@ -573,6 +577,97 @@ function runEra(era) {
         }
         // The warp to Izlude is still loading; a GM command typed now is lost.
         W.rotest('wait', '4000');
+        // Maps app 1.6.6's world sync filled with monsters: every new entry
+        // lands on its map in Renewal; Pre-renewal has none of them.
+        const synced = [
+            [['Fields', 'Destroyed Geffen Field'], 'hem_fild'],
+            [['Fields', 'Power Twisted Plains'], 'ra_pol01'],
+            [['Fields', 'Twisted Land of Darkness'], 'ygg_roots'],
+            [['Fields', 'Volund Fields', 'Outside the Volund Valley'], 'mu_fild01'],
+            [['Fields', 'Volund Fields', 'Volund Plain'], 'mu_fild02'],
+            [['Fields', 'Volund Fields', 'Volund Forest'], 'mu_fild03'],
+            [['Fields', 'Niflheim Fields', 'Niflheim Pumpkin Farm'], 'nif_fild03'],
+            [['Fields', 'Frozen Scale Fields', 'Frozen Scale Beach'], 'jor_back4'],
+            [['Fields', 'Frozen Scale Fields', 'Ancient Ice Canyon East'], 'jor_back5'],
+            [['Fields', 'Frozen Scale Fields', 'Ancient Ice Canyon West'], 'jor_back6'],
+            [['Fields', 'Frozen Scale Fields', 'Drift Ice Zone'], 'jor_twice'],
+            [['Fields', 'Frozen Scale Fields', 'Northern Rising Land'], 'jor_raise1'],
+            [['Fields', 'Frozen Scale Fields', 'Southern Rising Land'], 'jor_raise2'],
+            [['Fields', 'Frozen Scale Fields', 'Jornville'], 'jor_base'],
+            [['Dungeons', 'Ancient Temple Akhet'], 'moc_akhet'],
+            [['Dungeons', 'Destroyed Valkyrie Realm'], 'hem_dun02'],
+            [['Dungeons', 'Destroyed Verus'], 'hem_dun01'],
+            [['Dungeons', 'Devoured Geffenia', 'Devoured Geffenia East'], 'ch1_gfn01'],
+            [['Dungeons', 'Devoured Geffenia', 'Devoured Geffenia West'], 'ch1_gfn03'],
+            [['Dungeons', 'Distorted Brimir', 'Distorted Brimir 1'], 'uknw_ruin'],
+            [['Dungeons', 'Distorted Brimir', 'Distorted Brimir 2'], 'uknw_ruin2'],
+            [['Dungeons', 'Distorted Ragsrut'], 'rgs_dun1'],
+            [['Dungeons', 'Issgard Dungeon', "Snake God's Root 1st"], 'jor_root1'],
+            [['Dungeons', 'Issgard Dungeon', "Snake God's Root 2nd"], 'jor_root2'],
+            [['Dungeons', 'Issgard Dungeon', 'Deep Root Cave'], 'jor_root3'],
+            [['Dungeons', 'Issgard Dungeon', 'Snake Labyrinth'], 'jor_maze'],
+            [['Dungeons', 'Jormungand Cult Temple', 'Cult Temple 1st'], 'jor_sklf1'],
+            [['Dungeons', 'Jormungand Cult Temple', 'Cult Temple 2nd'], 'jor_sklf2'],
+            [['Dungeons', 'Jormungand Cult Temple', 'Gimleh 1st'], 'jor_tmple1'],
+            [['Dungeons', 'Jormungand Cult Temple', 'Gimleh 2nd'], 'jor_tmple2'],
+            [['Dungeons', 'Mjolnir Underground Cave'], 'mjo_wst01'],
+            [['Dungeons', 'Primordial Flame', 'Primordial Flame 1'], 'mu_dun01'],
+            [['Dungeons', 'Primordial Flame', 'Primordial Flame 2'], 'mu_dun02'],
+            [['Dungeons', 'Root of Death'], 'deadroot'],
+            [['Dungeons', 'Unknown Blue Hole'], 'cmd_bhole'],
+            [['Dungeons', "Varmundt's Dungeon", 'Soul Rune'], 'bl_soul'],
+            [['Dungeons', "Varmundt's Dungeon", 'Temple Rune'], 'bl_temple'],
+            [['Dungeons', "Varmundt's Dungeon", 'Venom Rune'], 'bl_venom'],
+            [['Dungeons', "Varmundt's Dungeon", 'Biosphere Depth 1'], 'bl_depth1'],
+            [['Dungeons', "Varmundt's Dungeon", 'Biosphere Depth 2'], 'bl_depth2'],
+            [['Dungeons', 'Zerocell Sector', 'Lux'], 'ch1zero1'],
+            [['Dungeons', 'Zerocell Sector', 'Nox'], 'ch1zero2'],
+            [['Dungeons', 'Zerocell Sector', 'Vita'], 'ch1zero3'],
+            [['Dungeons', 'Zerocell Sector', 'Arc'], 'ch1zero4'],
+            ...['death', 'factory', 'ground', 'ice', 'jungle', 'lava', 'soul', 'temple', 'valley', 'venom']
+                .map(k => [['Dungeons', 'Dimensional Biosphere', k[0].toUpperCase() + k.slice(1)], `ab_${k}1`]),
+            [['Towns', 'Yongjirak'], 'kindlbrk'],
+            [['Dungeons', 'Herosria Dungeon'], 'hero_dun1'],
+        ];
+        // The monsters there are level 205+: while it is on, they leave the
+        // tester alone (a dead character's chat no longer takes GM commands).
+        gm('@monsterignore');
+        const list = era === 'renewal' ? synced : synced.slice(0, 1);
+        for (const [i, [path, map]] of list.entries()) {
+            // Dozens of big maps in a row crash the test browser: a fresh
+            // client every 12 (monsterignore ends with the session).
+            if (i && i % 12 === 0) {
+                W.rotest('stop');
+                Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 5000);
+                const again = enterGame();
+                if (!again.ok) { check(false, 'Warper: client restarted', again.detail); break; }
+                gm('@monsterignore');
+            }
+            // A big map may still be loading: a GM command typed then is lost.
+            for (let k = 0; k < 3 && !/prontera/.test(ev('roAgent.player() && roAgent.player().map')); k++) {
+                gm('@alive');
+                gm('@warp prontera 160 189');
+                W.rotest('wait', '4000');
+            }
+            const r = warper(path, 'Pay');
+            // Pre-renewal: "not enabled" is a message over the head, not in the window.
+            const ok = era === 'renewal' ? r && String(r.map).replace(/\.gat$/, '') === map
+                : r && /prontera/.test(r.map);
+            check(ok, `Warper: ${path.slice(1).join(' > ')} ${era === 'renewal' ? 'lands on ' + map : 'closed in Pre-renewal'}`,
+                JSON.stringify(r).slice(-200));
+            W.rotest('wait', '4000');
+        }
+        // Yongjirak has its own Warper and Buffer (npc/*_era.txt, Renewal only).
+        if (era === 'renewal') {
+            gm('@warp kindlbrk 181 125');
+            W.rotest('wait', '6000');
+            const town = ev(`roAgent.entities({ type: 'NPC', radius: 12 }).map(n => n.name + '@' + n.position.join(','))`);
+            check(Array.isArray(town) && town.includes('Warper@184,128') && town.includes('Buffer@174,120'),
+                'Warper and Buffer stand in Yongjirak', JSON.stringify(town).slice(-200));
+        }
+        gm('@warp prontera 160 189');
+        W.rotest('wait', '4000');
+        gm('@monsterignore');
     }
 
     if (want('smuggler')) {

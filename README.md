@@ -5,7 +5,7 @@
 <p align="center">
   <a href="../../releases/latest"><img src="https://img.shields.io/github/v/release/MondoTruth/standart-npc?style=for-the-badge&label=latest&color=d9a233" alt="Latest release"></a>
   <a href="../../releases"><img src="https://img.shields.io/github/downloads/MondoTruth/standart-npc/total?style=for-the-badge&color=5da9e0" alt="Downloads"></a>
-  <a href="https://github.com/Flux159/ragnarokoffline.app"><img src="https://img.shields.io/badge/Ragnarok%20Offline-%E2%89%A5%201.6.1-c8503f?style=for-the-badge" alt="Requires Ragnarok Offline 1.6.1 or newer"></a>
+  <a href="https://github.com/Flux159/ragnarokoffline.app"><img src="https://img.shields.io/badge/Ragnarok%20Offline-%E2%89%A5%201.6.5-c8503f?style=for-the-badge" alt="Requires Ragnarok Offline 1.6.5 or newer"></a>
 </p>
 
 <p align="center">
@@ -29,7 +29,7 @@ In Ragnarok Offline: **Settings → Mods → Find Mods** → install **standart-
 Or by hand: download the zip from the [latest release](../../releases/latest), then **Settings → Mods → Add mod from folder…** and pick the zip.
 
 > [!IMPORTANT]
-> Needs Ragnarok Offline **1.6.1 or newer**. On an older app you keep the version you have until you update the app.
+> Needs Ragnarok Offline **1.6.5 or newer**; the Warper's newest maps need **1.6.6**. On an older app you keep the version you have until you update the app.
 
 ---
 
@@ -60,7 +60,7 @@ Everything is on after install. To change it: **Settings → Mods → standart-n
 
 | | NPC | What it does | Location |
 |:-:|---|---|---|
-| 🌀 | **Warper** | Menu-based travel — towns, fields, dungeons, guild castles, instances. 3rd/4th classes pay 5,000 Zeny (15,000 for dungeons and instances); some dungeons need their quest first. Both can be switched off. | Every major town |
+| 🌀 | **Warper** | Menu-based travel — towns, fields, dungeons, guild castles, instances. 3rd/4th classes pay 5,000 Zeny (15,000 for dungeons and instances); some dungeons need their quest first. Both can be switched off. On Renewal it also reaches the maps app 1.6.6 filled with monsters (Dimensional Biosphere, Jormungand Cult Temple, Zerocell Sector, Yongjirak and more). | Every major town |
 | ✨ | **Buffer** | Free instant buffs + full heal on click, no dialog window. You choose the buffs ([list](#-buffer)). | Every major town |
 | 📦 | **Premium Service Manager** | Save point, storage, free identify-all, and disposing of items that cannot be dropped or traded (account-bound and the like). | Prontera (160, 187) |
 | 🏋️ | **Weight Maxxer** | Trades a Gym Pass for +1 permanent carry capacity, up to 10 times. Gym Pass: the Cash Shop with cash-shop-extended, the Tool Dealer (100,000 Zeny) without it. | Prontera (147, 172) |
@@ -70,10 +70,10 @@ Everything is on after install. To change it: **Settings → Mods → standart-n
 
 | | NPC | What it does | Location |
 |:-:|---|---|---|
-| 🎓 | **Job Master** | Full job changer up to 4th class (and the Druid line on servers that have it), including job-change equipment (Wolf Flute for Ranger, etc.). | Prontera (157, 195) |
+| 🎓 | **Job Master** | Full job changer up to 4th class (and the Druid line — Druid, Karnos, Alitea — on app 1.6.4 or newer), including job-change equipment (Wolf Flute for Ranger, etc.). | Prontera (157, 195) |
 | 🔄 | **Reset Girl** | Resets skills, stats, or both, for Zeny. | Prontera (154, 195) |
 | 💇 | **Stylist** | Styling window for hair style, hair color, cloth color and, on Renewal, the 3rd class alternative outfit, paid in Zeny (prices in Settings…) or with a coupon. | Prontera (169, 180) |
-| 🛡️ | **Episode Valkyrie** | Sells Episode Clear Tickets for Zeny. A ticket skips one part of an episode's main story, as on official servers: its maps, instances and daily quests open, no rewards. Parts 13.1 – 18 for now, in story order ([what each opens](#episode-valkyrie)). Renewal only. | Prontera (128, 193) |
+| 🛡️ | **Episode Valkyrie** | Sells Episode Clear Tickets for Zeny. A ticket skips one part of an episode's main story, as on official servers: its maps, instances and daily quests open, no rewards. Parts 13.1 – 19 for now, in story order ([what each opens](#episode-valkyrie)). Renewal only. | Prontera (128, 193) |
 | 🎭 | **Plagiarism Master** | Rogue, Stalker, Shadow Chaser and Abyss Chaser copy any skill Plagiarism can copy. The level goes up to your Plagiarism level. Shadow Chaser and Abyss Chaser can also put a 3rd class skill into their Reproduce slot (Renewal). | Prontera (171, 182) |
 
 #### 🛒 Shops & cards
@@ -111,7 +111,7 @@ Everything is on after install. To change it: **Settings → Mods → standart-n
 
 | | NPC | What it does | Location |
 |:-:|---|---|---|
-| 👼 | **Welcoming** | A one-time starter gift for every new character: 150,000 Zeny, a Premium Booster Box and two costumes. Renewal only. | Izlude (189, 209) |
+| 👼 | **Welcoming** | A one-time starter gift for every new character: 150,000 Zeny, a Premium Booster Box and two costumes. Renewal only. Steps aside while the mega-booster mod is on: its Booster Guide hands out the same box. | Izlude (189, 209) |
 
 > [!NOTE]
 > Lil Art's **cash-shop-extended** (Find Mods, Renewal only) adds a Cash Shop and Cash Points. With it, the Cheffenia Gatekeeper also takes Cash Points, the Smuggler charges more (so it does not undercut the shop) and the Elemental Endower points to the Cash Shop for converters. Without it, Zeny only, the Smuggler's lower prices, the Elemental Endower sells the converters and the Tool Dealer the Gym Pass.
@@ -150,6 +150,7 @@ One ticket per part. A part needs the one before it finished, played or skipped,
 | 17.1 | Rekenber, Rudus, Clana Nemieri |
 | 17.2 | the Mansion areas, Lost Farm, Hidden Garden |
 | 18 | Villa of Deception |
+| 19 | Issgard: the Ice Castle, the snake's nest, Airship Destruction, Bagot's Laboratory |
 
 ### ✨ Buffer
 

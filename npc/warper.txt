@@ -45,6 +45,10 @@ menu	"Last Warp ^777777["+lastwarp$+"]^000000",-,
 	// 0 = a Last Warp saved before it existed, priced as a town.
 	.@group = SNPC_LastWarpGroup - 1;
 	if (.@group < 0) .@group = 1;
+	if (getmapusers(lastwarp$) < 0) {
+		message strcharinfo(0),"This map needs a newer Ragnarok Offline.";
+		end;
+	}
 	if (callfunc("F_SNPC_WarpCheck", lastwarp$, .@group)) end;
 	warp lastwarp$,lastwarpx,lastwarpy;
 	end;
@@ -74,6 +78,12 @@ menu	"Last Warp ^777777["+lastwarp$+"]^000000",-,
 // --------------------------------------------------
 
 function Go {
+	// Maps added by a newer app (1.6.6's world sync) are missing on older
+	// ones: say so before any fee is taken.
+	if (getmapusers(getarg(0)) < 0) {
+		message strcharinfo(0),"This map needs a newer Ragnarok Offline.";
+		end;
+	}
 	if (callfunc("F_SNPC_WarpCheck", getarg(0), @snpc_wgroup)) end;
 	set SNPC_LastWarpGroup, @snpc_wgroup + 1;
 	set lastwarp$, getarg(0);
@@ -159,7 +169,7 @@ menu	"Prontera",T1, "Alberta",T2, "Aldebaran",T3, "Amatsu",T4, "Ayothaya",T5,
 		"Manuk",T26, "Midgarts Expedition Camp",T27, "Mora",T28, "Morocc",T29, "Moscovia",T30,
 		"Nameless Island (Day)",T31, "Nameless Island (Night)",T32, "Niflheim",T33, "Payon",T34, "Rachel",T35,
 		"Rockridge",T36, "Special Security Area, Cor",T37, "Splendide",T38, "Thor Camp",T39, "Umbala",T40,
-		"Varmundt's Mansion",T41, "Veins",T42, "Verus Findspot",T43, "Wolf Village",T44;
+		"Varmundt's Mansion",T41, "Veins",T42, "Verus Findspot",T43, "Wolf Village",T44, "Yongjirak",T45;
 
 T1: Go("prontera",155,183);
 T2: Go("alberta",28,234);
@@ -219,6 +229,8 @@ T43: Restrict("RE");
 	 Go("verus04",123,250);
 T44: Restrict("RE");
 	 Go("wolfvill",144,144);
+T45: Restrict("RE");
+	 Go("kindlbrk",181,125);
 
 // --------------------------------------------------
 	Fields:
@@ -226,16 +238,18 @@ T44: Restrict("RE");
 @snpc_wgroup = 1;	// fee group: town price (F_SNPC_WarpCheck)
 @f = true;
 menu	"Amatsu Fields",F1, "Ayothaya Fields",F2, "Bifrost Fields", F3,
-    	"Brasilis Fields",F4, "Comodo Fields",F5, "Dewata Fields",F6,
+    	"Brasilis Fields",F4, "Comodo Fields",F5, "Destroyed Geffen Field",F33,
+		"Dewata Fields",F6,
     	"Eclage Fields",F7, "Einbroch Fields",F8, "El Dicastes Fields",F9,
     	"Frozen Scale Fields",F10, "Geffen Fields",F11, "Grey Wolf Forest",F12,
 		"Hugel Fields",F13, "Juno Fields",F14, "Kiwawa Desert",F15,
 		"Kunlun Fields",F16, "Lasagna Fields",F17, "Lighthalzen Fields",F18,
 		"Luoyang Field",F19, "Lutie Field",F20, "Malaya Fields",F21,
 		"Manuk Fields",F22, "Mjolnir Fields",F23, "Moscovia Fields",F24,
-		"Niflheim Fields",F25, "Payon Forests",F26, "Prontera Fields",F27,
-		"Rachel Fields",F28, "Sograt Deserts",F29, "Splendide Fields",F30,
-		"Umbala Fields",F31, "Veins Fields",F32;
+		"Niflheim Fields",F25, "Payon Forests",F26, "Power Twisted Plains",F34,
+		"Prontera Fields",F27, "Rachel Fields",F28, "Sograt Deserts",F29,
+		"Splendide Fields",F30, "Twisted Land of Darkness",F35, "Umbala Fields",F31,
+		"Veins Fields",F32, "Volund Fields",F36;
 
 F1: setarray @c[2],190,197;
 	Disp("Amatsu Field",1,1); Pick("ama_fild");
@@ -263,8 +277,9 @@ F9: Restrict("RE");
 	setarray @c[2],143,132,143,217;
 	Disp("El Dicastes Field",1,2); Pick("dic_fild");
 F10: Restrict("RE");
-	 setarray @c[2],378,223,223,18,365,241,140,280;
-	 Disp("Frozen Scale Hill:Frozen Scale Plains:Frozen Scale Glacier:Frozen Tail"); Pick("","jor_back1","jor_back2","jor_back3","jor_tail");
+	 setarray @c[2],378,223,223,18,365,241,140,280,10,370,340,20,388,263,235,107,276,386,103,30,240,46;
+	 Disp("Frozen Scale Hill:Frozen Scale Plains:Frozen Scale Glacier:Frozen Tail:Frozen Scale Beach:Ancient Ice Canyon East:Ancient Ice Canyon West:Drift Ice Zone:Northern Rising Land:Southern Rising Land:Jornville");
+	 Pick("","jor_back1","jor_back2","jor_back3","jor_tail","jor_back4","jor_back5","jor_back6","jor_twice","jor_raise1","jor_raise2","jor_base");
 F11: Restrict("Pre-RE",13,15);
 	 setarray @c[0],46,199,213,204,195,212,257,192,188,171,166,263,248,158,195,191,186,183,221,117,178,218,136,328,240,181,235,235,211,185;
 	 Disp("Geffen Field",0,14); Pick("gef_fild",1);
@@ -300,8 +315,9 @@ F23: setarray @c[2],204,120,175,193,208,213,179,180,181,240,195,270,235,202,188,
 	 Disp("Mjolnir Field",1,12); Pick("mjolnir_");
 F24: setarray @c[2],82,104,131,147;
 	 Disp("Moscovia Field",1,2); Pick("mosk_fild");
-F25: setarray @c[2],215,229,167,234;
-	 Disp("Niflheim Field",1,2); Pick("nif_fild");
+F25: Restrict("RE",3);
+	 setarray @c[2],215,229,167,234,250,42;
+	 Disp("Niflheim Field 1:Niflheim Field 2:Niflheim Pumpkin Farm"); Pick("","nif_fild01","nif_fild02","nif_fild03");
 F26: Restrict("Pre-RE",5,11);
 	 setarray @c[2],158,206,151,219,205,148,186,247,134,204,193,235,200,177,137,189,201,224,160,205,194,150;
 	 Disp("Payon Forest",1,11); Pick("pay_fild");
@@ -325,6 +341,15 @@ F31: setarray @c[2],217,206,223,221,237,215,202,197;
 F32: Restrict("Pre-RE",5);
 	 setarray @c[2],186,175,196,370,222,45,51,250,202,324,150,223,149,307;
 	 Disp("Veins Field",1,7); Pick("ve_fild");
+F33: Restrict("RE");
+	 Go("hem_fild",207,27);
+F34: Restrict("RE");
+	 Go("ra_pol01",293,101);
+F35: Restrict("RE");
+	 Go("ygg_roots",161,241);
+F36: Restrict("RE");
+	 setarray @c[2],89,154,387,125,361,354;
+	 Disp("Outside the Volund Valley:Volund Plain:Volund Forest"); Pick("","mu_fild01","mu_fild02","mu_fild03");
 
 // --------------------------------------------------
 	Dungeons:
@@ -332,23 +357,28 @@ F32: Restrict("Pre-RE",5);
 @snpc_wgroup = 2;	// fee group: dungeon price (F_SNPC_WarpCheck)
 @d = true;
 menu	"Abandoned Lab Amicitia",D1, "Abyss Lakes",D2, "Amatsu Dungeon",D3,
-		"Anthell",D4, "Ayothaya Dungeon",D5, "Beach Dungeon",D6,
-		"Bifrost Tower",D7, "Bio Labs",D8, "Brasilis Dungeon",D9,
-		"Byalan Dungeon",D10, "Clock Tower",D11, "Coal Mines",D12,
-		"Culvert",D13, "Cursed Abbey",D14, "Dewata Dungeon",D15,
+		"Ancient Temple Akhet",D54, "Anthell",D4, "Ayothaya Dungeon",D5,
+		"Beach Dungeon",D6, "Bifrost Tower",D7, "Bio Labs",D8,
+		"Brasilis Dungeon",D9, "Byalan Dungeon",D10, "Clock Tower",D11,
+		"Coal Mines",D12, "Culvert",D13, "Cursed Abbey",D14,
+		"Destroyed Valkyrie Realm",D56, "Destroyed Verus",D57, "Devoured Geffenia",D55,
+		"Dewata Dungeon",D15, "Dimensional Biosphere",D66, "Distorted Brimir",D58, "Distorted Ragsrut",D59,
 		"Einbroch Dungeon",D16, "Flame Basin",D17, "Gefenia",D18,
-		"Geffen Dungeon",D19, "Glast Heim",D20, "Hidden Dungeon",D21,
+		"Geffen Dungeon",D19, "Glast Heim",D20, "Herosria Dungeon",D67,
+		"Hidden Dungeon",D21,
 		"Ice Dungeon",D22, "Illusion Dungeon",D23, "Issgard Dungeon",D24,
-		"Juperos",D25, "Kiel Dungeon",D26, "Kunlun Dungeon",D27,
-		"Lasagna Dungeon",D28, "Luoyang Dungeon",D29, "Magma Dungeon",D30,
-		"Malangdo Dungeon",D31, "Moscovia Dungeon",D32, "Nidhogg's Dungeon",D33,
-		"Niflheim Dungeon",D34, "Odin Temple",D35, "Orc Dungeon",D36,
-		"Oz Labyrinth Dungeon",D37, "Payon Dungeon",D38, "Prontera Underground",D39,
+		"Jormungand Cult Temple",D60, "Juperos",D25, "Kiel Dungeon",D26,
+		"Kunlun Dungeon",D27, "Lasagna Dungeon",D28, "Luoyang Dungeon",D29,
+		"Magma Dungeon",D30, "Malangdo Dungeon",D31, "Mjolnir Underground Cave",D61,
+		"Moscovia Dungeon",D32, "Nidhogg's Dungeon",D33, "Niflheim Dungeon",D34,
+		"Odin Temple",D35, "Orc Dungeon",D36, "Oz Labyrinth Dungeon",D37,
+		"Payon Dungeon",D38, "Primordial Flame",D62, "Prontera Underground",D39,
 		"Pyramids",D40, "Rachel Sanctuary",D41, "Rock Ridge Dungeon",D42,
-		"Rudus Dungeon",D43, "Scaraba Hole",D44, "Sphinx",D45,
-		"Sunken Ship",D46, "Thanatos Tower",D47, "Thor Volcano",D48,
-		"Toy Factory",D49, "Turtle Dungeon",D50, "Umbala Dungeon",D51,
-		"Varmundt's Dungeon",D52, "Verus Area",D53;
+		"Root of Death",D63, "Rudus Dungeon",D43, "Scaraba Hole",D44,
+		"Sphinx",D45, "Sunken Ship",D46, "Thanatos Tower",D47,
+		"Thor Volcano",D48, "Toy Factory",D49, "Turtle Dungeon",D50,
+		"Umbala Dungeon",D51, "Unknown Blue Hole",D64, "Varmundt's Dungeon",D52,
+		"Verus Area",D53, "Zerocell Sector",D65;
 
 D1: Restrict("RE");
 	setarray @c[2],253,244,145,278;
@@ -430,8 +460,9 @@ D23: menu	"Illusion of Abyss",SubD1, "Illusion of Frozen",SubD2, "Illusion of La
 	SubD9: Restrict("RE");
 		   Go("gef_d01_i",114,216);
 D24: Restrict("RE");
-	 setarray @c[2],112,15,280,87,112,12,274,85;
-	 Disp("Abandoned Pit Floor 1:Abandoned Pit Floor 2:Snake God's Warmth 1st Floor:Snake God's Warmth 2nd Floor"); Pick("","jor_ab01","jor_ab02","jor_dun01","jor_dun02");
+	 setarray @c[2],112,15,280,87,112,12,274,85,59,290,25,17,367,129,195,54;
+	 Disp("Abandoned Pit Floor 1:Abandoned Pit Floor 2:Snake God's Warmth 1st Floor:Snake God's Warmth 2nd Floor:Snake God's Root 1st Floor:Snake God's Root 2nd Floor:Deep Root Cave:Snake Labyrinth");
+	 Pick("","jor_ab01","jor_ab02","jor_dun01","jor_dun02","jor_root1","jor_root2","jor_root3","jor_maze");
 D25: Restrict("RE",5);
 	 setarray @c[2],140,51,53,247,37,63,150,285,146,215;
 	 Disp("Entrance:Juperos 1:Juperos 2:Core:Eastern Ruins of Juperos");
@@ -503,11 +534,48 @@ D51: Restrict("Pre-RE",1,2);
 	 Disp("Carpenter's Shop in the Tree:Passage to a Foreign World:Hvergermil's Fountain");
 	 Pick("","um_dun01","um_dun02","yggdrasil01");
 D52: Restrict("RE");
-	 setarray @c[2],275,21,15,115,15,115,159,27,162,36,159,11,156,33,337,333,314,64,163,18,156,20,39,81;
-	 Disp("Sewage Treatment Plant:1st Power Plant:2nd Power Plant:Large Bath Meditathio:Lost Farm Valley:Library Memory Corridor:Upper Floor of Tartaros Storage:Lower Floor of Tartaros Storage:Death Rune:Fire Rune:Grass Rune:Ice Rune"); Pick("","ba_pw02","ba_pw01","ba_pw03","ba_bath","ba_lost","ba_lib","ba_2whs01","ba_2whs02","bl_death","bl_lava","bl_grass","bl_ice");
+	 setarray @c[2],275,21,15,115,15,115,159,27,162,36,159,11,156,33,337,333,314,64,163,18,156,20,39,81,152,16,49,83,142,19,251,107,194,188;
+	 Disp("Sewage Treatment Plant:1st Power Plant:2nd Power Plant:Large Bath Meditathio:Lost Farm Valley:Library Memory Corridor:Upper Floor of Tartaros Storage:Lower Floor of Tartaros Storage:Death Rune:Fire Rune:Grass Rune:Ice Rune:Soul Rune:Temple Rune:Venom Rune:Biosphere Depth 1:Biosphere Depth 2");
+	 Pick("","ba_pw02","ba_pw01","ba_pw03","ba_bath","ba_lost","ba_lib","ba_2whs01","ba_2whs02","bl_death","bl_lava","bl_grass","bl_ice","bl_soul","bl_temple","bl_venom","bl_depth1","bl_depth2");
 D53: Restrict("RE");
 	 setarray @c[2],244,61,72,20,122,22;
 	 Disp("Lab-OPTATIO:R&D-WISH:Verus Center Square"); Pick("verus");
+// Maps the world sync of app 1.6.6 filled with monsters (Renewal only)
+D54: Restrict("RE");
+	 Go("moc_akhet",186,54);
+D55: Restrict("RE");
+	 setarray @c[2],194,238,180,230;
+	 Disp("Devoured Geffenia East:Devoured Geffenia West"); Pick("","ch1_gfn01","ch1_gfn03");
+D56: Restrict("RE");
+	 Go("hem_dun02",159,241);
+D57: Restrict("RE");
+	 Go("hem_dun01",226,212);
+D58: Restrict("RE");
+	 setarray @c[2],264,238,262,239;
+	 Disp("Distorted Brimir",1,2); Pick("","uknw_ruin","uknw_ruin2");
+D59: Restrict("RE");
+	 Go("rgs_dun1",171,45);
+D60: Restrict("RE");
+	 setarray @c[2],298,170,24,173,170,62,24,173;
+	 Disp("Cult Temple 1st Floor:Cult Temple 2nd Floor:Gimleh 1st Floor:Gimleh 2nd Floor"); Pick("","jor_sklf1","jor_sklf2","jor_tmple1","jor_tmple2");
+D61: Restrict("RE");
+	 Go("mjo_wst01",200,384);
+D62: Restrict("RE");
+	 setarray @c[2],258,121,93,36;
+	 Disp("Primordial Flame",1,2); Pick("mu_dun");
+D63: Restrict("RE");
+	 Go("deadroot",345,347);
+D64: Restrict("RE");
+	 Go("cmd_bhole",250,350);
+D65: Restrict("RE");
+	 setarray @c[2],255,141,147,15,211,263,243,60;
+	 Disp("Lux:Nox:Vita:Arc"); Pick("","ch1zero1","ch1zero2","ch1zero3","ch1zero4");
+D66: Restrict("RE");
+	 setarray @c[2],149,170,40,247,284,158,148,35,150,139,165,186,148,29,148,254,150,192,256,259;
+	 Disp("Death:Factory:Ground:Ice:Jungle:Lava:Soul:Temple:Valley:Venom");
+	 Pick("","ab_death1","ab_factory1","ab_ground1","ab_ice1","ab_jungle1","ab_lava1","ab_soul1","ab_temple1","ab_valley1","ab_venom1");
+D67: Restrict("RE");
+	 Go("hero_dun1",151,153);
 
 // --------------------------------------------------
 	Castles:
