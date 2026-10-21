@@ -1,8 +1,10 @@
-# standart-npc -- Training Dummy (Pre-renewal)
+# standart-npc -- Training Dummies (Pre-renewal)
 # Pre-renewal copy of db/when/enable_dummies/mob_db.yml (replaces it
-# there, "prerenewalFolder" in mod.json): same IDs, names and settings,
-# Level 99. Pre-renewal has no DUMMY_150, so the level and HP are our
-# own. Loaded only while "Training Dummies" (enable_dummies) is on.
+# there, "prerenewalFolder" in mod.json): same IDs and names, Level 99,
+# no DEF/MDEF so you see raw damage, and the MVP Dummy takes full
+# damage (no Pre-renewal monster has a DamageTaken). Pre-renewal has
+# no DUMMY_150, so the level and HP are our own. Loaded only while
+# "Training Dummies" (enable_dummies) is on.
 
 Header:
   Type: MOB_DB
@@ -11,7 +13,7 @@ Header:
 Body:
   - Id: 28412
     AegisName: SNPC_DUMMY
-    Name: Training Dummy
+    Name: Medium Dummy
     Level: 99
     Hp: 99999999
     Defense: 0
@@ -37,7 +39,7 @@ Body:
       KnockBackImmune: true
   - Id: 28413
     AegisName: SNPC_DUMMY_BOSS
-    Name: Training Dummy
+    Name: MVP Dummy
     Level: 99
     Hp: 99999999
     Defense: 0
@@ -50,7 +52,7 @@ Body:
     Luk: 0
     SkillRange: 0
     ChaseRange: 0
-    Size: Medium
+    Size: Large
     Race: Formless
     Element: Neutral
     ElementLevel: 1
@@ -61,3 +63,4 @@ Body:
     Modes:
       TeleportBlock: true
       KnockBackImmune: true
+      Mvp: true
