@@ -328,6 +328,8 @@ S_AddSlot:
     next;
     if (select("Add a slot:Cancel") == 2) close;
 
+// A failed try comes back here, so the next one needs no new talk
+L_SlotTry:
     if (countitem(6188) < 1) {	// Slot_Coupon
         mes "[Universal Enchanter]";
         mes "You need a ^0055FFSlotting Advertisement^000000. The Cash Shop sells them.";
@@ -389,6 +391,11 @@ S_AddSlot:
         specialeffect EF_SUI_EXPLOSION;
         mes "[Universal Enchanter]";
         mes "Ah... it did not take. Your ^0055FF" + getitemname(.@from) + "^000000 is unharmed, but the coupon is gone.";
+        .@left = countitem(6188);	// Slot_Coupon
+        if (.@left < 1) close;
+        mes "Slotting Advertisements left: " + .@left + ".";
+        next;
+        if (select("Try again:Stop") == 1) goto L_SlotTry;
         close;
     }
 
