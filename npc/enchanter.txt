@@ -10,8 +10,10 @@
 //= card slots stay for cards.
 //= Offered: enchant-type items, the enchants the item db leaves
 //= typed as plain cards (headgear jewels, costume stones -- not
-//= monster cards or Tarot cards), and stones/essences; only the
-//= ones whose item db places include the chosen slot (#46).
+//= monster cards or Tarot cards); only the ones whose item db
+//= places include the chosen slot (#46). Etc items are never
+//= offered: none has a script, so in a socket they do nothing
+//= (Etel Stone, Pink Glow Effect (Middle), ...).
 //= The item keeps its refine, grade, random options, bound type
 //= and broken state. Refused: rental items, forged/brewed/pet
 //= items (their card fields hold crafter data), and items the
@@ -201,10 +203,11 @@ prontera,164,169,4	script	Universal Enchanter	10182,{
         // Acceptance Criteria:
         // - Item of type IT_CARD that isn't a normal monster card (Nebula, Trait, Essences)
         // - An enchant the item db leaves without the Enchant subtype (above)
-        // - Item of type IT_ETC with explicit stone/enchantment sub-type designation
-        if (!((.@type == IT_CARD && .@subtype != CARD_NORMAL) || .@unmarked ||
-            (.@type == IT_ETC && .@subtype == CARD_ENCHANT) ||
-            (.@type == IT_ETC && (strpos(.@name$, "Stone") != -1 || strpos(.@name$, "Essence") != -1 || strpos(.@name$, "FixedCasting") != -1)))) {
+        // Etc items are not taken: none has a script in the item db (the
+        // 629 Etc "... Stone"/"... Essence" ones included), so in a socket
+        // they do nothing and the stone is lost. The working enchants are
+        // card-type, e.g. Pink Glow Effect 29161, not the Etc 25178.
+        if (!((.@type == IT_CARD && .@subtype != CARD_NORMAL) || .@unmarked)) {
             continue;
         }
 
