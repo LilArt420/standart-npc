@@ -271,6 +271,7 @@ If warps or Fly Wings get slower the longer you play, update Ragnarok Offline to
 
 ### Renewal only
 - Training Dummies: the Medium and MVP dummies both have 120 DEF and 120 MDEF, and the MVP Dummy takes 10% of the damage (90% less, like the newer MVPs). By Lil Art.
+- Yongjirak: the Buffer moved to (177,122). With the World Sync Extras mod it stood right next to White Powder (173,120).
 
 ## 5.0.1
 

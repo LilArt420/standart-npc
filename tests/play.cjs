@@ -678,7 +678,7 @@ function runEra(era) {
             gm('@warp kindlbrk 181 125');
             W.rotest('wait', '6000');
             const town = ev(`roAgent.entities({ type: 'NPC', radius: 12 }).map(n => n.name + '@' + n.position.join(','))`);
-            check(Array.isArray(town) && town.includes('Warper@184,128') && town.includes('Buffer@174,120'),
+            check(Array.isArray(town) && town.includes('Warper@184,128') && town.includes('Buffer@177,122'),
                 'Warper and Buffer stand in Yongjirak', JSON.stringify(town).slice(-200));
         }
         gm('@warp prontera 160 189');
