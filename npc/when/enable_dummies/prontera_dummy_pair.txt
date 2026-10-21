@@ -1,0 +1,56 @@
+//===== rAthena Script =======================================
+//= Prontera Training Dummies (Medium & MVP)
+//===== By: Lil Art ==========================================
+//===== Description: =========================================
+//= Two more stationary target dummies for testing damage output,
+//= next to the Dummy Master's: a Medium Dummy at Prontera (153,163)
+//= and an MVP Dummy at (158,163). The MVP Dummy is Large, Boss class
+//= with MVP mode, and on Renewal it takes 10% of the damage, as the
+//= newer MVPs do. A dummy that dies comes back after 2 seconds.
+//= Off by default: the "dummy_pair" setting turns them on.
+//===== How to customize: ====================================
+//= - Stats (level, HP, DEF, MDEF, size, class, damage taken): the
+//=   monster table, db/when/enable_dummies/mob_db.yml (Renewal) and
+//=   pre-renewal/db/when/enable_dummies/mob_db.yml (Pre-renewal);
+//=   28414 is the Medium Dummy, 28415 the MVP Dummy.
+//= - Look: db/when/enable_dummies/mob_avail.yml.
+//= - Position: the x,y in S_Medium and S_Mvp.
+//============================================================
+
+-	script	PrtDummyManager	-1,{
+OnInit:
+	if (!callfunc("F_ModSetting", "standart-npc", "dummy_pair", 0))
+		end;
+	// 28414/28415 come from db/when/enable_dummies/mob_db.yml. If that
+	// table was not read, say so in the log instead of spawning nothing.
+	if (getmonsterinfo(28414, MOB_LV) < 0 || getmonsterinfo(28415, MOB_LV) < 0) {
+		debugmes "Training Dummies: monsters 28414/28415 not in the mob db, no Medium/MVP dummies spawned.";
+		end;
+	}
+	killmonster "prontera", strnpcinfo(3) + "::OnMediumDead";
+	killmonster "prontera", strnpcinfo(3) + "::OnMvpDead";
+	callsub S_Medium;
+	callsub S_Mvp;
+	end;
+
+S_Medium:
+	monster "prontera", 153, 163, "Medium Dummy", 28414, 1, strnpcinfo(3) + "::OnMediumDead";
+	return;
+
+S_Mvp:
+	monster "prontera", 158, 163, "MVP Dummy", 28415, 1, strnpcinfo(3) + "::OnMvpDead";
+	return;
+
+// A dummy that dies comes back 2 seconds later. sleep needs no player
+// (unlike addtimer), so it also comes back when nobody is attached or
+// the killer logs out within the 2 seconds.
+OnMediumDead:
+	sleep 2000;
+	callsub S_Medium;
+	end;
+
+OnMvpDead:
+	sleep 2000;
+	callsub S_Mvp;
+	end;
+}

@@ -58,7 +58,11 @@ const PREM_TEST = { gauche: 1207, potion: 503, jellopy: 909 };
 // Universal Enchanter (#46): a slotless Hat on the head, a slotless Cotton
 // Shirt on the body, a Shard of Agility Jewel in the bag (Renewal only;
 // checked in the fork's re/pre-re item_db: Hat and Cotton Shirt in both).
-const ENCH_TEST = { hat: 2220, shirt: 2301, jewel: 27422 };
+const ENCH_TEST = { hat: 2220, shirt: 2301, jewel: 27422, stone: 953 };  // stone: Stone Heart, an Etc material in both eras
+// Universal Enchanter's Add a slot (#111): a Slotting Advertisement and a
+// Mantle (2307 -> slotted Mantle 2308, on the slot list) in the bag; both
+// IDs in the fork's re/pre-re item_db.
+const SLOT_TEST = { coupon: 6188, mantle: 2307 };
 // Episode Valkyrie (#51), Renewal: with the way to the New World open
 // (ep13_ryu 100, which 16.1 asks for) and an Eden Group Mark (which 15.1
 // asks for), the character stands in the middle of 13.1, 13.2, 13.3, 14.1,
@@ -164,7 +168,8 @@ const EXPECT = {
         job: 4252, level: 210,   // Dragon Knight
         bountyMenu: ['Target Hunt', 'Overlook Water Dungeon', 'Illusion Dungeons', 'Daily Area Purge', 'Cancel'],
         purgeMaps: ['sp_rudus4'],  // Lv 201-230: one map (#24)
-        dummy: { 28412: ['Size:Medium', 'Lv:150', 'DEF:0'], 28413: ['Size:Medium', 'Lv:150', 'DEF:0'] },
+        dummy: { 28412: ['Size:Medium', 'Lv:150', 'DEF:0'], 28413: ['Size:Medium', 'Lv:150', 'DEF:0'],
+            28414: ['Size:Medium', 'Lv:150', 'DEF:120'], 28415: ['Size:Large', 'Lv:150', 'DEF:120'] },
         blessing: true,            // Blacksmith Blessing in the Tool Dealer
         mvp90: true,               // Dummy Master's "MVP, 90% less damage": Renewal only
         welcome: true,             // Welcoming in Izlude: Renewal only
@@ -181,7 +186,8 @@ const EXPECT = {
         job: 4008, level: 99,    // Lord Knight
         bountyMenu: ['Target Hunt', 'Overlook Water Dungeon', 'Daily Area Purge', 'Cancel'],
         purgeMaps: ['ice_dun01', 'gl_church', 'yuno_fild08', 'ra_fild12', 'mosk_dun02', 'gef_fild06', 'gef_fild08'],
-        dummy: { 28412: ['Size:Medium', 'Lv:99', 'DEF:0'], 28413: ['Size:Medium', 'Lv:99', 'DEF:0'] },
+        dummy: { 28412: ['Size:Medium', 'Lv:99', 'DEF:0'], 28413: ['Size:Medium', 'Lv:99', 'DEF:0'],
+            28414: ['Size:Medium', 'Lv:99', 'DEF:0'], 28415: ['Size:Large', 'Lv:99', 'DEF:0'] },
         blessing: false,
         mvp90: false,
         welcome: false,
@@ -232,7 +238,7 @@ function setUpCharacter(era) {
         + ` DELETE FROM char_reg_str WHERE char_id=${id} AND \`key\` LIKE 'BB\\_%';`
         + ` DELETE FROM char_reg_num WHERE char_id=${id} AND \`key\`='SNPC_WelcomeGift';`
         + ` UPDATE inventory SET equip=0 WHERE char_id=${id} AND (equip & (34 | 256 | 16)) <> 0;`
-        + ` DELETE FROM inventory WHERE char_id=${id} AND nameid IN (${CARD_TEST.knife}, ${CARD_TEST.keep}, ${CARD_TEST.pull}, ${ENCH_TEST.hat}, ${ENCH_TEST.shirt}, ${ENCH_TEST.jewel}, ${SMUG_TEST.mask}, ${SMUG_TEST.gems}, ${SMUG_TEST.free}, ${PREM_TEST.gauche}, ${PREM_TEST.potion}, ${PREM_TEST.jellopy});`
+        + ` DELETE FROM inventory WHERE char_id=${id} AND nameid IN (${CARD_TEST.knife}, ${CARD_TEST.keep}, ${CARD_TEST.pull}, ${ENCH_TEST.hat}, ${ENCH_TEST.shirt}, ${ENCH_TEST.jewel}, ${ENCH_TEST.stone}, ${SLOT_TEST.coupon}, ${SLOT_TEST.mantle}, ${SMUG_TEST.mask}, ${SMUG_TEST.gems}, ${SMUG_TEST.free}, ${PREM_TEST.gauche}, ${PREM_TEST.potion}, ${PREM_TEST.jellopy});`
         + ` DELETE FROM char_reg_num WHERE char_id=${id} AND \`key\` LIKE 'SNPC\\_Smuggler%';`
         // Plagiarism Master's run leaves copied skills and a Shadow Chaser's skills.
         + ` DELETE FROM char_reg_num WHERE char_id=${id} AND \`key\` IN ('CLONE_SKILL', 'CLONE_SKILL_LV', 'REPRODUCE_SKILL', 'REPRODUCE_SKILL_LV');`
@@ -244,6 +250,8 @@ function setUpCharacter(era) {
         + ` INSERT INTO inventory (char_id, nameid, amount, equip, identify) VALUES (${id}, ${ENCH_TEST.hat}, 1, 256, 1), (${id}, ${ENCH_TEST.shirt}, 1, 16, 1);`
         + ` INSERT INTO inventory (char_id, nameid, amount, equip, identify, refine, bound) VALUES (${id}, ${PREM_TEST.gauche}, 1, 0, 1, 3, 1),`
         + ` (${id}, ${PREM_TEST.potion}, 5, 0, 1, 0, 1), (${id}, ${PREM_TEST.jellopy}, 1, 0, 1, 0, 0);`
+        + ` INSERT INTO inventory (char_id, nameid, amount, equip, identify) VALUES (${id}, ${ENCH_TEST.stone}, 1, 0, 1),`
+        + ` (${id}, ${SLOT_TEST.coupon}, 1, 0, 1), (${id}, ${SLOT_TEST.mantle}, 1, 0, 1);`
         + (e.jewel ? ` INSERT INTO inventory (char_id, nameid, amount, equip, identify) VALUES (${id}, ${ENCH_TEST.jewel}, 1, 0, 1);` : ''));
     checks.push({ ok: w.ok, text: `character set to job ${e.job}, Lv ${e.level}, no Bounty progress, carded Knife, Hat and Cotton Shirt equipped`, detail: w.ok ? '' : w.out.slice(-300) });
     return checks;
@@ -333,9 +341,19 @@ function runEra(era) {
             `Dummy Master: types ${e.mvp90 ? 'with' : 'without'} "MVP, 90% less damage"`, JSON.stringify(types));
         const dummyAfter = dummies();
         check(Array.isArray(dummyAfter) && dummyAfter.length === 1 && dummyAfter[0] === '156,225', 'Training Dummies: one dummy after Done', JSON.stringify(dummyAfter));
+        // The Medium and MVP dummies (dummy_pair, on in the test world).
+        gm('@warp prontera 155 160');
+        // Polls a few seconds: right after the warp the client may not have them yet.
+        const pair = ev(`(async () => {
+            const seen = () => roAgent.entities({ type: 'MOB', radius: 10 }).filter(m => /^(Medium|MVP) Dummy$/.test(m.name) && m.gid > 0 && !m.dead).map(m => m.name + '@' + m.position.join(',')).sort();
+            for (let i = 0; i < 10 && seen().length < 2; i++) await new Promise(r => setTimeout(r, 500));
+            return seen();
+        })()`);
+        check(Array.isArray(pair) && pair.join(' ') === 'MVP Dummy@158,163 Medium Dummy@153,163', 'Training Dummies: Medium Dummy at 153,163 and MVP Dummy at 158,163', JSON.stringify(pair));
         for (const [id, wanted] of Object.entries(e.dummy)) {
             gm(`@mobinfo ${id}`);
-            const info = ev(`snpc.chat(8).join(' ')`);
+            // An MVP's @mobinfo is 9 lines; read more and keep this monster's part.
+            const info = ev(`(() => { const t = snpc.chat(14).join(' '); return t.slice(t.lastIndexOf('Monster: ')); })()`);
             check(typeof info === 'string' && wanted.every(w => info.includes(w)), `Training Dummies: @mobinfo ${id} shows ${wanted.join(', ')}`,
                 typeof info === 'string' ? (info.match(/Lv:\d+|DEF:\d+|Size:\w+/g) || []).join(' ') : JSON.stringify(info));
         }
@@ -359,7 +377,7 @@ function runEra(era) {
         check(items.includes('Gym Pass'), 'Tool Dealer: Gym Pass sold without cash-shop-extended', items.includes('Gym Pass') ? 'listed' : 'not listed');
     }
     if (want('nokzin')) {
-        gm('@warp prontera 164 160');
+        gm('@warp prontera 147 163');
         const nokzin = ev(`(async () => {
             await snpc.talk('Elemental Endower');
             const v = await snpc.go('What about converter scrolls?');
@@ -487,8 +505,8 @@ function runEra(era) {
     }
     if (want('enchanter')) {
         // Universal Enchanter (#46): the headgear jewel is offered for the Hat,
-        // not for the Cotton Shirt.
-        if (e.jewel) {
+        // not for the Cotton Shirt; an Etc "Stone" (Stone Heart) never is.
+        {
             gm('@warp prontera 164 167');
             // Each step waits for its menu item (pressing Next as it comes),
             // and the talk ends on Cancel, so no window is left open.
@@ -517,9 +535,32 @@ function runEra(era) {
                 return out;
             })()`);
             const head = stones('Top Headgear');
-            check(Array.isArray(head) && head.includes('Shard of Agility Jewel'), 'Universal Enchanter: offers the jewel for the Top Headgear', JSON.stringify(head).slice(-200));
-            const body = stones('Armor');
-            check(Array.isArray(body) && !body.some(t => t.includes('Agility Jewel')), 'Universal Enchanter: not for the Armor', JSON.stringify(body).slice(-200));
+            if (e.jewel) {
+                check(Array.isArray(head) && head.includes('Shard of Agility Jewel'), 'Universal Enchanter: offers the jewel for the Top Headgear', JSON.stringify(head).slice(-200));
+                const body = stones('Armor');
+                check(Array.isArray(body) && !body.some(t => t.includes('Agility Jewel')), 'Universal Enchanter: not for the Armor', JSON.stringify(body).slice(-200));
+            }
+            check(Array.isArray(head) && !head.some(t => t.includes('Stone Heart')), 'Universal Enchanter: no Etc items (Stone Heart)', JSON.stringify(head).slice(-200));
+        }
+        // Add a slot (#111) is offered only with cash-shop-extended, which
+        // the test world does not load: hidden here, though the Tester
+        // carries a coupon and a Mantle. The slotting itself is not
+        // played (it needs cash-shop-extended's CashPointRewards NPC).
+        {
+            const first = ev(`(async () => {
+                const sleep = ms => new Promise(r => setTimeout(r, ms));
+                await snpc.talk('Universal Enchanter');
+                let v = snpc.view();
+                for (let i = 0; i < 30 && !v.menu.length; i++) {
+                    if (v.next) v = await snpc.next(); else { await sleep(200); v = snpc.view(); }
+                }
+                const out = v.menu.map(m => m.text);
+                if (out.includes('Cancel')) await snpc.pick('Cancel');
+                await snpc.close();
+                return out;
+            })()`);
+            check(Array.isArray(first) && first.includes('Regular Gear') && !first.some(t => t.includes('Add a slot')),
+                'Universal Enchanter: no Add a slot without cash-shop-extended', JSON.stringify(first).slice(-200));
         }
     }
     if (want('warper')) {
@@ -662,7 +703,7 @@ function runEra(era) {
             gm('@warp kindlbrk 181 125');
             W.rotest('wait', '6000');
             const town = ev(`roAgent.entities({ type: 'NPC', radius: 12 }).map(n => n.name + '@' + n.position.join(','))`);
-            check(Array.isArray(town) && town.includes('Warper@184,128') && town.includes('Buffer@174,120'),
+            check(Array.isArray(town) && town.includes('Warper@184,128') && town.includes('Buffer@177,122'),
                 'Warper and Buffer stand in Yongjirak', JSON.stringify(town).slice(-200));
         }
         gm('@warp prontera 160 189');
@@ -695,7 +736,7 @@ function runEra(era) {
             await snpc.close();
             return { said: [...new Set(said)].join(' / '), menu };
         })()`);
-        gm('@warp prontera 144 172');
+        gm('@warp prontera 187 192');
         const no = smug(['Not interested']);
         check(no && String(no.said).includes('Your loss'), 'Smuggler: the pitch can be refused', JSON.stringify(no).slice(-200));
         const offer = smug(['Mystic Box']);

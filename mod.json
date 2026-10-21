@@ -1,6 +1,6 @@
 {
   "name": "standart-npc",
-  "version": "5.0.1",
+  "version": "5.0.2",
   "author": "MondoTruth, Lil Art, IceGlaive, Nokzin, iguera, Claude, and the Ragnarok Offline community",
   "description": "Works with or without Lil Art's cash-shop-extended (Find Mods): with it, some NPCs also take Cash Points. Turning the mod on turns on every NPC; switch single ones off with Settings… (Warper, Job Master, Reset Girl, Stylist, Episode Valkyrie and all the others).",
   "settingsPage": "settings/index.html",
@@ -196,6 +196,13 @@
       "default": true,
       "label": "Training Dummies",
       "description": "A training dummy for testing damage output. The Dummy Master sets its size, element, race, DEF, MDEF and type (Normal, Boss, MVP). Prontera: dummy (156,225), Dummy Master (150,225)."
+    },
+    {
+      "key": "dummy_pair",
+      "type": "boolean",
+      "default": false,
+      "label": "Medium and MVP dummies",
+      "description": "Two more fixed dummies by Lil Art: a Medium Dummy and an MVP Dummy (Large, Boss, MVP; on Renewal both have 120 DEF/MDEF and the MVP one takes 90% less damage). Needs Training Dummies on. Prontera (153,163) and (158,163)."
     }
   ]
 }

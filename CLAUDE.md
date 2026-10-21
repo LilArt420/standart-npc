@@ -61,6 +61,7 @@ settings/index.html      -- the mod's own settings window
 client/index.js          -- client plugin: redraws the Attendance Check window with
                             the rewards the server gives (settings may change them)
 db/when/enable_dummies/  -- mob_db.yml, mob_avail.yml: the Training Dummy (Normal, Boss)
+                            and the Medium/MVP pair (dummy_pair)
 db/when/enable_attendance/ -- attendance.yml (Renewal rewards) and extension_db.yml
                             (attendance_repeat, attendance_script_rewards):
                             rAthena's Attendance Check
@@ -110,7 +111,7 @@ README.md, assets/, CLAUDE.md, docs/, tools/, tests/  -- repo only, never in the
   `db/import-tmpl`). Any other name lands in `db/import/` and is never read
   (#25).
 
-### Settings — 24 of max 40 used
+### Settings — 25 of max 40 used
 
 App limits: `type` is `boolean`, `number` or `string`; max 40 settings (20
 before app 1.5.5); `label` up to 120 and `description` up to **400 bytes**
@@ -141,15 +142,16 @@ CHANGELOG.md.
 | Weight Maxxer | 147,172 | npc_off `weightmax` |
 | Plagiarism Master | 171,182 | npc_off `plagiarism` |
 | Tool Dealer | 143,178 | npc_off `tooldealer` |
-| Smuggler | 144,174 | npc_off `smuggler` |
+| Smuggler | 187,194 | npc_off `smuggler` |
 | Card Exchanger | 151,187 | npc_off `cardexchanger` |
 | Bounty Hunter | 147,169 | enable_bounties |
 | Cheffenia Gatekeeper | 140,180 | enable_mvp |
 | Safe Refiner | 164,172 | npc_off `refiner` |
 | Grade Refiner | 164,166 | npc_off `grade` (Renewal only) |
 | Universal Enchanter | 164,169 | npc_off `enchanter` |
-| Elemental Endower | 164,163 | npc_off `nokzin` |
+| Elemental Endower | 147,166 | npc_off `nokzin` |
 | Training Dummy / Dummy Master | 156,225 / 150,225 | enable_dummies |
+| Medium Dummy / MVP Dummy | 153,163 / 158,163 | enable_dummies + dummy_pair (off by default) |
 
 Before placing a new NPC, grep all `prontera,` lines to avoid collisions.
 Others in Prontera (app 1.4.6+):

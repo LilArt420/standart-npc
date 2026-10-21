@@ -11,4 +11,4 @@
 //= One duplicate line per town (fields separated by TABs).
 //============================================================
 
-kindlbrk,174,120,5	duplicate(Buffer)	Buffer#kindl	936
+kindlbrk,177,122,5	duplicate(Buffer)	Buffer#kindl	936

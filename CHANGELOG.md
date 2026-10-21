@@ -262,6 +262,18 @@ If warps or Fly Wings get slower the longer you play, update Ragnarok Offline to
 ### Renewal and Pre-renewal
 - Smuggler: Settings… → Smuggler → Options… can keep him from selling cards, MVP cards, mini-boss cards, costumes, or any item IDs you list. Banned items are refused both for sale and as the free item after his quest. Requested on Discord.
 
+## 5.0.2
+
+### Renewal and Pre-renewal
+- Training Dummies: a new setting, "Medium and MVP dummies" (off by default), adds two fixed dummies next to the Dummy Master's: a Medium Dummy at Prontera (153,163) and an MVP Dummy at (158,163), Large, Boss class with MVP mode. A dummy that dies comes back after 2 seconds. By Lil Art.
+- The Elemental Endower moved to Prontera (147,166), next to the Bounty Hunter, and the Smuggler to (187,194). By Lil Art.
+- Universal Enchanter: no longer offers Etc items such as Etel Stone. None of them does anything in a socket, so the stone was simply lost.
+
+### Renewal only
+- Universal Enchanter: "Add a slot", when cash-shop-extended is loaded (its Cash Shop sells the Slotting Advertisement). One Slotting Advertisement adds a slot to an item from the official slotting NPCs' list (Seiyablem and Leablem: Mantle, Coat, Boots, Chain Mail, Gladius, Gakkung Bow and 106 more), with their success chance: 5 to 25%, the Hat of the Sun God 90%. The item keeps its refine, cards, enchants, grade and random options. The coupon is used up either way, but unlike the official NPCs a failure leaves the item as it was.
+- Training Dummies: the Medium and MVP dummies both have 120 DEF and 120 MDEF, and the MVP Dummy takes 10% of the damage (90% less, like the newer MVPs). By Lil Art.
+- Yongjirak: the Buffer moved to (177,122). With the World Sync Extras mod it stood right next to White Powder (173,120).
+
 ## 5.0.1
 
 Needs Ragnarok Offline 1.6.5 or newer (the Warper's new maps: 1.6.6).

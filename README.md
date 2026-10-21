@@ -81,7 +81,7 @@ Everything is on after install. To change it: **Settings → Mods → standart-n
 | | NPC | What it does | Location |
 |:-:|---|---|---|
 | 🧪 | **Tool Dealer** | Standard fixed-price shop — potions, wings, Blacksmith Blessing, and a few other staples. | Prontera (143, 178) |
-| 🕵️ | **Smuggler** | Buy any item by ID, as many as you want at once. First earn his trust with a short quest, once per character (a quest bubble shows until it is done). On Renewal the price depends on item type, on Pre-renewal every item costs its normal price x2. What he won't sell is up to you (settings). | Prontera (144, 174) |
+| 🕵️ | **Smuggler** | Buy any item by ID, as many as you want at once. First earn his trust with a short quest, once per character (a quest bubble shows until it is done). On Renewal the price depends on item type, on Pre-renewal every item costs its normal price x2. What he won't sell is up to you (settings). | Prontera (187, 194) |
 | 🃏 | **Card Exchanger** | 10 cards → Old Card Album, 30 cards → Mystical Card Album. Also pulls one card of your choice out of equipped gear. | Prontera (151, 187) |
 | 🦅 | **Falcon Breeder** | Falcon for Hunters and Snipers, Wolf Flute for Rangers and Windhawks, Hawk Flute for Windhawks (Renewal only). | Prontera (128, 211) |
 
@@ -98,14 +98,14 @@ Everything is on after install. To change it: **Settings → Mods → standart-n
 |:-:|---|---|---|
 | ⚒️ | **Safe Refiner** | Refine gear to +7 through +15 using certificates (Pre-renewal: +7, +8, +9, +11). | Prontera (164, 172) |
 | 📊 | **Grade Refiner** | Opens the game's grading and refining windows. Renewal only. | Prontera (164, 166) |
-| 💎 | **Universal Enchanter** | Attach an Enchant/Class Stone (or similar item) to costume, shadow or regular gear, for free. Keeps the refine level. | Prontera (164, 169) |
-| 🔥 | **Elemental Endower** | Endows your weapon with an element for an hour, works on carded weapons too. Can also remove an endow for free. Portable Elemental Converter scrolls: the Cash Shop with cash-shop-extended; without it he sells them himself (5,000z). | Prontera (164, 163) |
+| 💎 | **Universal Enchanter** | Attach an Enchant/Class Stone (or similar item) to costume, shadow or regular gear, for free. Keeps the refine level. With cash-shop-extended: add a slot to the equipment the official slotting NPCs work on, for a Slotting Advertisement (their success chance; a failure only uses up the coupon). | Prontera (164, 169) |
+| 🔥 | **Elemental Endower** | Endows your weapon with an element for an hour, works on carded weapons too. Can also remove an endow for free. Portable Elemental Converter scrolls: the Cash Shop with cash-shop-extended; without it he sells them himself (5,000z). | Prontera (147, 166) |
 
 #### 🥊 Training
 
 | | NPC | What it does | Location |
 |:-:|---|---|---|
-| 🎯 | **Training Dummies** | A training dummy for testing damage output, always there. The Dummy Master next to it sets its size, element and element level, race, DEF, MDEF and type: Normal, Boss, MVP, or (Renewal) MVP taking 90% less damage. | Prontera: dummy (156, 225), Dummy Master (150, 225) |
+| 🎯 | **Training Dummies** | A training dummy for testing damage output, always there. The Dummy Master next to it sets its size, element and element level, race, DEF, MDEF and type: Normal, Boss, MVP, or (Renewal) MVP taking 90% less damage. Optional (settings, off by default): two more fixed dummies, a Medium Dummy and an MVP Dummy (Large, Boss class with MVP mode); on Renewal both have 120 DEF and MDEF and the MVP Dummy takes 90% less damage. A dummy that dies comes back after 2 seconds. | Prontera: dummy (156, 225), Dummy Master (150, 225); Medium Dummy (153, 163), MVP Dummy (158, 163) |
 
 #### 🎁 Other
 

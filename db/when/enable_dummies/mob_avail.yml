@@ -13,3 +13,7 @@ Body:
     Sprite: DRAGON_EGG
   - Mob: SNPC_DUMMY_BOSS
     Sprite: DRAGON_EGG
+  - Mob: SNPC_DUMMY_MEDIUM
+    Sprite: DRAGON_EGG
+  - Mob: SNPC_DUMMY_MVP
+    Sprite: DRAGON_EGG

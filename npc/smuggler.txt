@@ -57,7 +57,7 @@
 //= - Location/sprite: the first line below.
 //============================================================
 
-prontera,144,174,4	script	Smuggler	494,{
+prontera,187,194,5	script	Smuggler	494,{
 	// Paid, but the talk ended before the box was opened.
 	if (SNPC_SmugglerPaid)
 		goto L_Box;

@@ -102,9 +102,10 @@ function installMod() {
 // Attendance Check rewards (#84): day 1 three Red Potions (501, in the
 // fork's re/pre-re item_db), day 2 left empty, day 3 an ID that is no item;
 // days 2 and 3 keep the mod's own rewards.
+// The Medium and MVP dummies (dummy_pair, off by default) on.
 const ATTENDANCE_SET = '501:3,,99999999:1';
 const TEST_SETTINGS = { smuggler_no_mvp_cards: true, smuggler_no_boss_cards: true, smuggler_no_costumes: true,
-    smuggler_ban: '502, 99999999', attendance_re: ATTENDANCE_SET, attendance_pre: ATTENDANCE_SET };
+    smuggler_ban: '502, 99999999', dummy_pair: true, attendance_re: ATTENDANCE_SET, attendance_pre: ATTENDANCE_SET };
 
 // Restarts the world in `era`. Returns { ok, out } of `world up`.
 function boot(era) {

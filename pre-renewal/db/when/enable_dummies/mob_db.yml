@@ -2,7 +2,10 @@
 # Pre-renewal copy of db/when/enable_dummies/mob_db.yml (replaces it
 # there, "prerenewalFolder" in mod.json): same IDs, names and settings,
 # Level 99. Pre-renewal has no DUMMY_150, so the level and HP are our
-# own. Loaded only while "Training Dummies" (enable_dummies) is on.
+# own. 28414/28415 (Medium and MVP Dummy, the "dummy_pair" setting)
+# have no DEF/MDEF so you see raw damage, and the MVP Dummy takes full
+# damage (no Pre-renewal monster has a DamageTaken).
+# Loaded only while "Training Dummies" (enable_dummies) is on.
 
 Header:
   Type: MOB_DB
@@ -61,3 +64,56 @@ Body:
     Modes:
       TeleportBlock: true
       KnockBackImmune: true
+  - Id: 28414
+    AegisName: SNPC_DUMMY_MEDIUM
+    Name: Medium Dummy
+    Level: 99
+    Hp: 99999999
+    Defense: 0
+    MagicDefense: 0
+    Str: 0
+    Agi: 0
+    Vit: 0
+    Int: 0
+    Dex: 0
+    Luk: 0
+    SkillRange: 0
+    ChaseRange: 0
+    Size: Medium
+    Race: Formless
+    Element: Neutral
+    ElementLevel: 1
+    WalkSpeed: 200
+    ClientAttackMotion: 0
+    Ai: 06
+    Class: Normal
+    Modes:
+      TeleportBlock: true
+      KnockBackImmune: true
+  - Id: 28415
+    AegisName: SNPC_DUMMY_MVP
+    Name: MVP Dummy
+    Level: 99
+    Hp: 99999999
+    Defense: 0
+    MagicDefense: 0
+    Str: 0
+    Agi: 0
+    Vit: 0
+    Int: 0
+    Dex: 0
+    Luk: 0
+    SkillRange: 0
+    ChaseRange: 0
+    Size: Large
+    Race: Formless
+    Element: Neutral
+    ElementLevel: 1
+    WalkSpeed: 200
+    ClientAttackMotion: 0
+    Ai: 06
+    Class: Boss
+    Modes:
+      TeleportBlock: true
+      KnockBackImmune: true
+      Mvp: true
