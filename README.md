@@ -98,7 +98,7 @@ Everything is on after install. To change it: **Settings → Mods → standart-n
 |:-:|---|---|---|
 | ⚒️ | **Safe Refiner** | Refine gear to +7 through +15 using certificates (Pre-renewal: +7, +8, +9, +11). | Prontera (164, 172) |
 | 📊 | **Grade Refiner** | Opens the game's grading and refining windows. Renewal only. | Prontera (164, 166) |
-| 💎 | **Universal Enchanter** | Attach an Enchant/Class Stone (or similar item) to costume, shadow or regular gear, for free. Keeps the refine level. | Prontera (164, 169) |
+| 💎 | **Universal Enchanter** | Attach an Enchant/Class Stone (or similar item) to costume, shadow or regular gear, for free. Keeps the refine level. With cash-shop-extended: add a slot to the equipment the official slotting NPCs work on, for a Slotting Advertisement (their success chance; a failure only uses up the coupon). | Prontera (164, 169) |
 | 🔥 | **Elemental Endower** | Endows your weapon with an element for an hour, works on carded weapons too. Can also remove an endow for free. Portable Elemental Converter scrolls: the Cash Shop with cash-shop-extended; without it he sells them himself (5,000z). | Prontera (147, 166) |
 
 #### 🥊 Training

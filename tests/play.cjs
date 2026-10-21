@@ -59,6 +59,10 @@ const PREM_TEST = { gauche: 1207, potion: 503, jellopy: 909 };
 // Shirt on the body, a Shard of Agility Jewel in the bag (Renewal only;
 // checked in the fork's re/pre-re item_db: Hat and Cotton Shirt in both).
 const ENCH_TEST = { hat: 2220, shirt: 2301, jewel: 27422, stone: 953 };  // stone: Stone Heart, an Etc material in both eras
+// Universal Enchanter's Add a slot (#111): a Slotting Advertisement and a
+// Mantle (2307 -> slotted Mantle 2308, on the slot list) in the bag; both
+// IDs in the fork's re/pre-re item_db.
+const SLOT_TEST = { coupon: 6188, mantle: 2307 };
 // Episode Valkyrie (#51), Renewal: with the way to the New World open
 // (ep13_ryu 100, which 16.1 asks for) and an Eden Group Mark (which 15.1
 // asks for), the character stands in the middle of 13.1, 13.2, 13.3, 14.1,
@@ -234,7 +238,7 @@ function setUpCharacter(era) {
         + ` DELETE FROM char_reg_str WHERE char_id=${id} AND \`key\` LIKE 'BB\\_%';`
         + ` DELETE FROM char_reg_num WHERE char_id=${id} AND \`key\`='SNPC_WelcomeGift';`
         + ` UPDATE inventory SET equip=0 WHERE char_id=${id} AND (equip & (34 | 256 | 16)) <> 0;`
-        + ` DELETE FROM inventory WHERE char_id=${id} AND nameid IN (${CARD_TEST.knife}, ${CARD_TEST.keep}, ${CARD_TEST.pull}, ${ENCH_TEST.hat}, ${ENCH_TEST.shirt}, ${ENCH_TEST.jewel}, ${ENCH_TEST.stone}, ${SMUG_TEST.mask}, ${SMUG_TEST.gems}, ${SMUG_TEST.free}, ${PREM_TEST.gauche}, ${PREM_TEST.potion}, ${PREM_TEST.jellopy});`
+        + ` DELETE FROM inventory WHERE char_id=${id} AND nameid IN (${CARD_TEST.knife}, ${CARD_TEST.keep}, ${CARD_TEST.pull}, ${ENCH_TEST.hat}, ${ENCH_TEST.shirt}, ${ENCH_TEST.jewel}, ${ENCH_TEST.stone}, ${SLOT_TEST.coupon}, ${SLOT_TEST.mantle}, ${SMUG_TEST.mask}, ${SMUG_TEST.gems}, ${SMUG_TEST.free}, ${PREM_TEST.gauche}, ${PREM_TEST.potion}, ${PREM_TEST.jellopy});`
         + ` DELETE FROM char_reg_num WHERE char_id=${id} AND \`key\` LIKE 'SNPC\\_Smuggler%';`
         // Plagiarism Master's run leaves copied skills and a Shadow Chaser's skills.
         + ` DELETE FROM char_reg_num WHERE char_id=${id} AND \`key\` IN ('CLONE_SKILL', 'CLONE_SKILL_LV', 'REPRODUCE_SKILL', 'REPRODUCE_SKILL_LV');`
@@ -246,7 +250,8 @@ function setUpCharacter(era) {
         + ` INSERT INTO inventory (char_id, nameid, amount, equip, identify) VALUES (${id}, ${ENCH_TEST.hat}, 1, 256, 1), (${id}, ${ENCH_TEST.shirt}, 1, 16, 1);`
         + ` INSERT INTO inventory (char_id, nameid, amount, equip, identify, refine, bound) VALUES (${id}, ${PREM_TEST.gauche}, 1, 0, 1, 3, 1),`
         + ` (${id}, ${PREM_TEST.potion}, 5, 0, 1, 0, 1), (${id}, ${PREM_TEST.jellopy}, 1, 0, 1, 0, 0);`
-        + ` INSERT INTO inventory (char_id, nameid, amount, equip, identify) VALUES (${id}, ${ENCH_TEST.stone}, 1, 0, 1);`
+        + ` INSERT INTO inventory (char_id, nameid, amount, equip, identify) VALUES (${id}, ${ENCH_TEST.stone}, 1, 0, 1),`
+        + ` (${id}, ${SLOT_TEST.coupon}, 1, 0, 1), (${id}, ${SLOT_TEST.mantle}, 1, 0, 1);`
         + (e.jewel ? ` INSERT INTO inventory (char_id, nameid, amount, equip, identify) VALUES (${id}, ${ENCH_TEST.jewel}, 1, 0, 1);` : ''));
     checks.push({ ok: w.ok, text: `character set to job ${e.job}, Lv ${e.level}, no Bounty progress, carded Knife, Hat and Cotton Shirt equipped`, detail: w.ok ? '' : w.out.slice(-300) });
     return checks;
@@ -536,6 +541,26 @@ function runEra(era) {
                 check(Array.isArray(body) && !body.some(t => t.includes('Agility Jewel')), 'Universal Enchanter: not for the Armor', JSON.stringify(body).slice(-200));
             }
             check(Array.isArray(head) && !head.some(t => t.includes('Stone Heart')), 'Universal Enchanter: no Etc items (Stone Heart)', JSON.stringify(head).slice(-200));
+        }
+        // Add a slot (#111) is offered only with cash-shop-extended, which
+        // the test world does not load: hidden here, though the Tester
+        // carries a coupon and a Mantle. The slotting itself is not
+        // played (it needs cash-shop-extended's CashPointRewards NPC).
+        {
+            const first = ev(`(async () => {
+                const sleep = ms => new Promise(r => setTimeout(r, ms));
+                await snpc.talk('Universal Enchanter');
+                let v = snpc.view();
+                for (let i = 0; i < 30 && !v.menu.length; i++) {
+                    if (v.next) v = await snpc.next(); else { await sleep(200); v = snpc.view(); }
+                }
+                const out = v.menu.map(m => m.text);
+                if (out.includes('Cancel')) await snpc.pick('Cancel');
+                await snpc.close();
+                return out;
+            })()`);
+            check(Array.isArray(first) && first.includes('Regular Gear') && !first.some(t => t.includes('Add a slot')),
+                'Universal Enchanter: no Add a slot without cash-shop-extended', JSON.stringify(first).slice(-200));
         }
     }
     if (want('warper')) {
