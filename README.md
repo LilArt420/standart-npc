@@ -105,7 +105,7 @@ Everything is on after install. To change it: **Settings → Mods → standart-n
 
 | | NPC | What it does | Location |
 |:-:|---|---|---|
-| 🎯 | **Training Dummies** | Two target dummies for testing damage output, always there: a Medium Dummy and an MVP Dummy (Large, Boss class with MVP mode). On Renewal both have 120 DEF and MDEF, and the MVP Dummy takes 90% less damage, like the newer MVPs. A dummy that dies comes back after 2 seconds. | Prontera: Medium Dummy (153, 163), MVP Dummy (158, 163) |
+| 🎯 | **Training Dummies** | A training dummy for testing damage output, always there. The Dummy Master next to it sets its size, element and element level, race, DEF, MDEF and type: Normal, Boss, MVP, or (Renewal) MVP taking 90% less damage. Optional (settings, off by default): two more fixed dummies, a Medium Dummy and an MVP Dummy (Large, Boss class with MVP mode); on Renewal both have 120 DEF and MDEF and the MVP Dummy takes 90% less damage. A dummy that dies comes back after 2 seconds. | Prontera: dummy (156, 225), Dummy Master (150, 225); Medium Dummy (153, 163), MVP Dummy (158, 163) |
 
 #### 🎁 Other
 

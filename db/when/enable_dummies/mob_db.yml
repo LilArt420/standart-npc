@@ -1,13 +1,18 @@
-# standart-npc -- Training Dummies (Renewal)
-# Two target dummies of their own in Prontera, so Medium and Large
-# really are Medium and Large size. 28412 is the Medium Dummy
-# (153,163): Normal class, full damage. 28413 is the MVP Dummy
-# (158,163): Large, Boss class with MVP mode, and it takes 10% of the
-# damage (90% less, like the newer MVPs). Spawned by
-# npc/when/enable_dummies/prontera_dummies.txt. Level and HP from
-# rAthena's DUMMY_150 (2411, db/re/mob_db.yml in Flux159/rathena @
-# 7b526e6). KnockBackImmune keeps them on their cells. IDs are in the
-# range the app's modding guide gives to mod monsters (25000-31998).
+# standart-npc -- Training Dummy (Renewal)
+# The dummy the Dummy Master puts up in Prontera. 28412 is the
+# Normal-class dummy, 28413 the Boss-class one (Boss and both MVP
+# choices): the class cannot be changed on a spawned monster, so it
+# takes two entries. Size, element, race, DEF, MDEF and MVP mode are
+# set by npc/when/enable_dummies/prontera_dummies.txt when it spawns;
+# the values here are its defaults. Level and HP from rAthena's
+# DUMMY_150 (2411, db/re/mob_db.yml in Flux159/rathena @ 7b526e6).
+# KnockBackImmune keeps it on its cell. IDs are in the range the app's
+# modding guide gives to mod monsters (25000-31998).
+# 28414 (Medium Dummy) and 28415 (MVP Dummy) are the fixed pair by Lil
+# Art, spawned by npc/when/enable_dummies/prontera_dummy_pair.txt when
+# the "dummy_pair" setting is on: 120 DEF and MDEF, and the MVP Dummy
+# is Large, Boss class with MVP mode and takes 10% of the damage (90%
+# less, like the newer MVPs).
 # Loaded only while "Training Dummies" (enable_dummies) is on.
 # On Pre-renewal this file is replaced by
 # pre-renewal/db/when/enable_dummies/mob_db.yml.
@@ -19,6 +24,58 @@ Header:
 Body:
   - Id: 28412
     AegisName: SNPC_DUMMY
+    Name: Training Dummy
+    Level: 150
+    Hp: 99999999
+    Defense: 0
+    MagicDefense: 0
+    Str: 0
+    Agi: 0
+    Vit: 0
+    Int: 0
+    Dex: 0
+    Luk: 0
+    SkillRange: 0
+    ChaseRange: 0
+    Size: Medium
+    Race: Formless
+    Element: Neutral
+    ElementLevel: 1
+    WalkSpeed: 200
+    ClientAttackMotion: 0
+    Ai: 06
+    Class: Normal
+    Modes:
+      TeleportBlock: true
+      KnockBackImmune: true
+  - Id: 28413
+    AegisName: SNPC_DUMMY_BOSS
+    Name: Training Dummy
+    Level: 150
+    Hp: 99999999
+    Defense: 0
+    MagicDefense: 0
+    Str: 0
+    Agi: 0
+    Vit: 0
+    Int: 0
+    Dex: 0
+    Luk: 0
+    SkillRange: 0
+    ChaseRange: 0
+    Size: Medium
+    Race: Formless
+    Element: Neutral
+    ElementLevel: 1
+    WalkSpeed: 200
+    ClientAttackMotion: 0
+    Ai: 06
+    Class: Boss
+    Modes:
+      TeleportBlock: true
+      KnockBackImmune: true
+  - Id: 28414
+    AegisName: SNPC_DUMMY_MEDIUM
     Name: Medium Dummy
     Level: 150
     Hp: 99999999
@@ -44,8 +101,8 @@ Body:
     Modes:
       TeleportBlock: true
       KnockBackImmune: true
-  - Id: 28413
-    AegisName: SNPC_DUMMY_BOSS
+  - Id: 28415
+    AegisName: SNPC_DUMMY_MVP
     Name: MVP Dummy
     Level: 150
     Hp: 99999999

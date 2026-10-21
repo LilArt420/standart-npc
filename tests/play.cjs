@@ -164,7 +164,8 @@ const EXPECT = {
         job: 4252, level: 210,   // Dragon Knight
         bountyMenu: ['Target Hunt', 'Overlook Water Dungeon', 'Illusion Dungeons', 'Daily Area Purge', 'Cancel'],
         purgeMaps: ['sp_rudus4'],  // Lv 201-230: one map (#24)
-        dummy: { 28412: ['Size:Medium', 'Lv:150', 'DEF:0'], 28413: ['Size:Medium', 'Lv:150', 'DEF:0'] },
+        dummy: { 28412: ['Size:Medium', 'Lv:150', 'DEF:0'], 28413: ['Size:Medium', 'Lv:150', 'DEF:0'],
+            28414: ['Size:Medium', 'Lv:150', 'DEF:120'], 28415: ['Size:Large', 'Lv:150', 'DEF:120'] },
         blessing: true,            // Blacksmith Blessing in the Tool Dealer
         mvp90: true,               // Dummy Master's "MVP, 90% less damage": Renewal only
         welcome: true,             // Welcoming in Izlude: Renewal only
@@ -181,7 +182,8 @@ const EXPECT = {
         job: 4008, level: 99,    // Lord Knight
         bountyMenu: ['Target Hunt', 'Overlook Water Dungeon', 'Daily Area Purge', 'Cancel'],
         purgeMaps: ['ice_dun01', 'gl_church', 'yuno_fild08', 'ra_fild12', 'mosk_dun02', 'gef_fild06', 'gef_fild08'],
-        dummy: { 28412: ['Size:Medium', 'Lv:99', 'DEF:0'], 28413: ['Size:Medium', 'Lv:99', 'DEF:0'] },
+        dummy: { 28412: ['Size:Medium', 'Lv:99', 'DEF:0'], 28413: ['Size:Medium', 'Lv:99', 'DEF:0'],
+            28414: ['Size:Medium', 'Lv:99', 'DEF:0'], 28415: ['Size:Large', 'Lv:99', 'DEF:0'] },
         blessing: false,
         mvp90: false,
         welcome: false,
@@ -333,6 +335,10 @@ function runEra(era) {
             `Dummy Master: types ${e.mvp90 ? 'with' : 'without'} "MVP, 90% less damage"`, JSON.stringify(types));
         const dummyAfter = dummies();
         check(Array.isArray(dummyAfter) && dummyAfter.length === 1 && dummyAfter[0] === '156,225', 'Training Dummies: one dummy after Done', JSON.stringify(dummyAfter));
+        // The Medium and MVP dummies (dummy_pair, on in the test world).
+        gm('@warp prontera 155 160');
+        const pair = ev(`roAgent.entities({ type: 'MOB', radius: 10 }).filter(m => /^(Medium|MVP) Dummy$/.test(m.name) && m.gid > 0 && !m.dead).map(m => m.name + '@' + m.position.join(',')).sort()`);
+        check(Array.isArray(pair) && pair.join(' ') === 'MVP Dummy@158,163 Medium Dummy@153,163', 'Training Dummies: Medium Dummy at 153,163 and MVP Dummy at 158,163', JSON.stringify(pair));
         for (const [id, wanted] of Object.entries(e.dummy)) {
             gm(`@mobinfo ${id}`);
             const info = ev(`snpc.chat(8).join(' ')`);
@@ -359,7 +365,7 @@ function runEra(era) {
         check(items.includes('Gym Pass'), 'Tool Dealer: Gym Pass sold without cash-shop-extended', items.includes('Gym Pass') ? 'listed' : 'not listed');
     }
     if (want('nokzin')) {
-        gm('@warp prontera 164 160');
+        gm('@warp prontera 147 163');
         const nokzin = ev(`(async () => {
             await snpc.talk('Elemental Endower');
             const v = await snpc.go('What about converter scrolls?');
@@ -695,7 +701,7 @@ function runEra(era) {
             await snpc.close();
             return { said: [...new Set(said)].join(' / '), menu };
         })()`);
-        gm('@warp prontera 144 172');
+        gm('@warp prontera 187 192');
         const no = smug(['Not interested']);
         check(no && String(no.said).includes('Your loss'), 'Smuggler: the pitch can be refused', JSON.stringify(no).slice(-200));
         const offer = smug(['Mystic Box']);

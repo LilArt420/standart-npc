@@ -195,7 +195,14 @@
       "type": "boolean",
       "default": true,
       "label": "Training Dummies",
-      "description": "Two target dummies for testing damage output: a Medium Dummy and an MVP Dummy (Large, Boss, MVP; on Renewal it takes 90% less damage). Prontera (153,163) and (158,163)."
+      "description": "A training dummy for testing damage output. The Dummy Master sets its size, element, race, DEF, MDEF and type (Normal, Boss, MVP). Prontera: dummy (156,225), Dummy Master (150,225)."
+    },
+    {
+      "key": "dummy_pair",
+      "type": "boolean",
+      "default": false,
+      "label": "Medium and MVP dummies",
+      "description": "Two more fixed dummies by Lil Art: a Medium Dummy and an MVP Dummy (Large, Boss, MVP; on Renewal both have 120 DEF/MDEF and the MVP one takes 90% less damage). Needs Training Dummies on. Prontera (153,163) and (158,163)."
     }
   ]
 }

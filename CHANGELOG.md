@@ -265,11 +265,11 @@ If warps or Fly Wings get slower the longer you play, update Ragnarok Offline to
 ## 5.0.2
 
 ### Renewal and Pre-renewal
-- Training Dummies: two fixed dummies in place of the Dummy Master and his dummy north of the fountain: a Medium Dummy at Prontera (153,163) and an MVP Dummy at (158,163), Large, Boss class with MVP mode. A dummy that dies comes back after 2 seconds. By Lil Art.
+- Training Dummies: a new setting, "Medium and MVP dummies" (off by default), adds two fixed dummies next to the Dummy Master's: a Medium Dummy at Prontera (153,163) and an MVP Dummy at (158,163), Large, Boss class with MVP mode. A dummy that dies comes back after 2 seconds. By Lil Art.
 - The Elemental Endower moved to Prontera (147,166), next to the Bounty Hunter, and the Smuggler to (187,194). By Lil Art.
 
 ### Renewal only
-- Training Dummies: both have 120 DEF and 120 MDEF, and the MVP Dummy takes 10% of the damage (90% less, like the newer MVPs). By Lil Art.
+- Training Dummies: the Medium and MVP dummies both have 120 DEF and 120 MDEF, and the MVP Dummy takes 10% of the damage (90% less, like the newer MVPs). By Lil Art.
 
 ## 5.0.1
 
