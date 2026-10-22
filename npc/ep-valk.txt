@@ -86,6 +86,16 @@
 //= story unlocks. Starts the Purification Saint side story if you have
 //= not (the story gives it at the Ice Castle); the side stories
 //= themselves are left as they are.
+//= Episode 20: wsj_ep20 = 700, through the World Sync Extras mod (2.0.0+),
+//= which has Episode 20's story (F_WSJ_Skip20; the mod sets $@wsj_ep20_skip
+//= on every start). Needs base level 200. Opens Episode 20's dailies.
+//= Without that mod there is no Episode 20 story to skip, and the
+//= ticket is neither taken nor sold.
+//= Episode 21: its story (Lunaforma, Alberta of old) comes with the same
+//= mod, which sets $@wsj_ep21_skip and brings F_WSJ_Skip21 (the skip) and
+//= F_WSJ_Done21 (1 once the story is finished). Needs base level 230, as
+//= Voglinde. Without the mod the Eps 21 Clear Ticket is listed and kept:
+//= neither taken nor sold.
 //===== How to customize: ====================================
 //= OnInit: .price[<episode>] is the ticket price in Zeny,
 //= .ready the parts with a skip, .order the story order (0 starts a
@@ -104,6 +114,13 @@ prontera,128,193,4	script	Valkyrie#EpsClear	4_F_VALKYRIE,{
 			close;
 		.@ep = .@part / 10;
 		.@name$ = callsub(S_Name, .@part);
+		if (!callsub(S_Here, .@ep)) {
+			mes "[Valkyrie]";
+			mes "Episode " + .@ep + "'s story isn't on this server yet.";
+			if (countitem(.ticket[.@ep]))
+				mes "Keep your ticket until it is.";
+			close;
+		}
 		if (callsub(S_Done, .@part)) {
 			mes "[Valkyrie]";
 			mes "You have already finished Episode " + .@name$ + ". Keep your ticket.";
@@ -141,13 +158,19 @@ prontera,128,193,4	script	Valkyrie#EpsClear	4_F_VALKYRIE,{
 		mes "It is done. Episode " + .@name$ + " is behind you.";
 		close;
 	case 2:
+		// Only tickets for a story on this server are sold.
 		.@n = getarraysize(.sell);
-		for (.@i = 0; .@i < .@n; .@i++)
+		for (.@i = 0; .@i < .@n; .@i++) {
+			if (!callsub(S_Here, .sell[.@i]))
+				continue;
+			.@shown[.@k] = .sell[.@i];
+			.@k++;
 			.@menu$ += "Episode " + .sell[.@i] + " ticket (" + callfunc("F_InsertComma", .price[.sell[.@i]]) + " z):";
+		}
 		.@c = select(.@menu$ + "Cancel") - 1;
-		if (.@c >= .@n)
+		if (.@c >= .@k)
 			close;
-		.@ep = .sell[.@c];
+		.@ep = .@shown[.@c];
 		// Refused only when every part it can be used for is finished.
 		.@open = 0;
 		.@n = getarraysize(.ready);
@@ -183,8 +206,12 @@ prontera,128,193,4	script	Valkyrie#EpsClear	4_F_VALKYRIE,{
 	case 3:
 		mes "[Valkyrie]";
 		.@n = getarraysize(.ready);
-		for (.@i = 0; .@i < .@n; .@i++)
-			mes "Episode " + callsub(S_Name, .ready[.@i]) + ": ready.";
+		for (.@i = 0; .@i < .@n; .@i++) {
+			if (callsub(S_Here, .ready[.@i] / 10))
+				mes "Episode " + callsub(S_Name, .ready[.@i]) + ": ready.";
+			else
+				mes "Episode " + callsub(S_Name, .ready[.@i]) + ": coming. Keep your ticket until then.";
+		}
 		mes "One ticket skips one part, in story order. Other episodes will follow; if you hold a ticket for one of them, keep it until then.";
 		close;
 	}
@@ -216,6 +243,17 @@ S_Prev:
 			return .order[.@i - 1];
 	}
 	return 0;
+
+// Whether the episode's story is on this server: 20 and 21 come with
+// the World Sync Extras mod, which says so on every start.
+S_Here:
+	switch (getarg(0)) {
+	case 20:
+		return $@wsj_ep20_skip;
+	case 21:
+		return $@wsj_ep21_skip;
+	}
+	return 1;
 
 // What the game asks before the part begins, beyond the part before it:
 // "" when nothing is missing, else what to say.
@@ -263,6 +301,19 @@ S_Need:
 		// The Grey Wolf Villager in Wolfvill (quests_19.txt).
 		if (BaseLevel < 200)
 			return "Episode 19 needs base level 200.";
+		break;
+	case 200:
+		// Episode 20's story comes with the World Sync Extras mod.
+		if (!$@wsj_ep20_skip)
+			return "Episode 20's story isn't on this server yet. Keep your ticket.";
+		if (BaseLevel < 200)
+			return "Episode 20 needs base level 200.";
+		break;
+	case 210:
+		// Voglinde starts Episode 21 at level 230 (World Sync Extras),
+		// as the kRO update does.
+		if (BaseLevel < 230)
+			return "Episode 21 needs base level 230.";
 		break;
 	}
 	return "";
@@ -321,6 +372,14 @@ S_Done:
 		// Aurelie's last talk (quests_19.txt): 61 to 100, which opens the
 		// remaining dailies and side quests.
 		return (ep19_main >= 100);
+	case 200:
+		// Voglinde's debrief in the Ice Castle (World Sync Extras).
+		return (wsj_ep20 >= 700);
+	case 210:
+		// Episode 21's story (World Sync Extras) knows its own end.
+		if (!$@wsj_ep21_skip)
+			return 0;
+		return callfunc("F_WSJ_Done21");
 	}
 	return 0;
 
@@ -470,6 +529,13 @@ S_Skip:
 				delitem .@item[.@i], countitem(.@item[.@i]);
 		}
 		break;
+	case 200:
+		// The mod's own function: it knows its quests and steps.
+		callfunc "F_WSJ_Skip20";
+		break;
+	case 210:
+		callfunc "F_WSJ_Skip21";
+		break;
 	}
 	// Main quests still open are closed, as the story would have.
 	.@n = getarraysize(.@open);
@@ -496,12 +562,12 @@ OnInit:
 		end;
 	}
 	// Parts with a real skip, in menu order.
-	setarray .ready[0], 131, 132, 133, 141, 142, 143, 151, 152, 161, 162, 171, 172, 180, 190;
+	setarray .ready[0], 131, 132, 133, 141, 142, 143, 151, 152, 161, 162, 171, 172, 180, 190, 200, 210;
 	// Story order, as far as S_Done can tell a part is finished. 14.1, 14.2,
 	// 15.1 and 16.1 do not need the part before them in the game, so 0
 	// starts a new chain there.
-	setarray .order[0], 131, 132, 133, 0, 141, 0, 142, 143, 0, 151, 152, 0, 161, 162, 171, 172, 180, 190;
-	// Episode Clear Tickets (EpisodClear13 - EpisodClear19).
+	setarray .order[0], 131, 132, 133, 0, 141, 0, 142, 143, 0, 151, 152, 0, 161, 162, 171, 172, 180, 190, 200, 210;
+	// Episode Clear Tickets (EpisodClear13 - EpisodClear21).
 	.ticket[13] = 1000284;
 	.ticket[14] = 1000285;
 	.ticket[15] = 1000286;
@@ -509,6 +575,8 @@ OnInit:
 	.ticket[17] = 1000287;
 	.ticket[18] = 1000288;
 	.ticket[19] = 1000988;
+	.ticket[20] = 1001214;
+	.ticket[21] = 1001215;
 	// Ticket prices in Zeny.
 	.price[13] = 1000000;
 	.price[14] = 2000000;
@@ -517,6 +585,8 @@ OnInit:
 	.price[17] = 5000000;
 	.price[18] = 6000000;
 	.price[19] = 7000000;
+	.price[20] = 8000000;
+	.price[21] = 9000000;
 	// Episodes whose tickets are sold: those of the ready parts.
 	.@n = getarraysize(.ready);
 	for (.@i = 0; .@i < .@n; .@i++) {
